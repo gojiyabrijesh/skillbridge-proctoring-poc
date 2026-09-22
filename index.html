@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillBridge - Edge Proctoring PoC</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #111; color: #fff; text-align: center; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        video { border: 3px solid #333; border-radius: 10px; width: 100%; max-width: 600px; background: #000; }
+        .status-board { display: flex; justify-content: space-around; margin: 20px 0; padding: 15px; background: #222; border-radius: 8px; }
+        .status { padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+        .safe { background: #1b5e20; color: #a5d6a7; }
+        .danger { background: #b71c1c; color: #ffcdd2; }
+        #logs { text-align: left; background: #000; padding: 15px; border-radius: 8px; height: 150px; overflow-y: scroll; font-family: monospace; color: #00e676; }
+        button { background: #2962ff; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛡️ SkillBridge Edge Proctoring PoC</h2>
+        <p>Proving client-side tab locking and audio detection without server bandwidth.</p>
+        
+        <button id="startBtn">Start Secure Assessment</button>
+        
+        <div class="status-board" style="display: none;" id="statusBoard">
+            <div id="tabStatus" class="status safe">Tab: ACTIVE</div>
+            <div id="audioStatus" class="status safe">Audio: QUIET</div>
+        </div>
+
+        <video id="webcam" autoplay muted playsinline></video>
+        
+        <h3 style="text-align: left; margin-top: 30px;">Violation Logs:</h3>
+        <div id="logs">> System initialized. Waiting for assessment to start...<br></div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const statusBoard = document.getElementById('statusBoard');
+        const tabStatus = document.getElementById('tabStatus');
+        const audioStatus = document.getElementById('audioStatus');
+        const logs = document.getElementById('logs');
+        const video = document.getElementById('webcam');
+
+        function logEvent(message, isViolation = false) {
+            const time = new Date().toLocaleTimeString();
+            const color = isViolation ? '#ff5252' : '#00e676';
+            logs.innerHTML = `<span style="color:${color}">[${time}] ${message}</span><br>` + logs.innerHTML;
+        }
+
+        startBtn.addEventListener('click', async () => {
+            startBtn.style.display = 'none';
+            statusBoard.style.display = 'flex';
+            logEvent('Requesting camera and microphone access...');
+
+            try {
+                // 1. Initialize Webcam & Mic
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                video.srcObject = stream;
+                logEvent('Edge sensors active. Assessment started.');
+
+                // 2. Tab Switching Detection (Visibility API)
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        tabStatus.className = 'status danger';
+                        tabStatus.innerText = 'Tab: SWITCHED (VIOLATION)';
+                        logEvent('VIOLATION: Candidate switched tabs or minimized window!', true);
+                    } else {
+                        tabStatus.className = 'status safe';
+                        tabStatus.innerText = 'Tab: ACTIVE';
+                        logEvent('Candidate returned to assessment tab.');
+                    }
+                });
+
+                // 3. Background Audio Detection (Web Audio API)
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                setInterval(() => {
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = dataArray.reduce((a, b) => a + b, 0);
+                    let average = sum / dataArray.length;
+
+                    // If volume spikes above threshold (someone talking)
+                    if (average > 40) { 
+                        audioStatus.className = 'status danger';
+                        audioStatus.innerText = 'Audio: TALKING DETECTED';
+                        logEvent(`VIOLATION: Unauthorized audio level detected (Volume: ${Math.round(average)})`, true);
+                    } else {
+                        audioStatus.className = 'status safe';
+                        audioStatus.innerText = 'Audio: QUIET';
+                    }
+                }, 1000); // Check every second
+
+            } catch (err) {
+                logEvent(`Error: ${err.message}. Please allow camera/mic permissions.`, true);
+            }
+        });
+    </script>
+</body>
+</html>
