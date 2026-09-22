@@ -15,33 +15,65 @@
         #logs { text-align: left; background: #000; padding: 15px; border-radius: 8px; height: 150px; overflow-y: scroll; font-family: monospace; color: #00e676; }
         button { background: #2962ff; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         button:hover { background: #1565c0; }
+        .alert-banner { display: none; background: #b71c1c; color: white; padding: 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; animation: pulse 1s infinite; }
+        
+        /* Instructions Card Style */
+        .instructions-card { background: #1e1e1e; border: 2px solid #333; border-radius: 10px; padding: 25px; margin-bottom: 25px; text-align: left; }
+        .instructions-card h3 { color: #ff5252; margin-top: 0; }
+        .instructions-card ul { padding-left: 20px; line-height: 1.6; color: #ccc; }
+        .instructions-card li strong { color: #fff; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>🛡️ SkillBridge Edge Proctoring PoC</h2>
-        <p>Proving client-side tab locking and audio detection without server bandwidth.</p>
+        <p>Client-side decentralized assessment security layer.</p>
         
-        <button id="startBtn">Start Secure Assessment</button>
-        
-        <div class="status-board" style="display: none;" id="statusBoard">
-            <div id="tabStatus" class="status safe">Tab: ACTIVE</div>
-            <div id="audioStatus" class="status safe">Audio: QUIET</div>
+        <!-- INSTRUCTIONS / WARNINGS SCREEN (Shown before starting) -->
+        <div id="instructionsView" class="instructions-card">
+            <h3>⚠️ Assessment Guidelines & Proctoring Rules</h3>
+            <p>Before you begin the secure session, please note the active edge-monitoring rules enforced by SkillBridge:</p>
+            <ul>
+                <li><strong>Do Not Switch Tabs:</strong> Minimizing the window, opening a new tab, or switching focus will instantly trigger a violation log and warning popup.</li>
+                <li><strong>Maintain Quiet Environment:</strong> Background speech, talking, or loud noises will be detected automatically by the local Web Audio frequency analyzer.</li>
+                <li><strong>Camera & Mic Required:</strong> Your hardware sensors must remain active throughout the duration of the evaluation.</li>
+                <li><strong>Zero Server Latency:</strong> All security checks are computed locally on your browser to protect your privacy under the DPDP Act framework.</li>
+            </ul>
+            <div style="text-align: center; margin-top: 25px;">
+                <button id="startBtn">I Understand — Start Secure Assessment</button>
+            </div>
         </div>
 
-        <video id="webcam" autoplay muted playsinline></video>
-        
-        <h3 style="text-align: left; margin-top: 30px;">Violation Logs:</h3>
-        <div id="logs">> System initialized. Waiting for assessment to start...<br></div>
+        <!-- ASSESSMENT VIEW (Hidden initially) -->
+        <div id="assessmentView" style="display: none;">
+            <div id="alertBanner" class="alert-banner">⚠️ WARNING: ASSESSMENT VIOLATION DETECTED!</div>
+
+            <div class="status-board" id="statusBoard">
+                <div id="tabStatus" class="status safe">Tab: ACTIVE</div>
+                <div id="audioStatus" class="status safe">Audio: QUIET</div>
+            </div>
+
+            <video id="webcam" autoplay muted playsinline></video>
+            
+            <h3 style="text-align: left; margin-top: 30px;">Violation Logs:</h3>
+            <div id="logs">> System initialized. Waiting for assessment to start...<br></div>
+        </div>
     </div>
 
     <script>
         const startBtn = document.getElementById('startBtn');
-        const statusBoard = document.getElementById('statusBoard');
+        const instructionsView = document.getElementById('instructionsView');
+        const assessmentView = document.getElementById('assessmentView');
         const tabStatus = document.getElementById('tabStatus');
         const audioStatus = document.getElementById('audioStatus');
         const logs = document.getElementById('logs');
         const video = document.getElementById('webcam');
+        const alertBanner = document.getElementById('alertBanner');
+
+        let violationCount = 0;
+        let lastAudioAlertTime = 0;
 
         function logEvent(message, isViolation = false) {
             const time = new Date().toLocaleTimeString();
@@ -50,8 +82,9 @@
         }
 
         startBtn.addEventListener('click', async () => {
-            startBtn.style.display = 'none';
-            statusBoard.style.display = 'flex';
+            // Hide instructions and show assessment UI
+            instructionsView.style.display = 'none';
+            assessmentView.style.display = 'block';
             logEvent('Requesting camera and microphone access...');
 
             try {
@@ -63,12 +96,17 @@
                 // 2. Tab Switching Detection (Visibility API)
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
+                        violationCount++;
                         tabStatus.className = 'status danger';
                         tabStatus.innerText = 'Tab: SWITCHED (VIOLATION)';
-                        logEvent('VIOLATION: Candidate switched tabs or minimized window!', true);
+                        alertBanner.style.display = 'block';
+                        logEvent(`VIOLATION #${violationCount}: Candidate switched tabs or minimized window!`, true);
+                        
+                        alert(`⚠️ SkillBridge Proctoring Alert:\n\nTab switch detected! This incident has been logged. Total Violations: ${violationCount}`);
                     } else {
                         tabStatus.className = 'status safe';
                         tabStatus.innerText = 'Tab: ACTIVE';
+                        alertBanner.style.display = 'none';
                         logEvent('Candidate returned to assessment tab.');
                     }
                 });
@@ -86,16 +124,23 @@
                     let sum = dataArray.reduce((a, b) => a + b, 0);
                     let average = sum / dataArray.length;
 
-                    // If volume spikes above threshold (someone talking)
-                    if (average > 40) { 
+                    if (average > 45) {  
                         audioStatus.className = 'status danger';
                         audioStatus.innerText = 'Audio: TALKING DETECTED';
-                        logEvent(`VIOLATION: Unauthorized audio level detected (Volume: ${Math.round(average)})`, true);
+                        
+                        let currentTime = Date.now();
+                        if (currentTime - lastAudioAlertTime > 5000) {
+                            violationCount++;
+                            lastAudioAlertTime = currentTime;
+                            logEvent(`VIOLATION #${violationCount}: Unauthorized talking/noise detected!`, true);
+                            
+                            alert(`⚠️ SkillBridge Proctoring Alert:\n\nUnauthorized speech/noise detected! Total Violations: ${violationCount}`);
+                        }
                     } else {
                         audioStatus.className = 'status safe';
                         audioStatus.innerText = 'Audio: QUIET';
                     }
-                }, 1000); // Check every second
+                }, 1000);
 
             } catch (err) {
                 logEvent(`Error: ${err.message}. Please allow camera/mic permissions.`, true);
