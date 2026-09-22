@@ -166,7 +166,7 @@
             <li><strong>Face monitoring:</strong> The PoC detects face presence and multiple people locally in the browser.</li>
             <li><strong>Tab monitoring:</strong> Leaving the assessment page creates a monitoring event.</li>
             <li><strong>Fullscreen:</strong> Unexpectedly leaving fullscreen creates a monitoring event when fullscreen is active.</li>
-            <li><strong>Audio:</strong> Sustained elevated audio activity is monitored locally. Short sounds and isolated volume spikes are ignored; this PoC does not identify who is speaking.</li>
+            <li><strong>Audio:</strong> Elevated microphone energy is recorded as a noise event; this PoC does not claim speech recognition.</li>
             <li><strong>Privacy:</strong> Camera/audio streams are not uploaded by this HTML implementation.</li>
         </ul>
         <div class="prep-actions">
@@ -206,7 +206,6 @@
                 <div class="side-card">
                     <div class="metric-label">Audio Environment</div>
                     <div id="audioStatus" class="status-value safe" style="margin-top:8px">● CALIBRATING</div>
-                    <div style="margin-top:8px;color:#8b98a7;font-size:11px;line-height:1.4">Adaptive detection: sustained audio is required before an event is recorded.</div>
                 </div>
                 <div class="side-card privacy">
                     <h3>🔒 Edge Processing</h3>
@@ -345,9 +344,7 @@
     let noFaceSince = null;
     let audioSamples = [];
     let audioBaseline = 0;
-    let audioThreshold = { rms: 0.055, speech: 18 };
-    let audioHighSince = null;
-    let audioHighWindows = 0;
+    let audioThreshold = 20;
     let toastTimer = null;
 
     /* -----------------------------
@@ -462,153 +459,47 @@
 
         audioContext = new AudioContext();
         analyser = audioContext.createAnalyser();
-
-        // More stable than averaging raw FFT bins.
-        analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.75;
-
+        analyser.fftSize = 256;
         const source = audioContext.createMediaStreamSource(stream);
         source.connect(analyser);
-
-        const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-        const timeData = new Uint8Array(analyser.fftSize);
-
+        const data = new Uint8Array(analyser.frequencyBinCount);
         const calibrationStarted = Date.now();
         audioSamples = [];
-        audioBaseline = 0;
-        audioThreshold = { rms: 0.055, speech: 18 };
-        audioHighSince = null;
-        audioHighWindows = 0;
 
         audioStatus.textContent = "● CALIBRATING";
         audioStatus.className = "status-value warning";
 
         audioTimer = setInterval(() => {
-            analyser.getByteTimeDomainData(timeData);
-            analyser.getByteFrequencyData(frequencyData);
+            analyser.getByteFrequencyData(data);
+            const average = data.reduce((sum, value) => sum + value, 0) / data.length;
 
-            // RMS = actual signal energy. This avoids treating one FFT spike
-            // as a violation.
-            let sumSquares = 0;
-            for (let i = 0; i < timeData.length; i++) {
-                const normalized = (timeData[i] - 128) / 128;
-                sumSquares += normalized * normalized;
-            }
-            const rms = Math.sqrt(sumSquares / timeData.length);
-
-            // Approximate speech-frequency activity: 300–3400 Hz.
-            const nyquist = audioContext.sampleRate / 2;
-            const lowBin = Math.max(
-                0,
-                Math.floor((300 / nyquist) * frequencyData.length)
-            );
-            const highBin = Math.min(
-                frequencyData.length - 1,
-                Math.ceil((3400 / nyquist) * frequencyData.length)
-            );
-
-            let bandSum = 0;
-            let bandCount = 0;
-
-            for (let i = lowBin; i <= highBin; i++) {
-                bandSum += frequencyData[i];
-                bandCount++;
-            }
-
-            const speechBandAverage = bandCount
-                ? bandSum / bandCount
-                : 0;
-
-            // 4-second calibration: learn the microphone/room baseline.
-            if (Date.now() - calibrationStarted < 4000) {
-                audioSamples.push({
-                    rms,
-                    speechBandAverage
-                });
+            if (Date.now() - calibrationStarted < 3000) {
+                audioSamples.push(average);
                 return;
             }
 
             if (audioBaseline === 0 && audioSamples.length) {
-                const baselineRms =
-                    audioSamples.reduce((sum, s) => sum + s.rms, 0) /
-                    audioSamples.length;
-
-                const baselineSpeech =
-                    audioSamples.reduce(
-                        (sum, s) => sum + s.speechBandAverage,
-                        0
-                    ) / audioSamples.length;
-
-                audioBaseline = baselineRms;
-
-                audioThreshold = {
-                    // Relative threshold + minimum threshold.
-                    rms: Math.max(0.055, baselineRms * 2.2),
-                    speech: Math.max(18, baselineSpeech * 1.8)
-                };
-
-                logEvent(
-                    `Audio calibrated: RMS ${baselineRms.toFixed(3)}, ` +
-                    `RMS threshold ${audioThreshold.rms.toFixed(3)}, ` +
-                    `speech-band threshold ${audioThreshold.speech.toFixed(1)}.`
-                );
+                audioBaseline = audioSamples.reduce((a,b) => a+b, 0) / audioSamples.length;
+                audioThreshold = Math.max(45, audioBaseline + 18);
+                logEvent(`Audio baseline calibrated (${audioBaseline.toFixed(1)}; threshold ${audioThreshold.toFixed(1)}).`);
             }
 
             if (!assessmentRunning) return;
 
-            // BOTH conditions must be true.
-            // This filters many keyboard clicks, bumps and short noises.
-            const elevated =
-                rms > audioThreshold.rms &&
-                speechBandAverage > audioThreshold.speech;
-
-            if (elevated) {
-                audioHighWindows++;
-
-                if (!audioHighSince) {
-                    audioHighSince = Date.now();
-                }
-
-                const sustainedFor = Date.now() - audioHighSince;
-
-                audioStatus.textContent =
-                    sustainedFor >= 1500
-                        ? "● SUSTAINED AUDIO"
-                        : "● AUDIO ACTIVITY";
-
-                audioStatus.className =
-                    sustainedFor >= 1500
-                        ? "status-value danger-text"
-                        : "status-value warning";
-
-                // A single loud word / short sound does NOT become a violation.
-                // Require at least 1.5 seconds + 3 consecutive windows.
+            if (average > audioThreshold) {
+                audioStatus.textContent = "● ELEVATED NOISE";
+                audioStatus.className = "status-value danger-text";
                 const now = Date.now();
-
-                if (
-                    sustainedFor >= 1500 &&
-                    audioHighWindows >= 3 &&
-                    now - lastAudioViolation >= 8000
-                ) {
+                if (now - lastAudioViolation > 5000) {
                     lastAudioViolation = now;
-
-                    registerViolation(
-                        "Sustained elevated audio activity detected. " +
-                        "This is an audio/noise signal, not speech identification."
-                    );
-
-                    audioHighWindows = 0;
+                    registerViolation("Elevated background audio/noise detected.");
                 }
             } else {
-                audioHighWindows = 0;
-                audioHighSince = null;
-
-                audioStatus.textContent = "● NORMAL";
+                audioStatus.textContent = "● QUIET";
                 audioStatus.className = "status-value safe";
             }
-        }, 300);
+        }, 500);
     }
-
 
     /* -----------------------------
        BlazeFace
