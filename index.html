@@ -3,149 +3,1609 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>SkillBridge - Edge Proctoring PoC</title>
+
     <style>
-        body { font-family: -apple-system, sans-serif; background: #111; color: #fff; text-align: center; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        video { border: 3px solid #333; border-radius: 10px; width: 100%; max-width: 600px; background: #000; }
-        .status-board { display: flex; justify-content: space-around; margin: 20px 0; padding: 15px; background: #222; border-radius: 8px; }
-        .status { padding: 10px 20px; border-radius: 5px; font-weight: bold; }
-        .safe { background: #1b5e20; color: #a5d6a7; }
-        .danger { background: #b71c1c; color: #ffcdd2; }
-        #logs { text-align: left; background: #000; padding: 15px; border-radius: 8px; height: 150px; overflow-y: scroll; font-family: monospace; color: #00e676; }
-        button { background: #2962ff; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #1565c0; }
-        .alert-banner { display: none; background: #b71c1c; color: white; padding: 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; animation: pulse 1s infinite; }
-        
-        /* Instructions Card Style */
-        .instructions-card { background: #1e1e1e; border: 2px solid #333; border-radius: 10px; padding: 25px; margin-bottom: 25px; text-align: left; }
-        .instructions-card h3 { color: #ff5252; margin-top: 0; }
-        .instructions-card ul { padding-left: 20px; line-height: 1.6; color: #ccc; }
-        .instructions-card li strong { color: #fff; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>🛡️ SkillBridge Edge Proctoring PoC</h2>
-        <p>Client-side decentralized assessment security layer.</p>
-        
-        <!-- INSTRUCTIONS / WARNINGS SCREEN (Shown before starting) -->
-        <div id="instructionsView" class="instructions-card">
-            <h3>⚠️ Assessment Guidelines & Proctoring Rules</h3>
-            <p>Before you begin the secure session, please note the active edge-monitoring rules enforced by SkillBridge:</p>
-            <ul>
-                <li><strong>Do Not Switch Tabs:</strong> Minimizing the window, opening a new tab, or switching focus will instantly trigger a violation log and warning popup.</li>
-                <li><strong>Maintain Quiet Environment:</strong> Background speech, talking, or loud noises will be detected automatically by the local Web Audio frequency analyzer.</li>
-                <li><strong>Camera & Mic Required:</strong> Your hardware sensors must remain active throughout the duration of the evaluation.</li>
-                <li><strong>Zero Server Latency:</strong> All security checks are computed locally on your browser to protect your privacy under the DPDP Act framework.</li>
-            </ul>
-            <div style="text-align: center; margin-top: 25px;">
-                <button id="startBtn">I Understand — Start Secure Assessment</button>
-            </div>
-        </div>
-
-        <!-- ASSESSMENT VIEW (Hidden initially) -->
-        <div id="assessmentView" style="display: none;">
-            <div id="alertBanner" class="alert-banner">⚠️ WARNING: ASSESSMENT VIOLATION DETECTED!</div>
-
-            <div class="status-board" id="statusBoard">
-                <div id="tabStatus" class="status safe">Tab: ACTIVE</div>
-                <div id="audioStatus" class="status safe">Audio: QUIET</div>
-            </div>
-
-            <video id="webcam" autoplay muted playsinline></video>
-            
-            <h3 style="text-align: left; margin-top: 30px;">Violation Logs:</h3>
-            <div id="logs">> System initialized. Waiting for assessment to start...<br></div>
-        </div>
-    </div>
-
-    <script>
-        const startBtn = document.getElementById('startBtn');
-        const instructionsView = document.getElementById('instructionsView');
-        const assessmentView = document.getElementById('assessmentView');
-        const tabStatus = document.getElementById('tabStatus');
-        const audioStatus = document.getElementById('audioStatus');
-        const logs = document.getElementById('logs');
-        const video = document.getElementById('webcam');
-        const alertBanner = document.getElementById('alertBanner');
-
-        let violationCount = 0;
-        let lastAudioAlertTime = 0;
-
-        function logEvent(message, isViolation = false) {
-            const time = new Date().toLocaleTimeString();
-            const color = isViolation ? '#ff5252' : '#00e676';
-            logs.innerHTML = `<span style="color:${color}">[${time}] ${message}</span><br>` + logs.innerHTML;
+        * {
+            box-sizing: border-box;
         }
 
-        startBtn.addEventListener('click', async () => {
-            // Hide instructions and show assessment UI
-            instructionsView.style.display = 'none';
-            assessmentView.style.display = 'block';
-            logEvent('Requesting camera and microphone access...');
+        body {
+            margin: 0;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #0b0f14;
+            color: #ffffff;
+        }
 
-            try {
-                // 1. Initialize Webcam & Mic
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                video.srcObject = stream;
-                logEvent('Edge sensors active. Assessment started.');
+        .container {
+            width: min(1100px, 94%);
+            margin: 30px auto;
+        }
 
-                // 2. Tab Switching Detection (Visibility API)
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        violationCount++;
-                        tabStatus.className = 'status danger';
-                        tabStatus.innerText = 'Tab: SWITCHED (VIOLATION)';
-                        alertBanner.style.display = 'block';
-                        logEvent(`VIOLATION #${violationCount}: Candidate switched tabs or minimized window!`, true);
-                        
-                        alert(`⚠️ SkillBridge Proctoring Alert:\n\nTab switch detected! This incident has been logged. Total Violations: ${violationCount}`);
-                    } else {
-                        tabStatus.className = 'status safe';
-                        tabStatus.innerText = 'Tab: ACTIVE';
-                        alertBanner.style.display = 'none';
-                        logEvent('Candidate returned to assessment tab.');
-                    }
+        /* HEADER */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .shield {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #2962ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .brand p {
+            margin: 3px 0 0;
+            color: #8b98a7;
+            font-size: 13px;
+        }
+
+        .poc-badge {
+            background: #1c2530;
+            border: 1px solid #33404d;
+            color: #90caf9;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* INSTRUCTIONS */
+
+        .card {
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .instructions-card {
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .instructions-card h2 {
+            margin-top: 0;
+        }
+
+        .instructions-card h3 {
+            color: #ffb74d;
+        }
+
+        .instructions-card ul {
+            color: #b7c1cc;
+            line-height: 1.8;
+        }
+
+        .instructions-card li {
+            margin-bottom: 8px;
+        }
+
+        .instructions-card strong {
+            color: #fff;
+        }
+
+        .start-area {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 13px 24px;
+            background: #2962ff;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1e4fd6;
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: #26313d;
+        }
+
+        button.danger-btn {
+            background: #b71c1c;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ASSESSMENT */
+
+        #assessmentView {
+            display: none;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 15px;
+        }
+
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #69f0ae;
+            font-weight: bold;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #00e676;
+            box-shadow: 0 0 10px #00e676;
+        }
+
+        .timer {
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* STATUS GRID */
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .status-card {
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 12px;
+            padding: 17px;
+        }
+
+        .status-title {
+            color: #7e8b99;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .status-value {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .status-value.safe {
+            color: #69f0ae;
+        }
+
+        .status-value.warning {
+            color: #ffca28;
+        }
+
+        .status-value.danger {
+            color: #ff5252;
+        }
+
+        /* MAIN GRID */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 18px;
+        }
+
+        .video-card {
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        video {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            background: #000;
+            border-radius: 10px;
+            border: 2px solid #27313c;
+        }
+
+        .camera-label {
+            margin-top: 12px;
+            color: #7e8b99;
+            font-size: 12px;
+        }
+
+        /* SIDE PANEL */
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .metric-card {
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .metric-label {
+            color: #7e8b99;
+            font-size: 13px;
+        }
+
+        .metric-number {
+            font-size: 38px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .privacy-card {
+            background: #0e2119;
+            border: 1px solid #1d563c;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .privacy-card h3 {
+            margin: 0 0 8px;
+            color: #69f0ae;
+        }
+
+        .privacy-card p {
+            margin: 0;
+            color: #a8c4b3;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        /* LOGS */
+
+        .logs-card {
+            margin-top: 18px;
+            background: #121820;
+            border: 1px solid #27313c;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .logs-header h3 {
+            margin: 0;
+        }
+
+        #logs {
+            height: 190px;
+            overflow-y: auto;
+            background: #080b0f;
+            border-radius: 9px;
+            padding: 14px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .log-normal {
+            color: #69f0ae;
+        }
+
+        .log-warning {
+            color: #ffca28;
+        }
+
+        .log-violation {
+            color: #ff5252;
+        }
+
+        /* WARNING */
+
+        .warning-banner {
+            display: none;
+            background: #4a1717;
+            border: 1px solid #ff5252;
+            color: #ffbaba;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* TOAST */
+
+        #toast {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            width: 330px;
+            background: #181e26;
+            border: 1px solid #ff5252;
+            border-left: 5px solid #ff5252;
+            padding: 17px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+            display: none;
+            z-index: 1000;
+        }
+
+        #toastTitle {
+            font-weight: bold;
+            color: #ff5252;
+            margin-bottom: 5px;
+        }
+
+        #toastMessage {
+            color: #d7dde4;
+            font-size: 13px;
+        }
+
+        /* SUMMARY */
+
+        .summary {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-item {
+            background: #0d1319;
+            border: 1px solid #27313c;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .summary-item span {
+            display: block;
+            color: #7e8b99;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .summary-item strong {
+            font-size: 25px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 800px) {
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .session-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        @media(max-width: 500px) {
+
+            .header {
+                align-items: flex-start;
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="brand">
+
+            <div class="shield">
+                🛡️
+            </div>
+
+            <div>
+                <h1>SkillBridge</h1>
+                <p>Edge Assessment Monitoring</p>
+            </div>
+
+        </div>
+
+        <div class="poc-badge">
+            PROOF OF CONCEPT
+        </div>
+
+    </div>
+
+
+    <!-- INSTRUCTIONS -->
+
+    <div id="instructionsView" class="card instructions-card">
+
+        <h2>Secure Assessment</h2>
+
+        <h3>⚠ Assessment Guidelines</h3>
+
+        <p>
+            Before starting the assessment, please review the monitoring rules.
+        </p>
+
+        <ul>
+
+            <li>
+                <strong>Tab Monitoring:</strong>
+                Switching tabs or leaving the assessment window creates a violation event.
+            </li>
+
+            <li>
+                <strong>Audio Monitoring:</strong>
+                Local microphone analysis detects elevated background audio/noise.
+            </li>
+
+            <li>
+                <strong>Camera:</strong>
+                Your camera remains active during the assessment session.
+            </li>
+
+            <li>
+                <strong>Fullscreen:</strong>
+                Exiting fullscreen is recorded as a monitoring event.
+            </li>
+
+            <li>
+                <strong>Local Processing:</strong>
+                This PoC performs monitoring checks inside the browser.
+            </li>
+
+        </ul>
+
+        <div class="start-area">
+
+            <button id="startBtn">
+                Start Secure Assessment
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ASSESSMENT -->
+
+    <div id="assessmentView">
+
+        <!-- SESSION HEADER -->
+
+        <div class="session-header">
+
+            <div class="session-status">
+                <span class="live-dot"></span>
+                ASSESSMENT IN PROGRESS
+            </div>
+
+            <div class="timer" id="timer">
+                00:00
+            </div>
+
+        </div>
+
+
+        <!-- WARNING -->
+
+        <div id="warningBanner" class="warning-banner">
+
+            ⚠ Monitoring event detected. Please remain focused on the assessment.
+
+        </div>
+
+
+        <!-- STATUS GRID -->
+
+        <div class="status-grid">
+
+            <div class="status-card">
+
+                <div class="status-title">
+                    Camera
+                </div>
+
+                <div id="cameraStatus" class="status-value warning">
+                    ● INITIALIZING
+                </div>
+
+            </div>
+
+
+            <div class="status-card">
+
+                <div class="status-title">
+                    Microphone
+                </div>
+
+                <div id="micStatus" class="status-value warning">
+                    ● INITIALIZING
+                </div>
+
+            </div>
+
+
+            <div class="status-card">
+
+                <div class="status-title">
+                    Tab
+                </div>
+
+                <div id="tabStatus" class="status-value safe">
+                    ● ACTIVE
+                </div>
+
+            </div>
+
+
+            <div class="status-card">
+
+                <div class="status-title">
+                    Fullscreen
+                </div>
+
+                <div id="fullscreenStatus" class="status-value warning">
+                    ● CHECKING
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MAIN -->
+
+        <div class="main-grid">
+
+            <!-- CAMERA -->
+
+            <div class="video-card">
+
+                <video
+                    id="webcam"
+                    autoplay
+                    muted
+                    playsinline>
+                </video>
+
+                <div class="camera-label">
+                    Camera feed is processed locally for this PoC.
+                </div>
+
+            </div>
+
+
+            <!-- SIDE PANEL -->
+
+            <div class="side-panel">
+
+                <div class="metric-card">
+
+                    <div class="metric-label">
+                        Total Violations
+                    </div>
+
+                    <div
+                        id="violationCount"
+                        class="metric-number">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <div class="metric-label">
+                        Audio Environment
+                    </div>
+
+                    <div
+                        id="audioStatus"
+                        class="status-value safe"
+                        style="margin-top:10px;">
+                        ● QUIET
+                    </div>
+
+                </div>
+
+
+                <div class="privacy-card">
+
+                    <h3>🔒 Edge Processing</h3>
+
+                    <p>
+                        Camera and microphone monitoring checks are performed
+                        locally in this browser PoC. Raw sensor streams are not
+                        uploaded to a backend by this implementation.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOGS -->
+
+        <div class="logs-card">
+
+            <div class="logs-header">
+
+                <h3>Monitoring Events</h3>
+
+                <button
+                    id="clearLogsBtn"
+                    class="secondary">
+                    Clear
+                </button>
+
+            </div>
+
+            <div id="logs"></div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div
+            style="
+            display:flex;
+            justify-content:center;
+            gap:12px;
+            margin-top:20px;
+            flex-wrap:wrap;
+            ">
+
+            <button
+                id="fullscreenBtn">
+                Enter Fullscreen
+            </button>
+
+            <button
+                id="submitBtn"
+                class="danger-btn">
+                Submit Assessment
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div id="summary" class="card summary">
+
+            <h2>Assessment Completed</h2>
+
+            <p>
+                Monitoring session summary
+            </p>
+
+            <div class="summary-grid">
+
+                <div class="summary-item">
+
+                    <span>
+                        Session Duration
+                    </span>
+
+                    <strong id="summaryDuration">
+                        00:00
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Violations
+                    </span>
+
+                    <strong id="summaryViolations">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Tab Switches
+                    </span>
+
+                    <strong id="summaryTabSwitches">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <p
+                style="
+                color:#8b98a7;
+                font-size:13px;
+                ">
+                This is a demonstration PoC. Monitoring events shown here
+                are generated locally by the browser.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div id="toast">
+
+    <div id="toastTitle">
+        ⚠ Violation Detected
+    </div>
+
+    <div id="toastMessage">
+        Monitoring event detected.
+    </div>
+
+</div>
+
+
+<script>
+
+    /* ==========================================
+       DOM ELEMENTS
+    ========================================== */
+
+    const startBtn =
+        document.getElementById("startBtn");
+
+    const instructionsView =
+        document.getElementById("instructionsView");
+
+    const assessmentView =
+        document.getElementById("assessmentView");
+
+    const video =
+        document.getElementById("webcam");
+
+    const cameraStatus =
+        document.getElementById("cameraStatus");
+
+    const micStatus =
+        document.getElementById("micStatus");
+
+    const tabStatus =
+        document.getElementById("tabStatus");
+
+    const fullscreenStatus =
+        document.getElementById("fullscreenStatus");
+
+    const audioStatus =
+        document.getElementById("audioStatus");
+
+    const violationCountElement =
+        document.getElementById("violationCount");
+
+    const logs =
+        document.getElementById("logs");
+
+    const timerElement =
+        document.getElementById("timer");
+
+    const warningBanner =
+        document.getElementById("warningBanner");
+
+    const toast =
+        document.getElementById("toast");
+
+    const toastMessage =
+        document.getElementById("toastMessage");
+
+    const fullscreenBtn =
+        document.getElementById("fullscreenBtn");
+
+    const submitBtn =
+        document.getElementById("submitBtn");
+
+    const summary =
+        document.getElementById("summary");
+
+    const clearLogsBtn =
+        document.getElementById("clearLogsBtn");
+
+
+    /* ==========================================
+       STATE
+    ========================================== */
+
+    let stream = null;
+
+    let audioContext = null;
+
+    let analyser = null;
+
+    let audioInterval = null;
+
+    let timerInterval = null;
+
+    let startTime = null;
+
+    let violationCount = 0;
+
+    let tabSwitchCount = 0;
+
+    let lastAudioViolation = 0;
+
+    let assessmentRunning = false;
+
+
+    /* ==========================================
+       LOG SYSTEM
+    ========================================== */
+
+    function logEvent(message, type = "normal") {
+
+        const time =
+            new Date().toLocaleTimeString();
+
+        const entry =
+            document.createElement("div");
+
+        entry.className =
+            `log-entry log-${type}`;
+
+        let icon = "✓";
+
+        if (type === "warning") {
+            icon = "⚠";
+        }
+
+        if (type === "violation") {
+            icon = "🔴";
+        }
+
+        entry.innerHTML =
+            `[${time}] ${icon} ${message}`;
+
+        logs.prepend(entry);
+
+    }
+
+
+    /* ==========================================
+       VIOLATION SYSTEM
+    ========================================== */
+
+    function registerViolation(message) {
+
+        if (!assessmentRunning) {
+            return;
+        }
+
+        violationCount++;
+
+        violationCountElement.textContent =
+            violationCount;
+
+        logEvent(
+            `VIOLATION #${violationCount}: ${message}`,
+            "violation"
+        );
+
+        showWarning(message);
+
+    }
+
+
+    function showWarning(message) {
+
+        warningBanner.style.display =
+            "block";
+
+        toastMessage.textContent =
+            message;
+
+        toast.style.display =
+            "block";
+
+        setTimeout(() => {
+
+            toast.style.display =
+                "none";
+
+        }, 4000);
+
+    }
+
+
+    /* ==========================================
+       TIMER
+    ========================================== */
+
+    function updateTimer() {
+
+        if (!startTime) {
+            return;
+        }
+
+        const elapsed =
+            Math.floor(
+                (Date.now() - startTime) / 1000
+            );
+
+        timerElement.textContent =
+            formatTime(elapsed);
+
+    }
+
+
+    function formatTime(totalSeconds) {
+
+        const hours =
+            Math.floor(totalSeconds / 3600);
+
+        const minutes =
+            Math.floor(
+                (totalSeconds % 3600) / 60
+            );
+
+        const seconds =
+            totalSeconds % 60;
+
+        if (hours > 0) {
+
+            return `${String(hours).padStart(2, "0")}:` +
+                   `${String(minutes).padStart(2, "0")}:` +
+                   `${String(seconds).padStart(2, "0")}`;
+
+        }
+
+        return `${String(minutes).padStart(2, "0")}:` +
+               `${String(seconds).padStart(2, "0")}`;
+
+    }
+
+
+    /* ==========================================
+       CAMERA + MICROPHONE
+    ========================================== */
+
+    async function initializeSensors() {
+
+        try {
+
+            logEvent(
+                "Requesting camera and microphone permissions...",
+                "warning"
+            );
+
+            stream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
                 });
 
-                // 3. Background Audio Detection (Web Audio API)
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContext.createMediaStreamSource(stream);
-                const analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256;
-                source.connect(analyser);
-                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            video.srcObject =
+                stream;
 
-                setInterval(() => {
-                    analyser.getByteFrequencyData(dataArray);
-                    let sum = dataArray.reduce((a, b) => a + b, 0);
-                    let average = sum / dataArray.length;
 
-                    if (average > 45) {  
-                        audioStatus.className = 'status danger';
-                        audioStatus.innerText = 'Audio: TALKING DETECTED';
-                        
-                        let currentTime = Date.now();
-                        if (currentTime - lastAudioAlertTime > 5000) {
-                            violationCount++;
-                            lastAudioAlertTime = currentTime;
-                            logEvent(`VIOLATION #${violationCount}: Unauthorized talking/noise detected!`, true);
-                            
-                            alert(`⚠️ SkillBridge Proctoring Alert:\n\nUnauthorized speech/noise detected! Total Violations: ${violationCount}`);
-                        }
-                    } else {
-                        audioStatus.className = 'status safe';
-                        audioStatus.innerText = 'Audio: QUIET';
+            /* CAMERA */
+
+            cameraStatus.textContent =
+                "● ACTIVE";
+
+            cameraStatus.className =
+                "status-value safe";
+
+
+            /* MICROPHONE */
+
+            micStatus.textContent =
+                "● ACTIVE";
+
+            micStatus.className =
+                "status-value safe";
+
+
+            logEvent(
+                "Camera connected.",
+                "normal"
+            );
+
+            logEvent(
+                "Microphone connected.",
+                "normal"
+            );
+
+            logEvent(
+                "Edge monitoring sensors active.",
+                "normal"
+            );
+
+
+            initializeAudioMonitoring();
+
+            return true;
+
+        }
+        catch (error) {
+
+            cameraStatus.textContent =
+                "● ERROR";
+
+            cameraStatus.className =
+                "status-value danger";
+
+            micStatus.textContent =
+                "● ERROR";
+
+            micStatus.className =
+                "status-value danger";
+
+            logEvent(
+                `Sensor initialization failed: ${error.message}`,
+                "violation"
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    /* ==========================================
+       AUDIO MONITORING
+    ========================================== */
+
+    function initializeAudioMonitoring() {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioContext) {
+
+            logEvent(
+                "Web Audio API is not supported.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+        audioContext =
+            new AudioContext();
+
+        const source =
+            audioContext.createMediaStreamSource(stream);
+
+        analyser =
+            audioContext.createAnalyser();
+
+        analyser.fftSize =
+            256;
+
+        source.connect(analyser);
+
+        const dataArray =
+            new Uint8Array(
+                analyser.frequencyBinCount
+            );
+
+
+        audioInterval =
+            setInterval(() => {
+
+                if (!assessmentRunning) {
+                    return;
+                }
+
+                analyser.getByteFrequencyData(
+                    dataArray
+                );
+
+                const sum =
+                    dataArray.reduce(
+                        (a, b) => a + b,
+                        0
+                    );
+
+                const average =
+                    sum / dataArray.length;
+
+
+                /*
+                    This is an AUDIO ENERGY
+                    detector, not speech recognition.
+                */
+
+                if (average > 45) {
+
+                    audioStatus.textContent =
+                        "● NOISE DETECTED";
+
+                    audioStatus.className =
+                        "status-value danger";
+
+
+                    const now =
+                        Date.now();
+
+                    /*
+                        Avoid repeated events every second.
+                    */
+
+                    if (
+                        now - lastAudioViolation >
+                        5000
+                    ) {
+
+                        lastAudioViolation =
+                            now;
+
+                        registerViolation(
+                            "Elevated background audio/noise detected."
+                        );
+
                     }
-                }, 1000);
 
-            } catch (err) {
-                logEvent(`Error: ${err.message}. Please allow camera/mic permissions.`, true);
+                }
+                else {
+
+                    audioStatus.textContent =
+                        "● QUIET";
+
+                    audioStatus.className =
+                        "status-value safe";
+
+                }
+
+            }, 1000);
+
+    }
+
+
+    /* ==========================================
+       TAB VISIBILITY
+    ========================================== */
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (!assessmentRunning) {
+                return;
             }
-        });
-    </script>
+
+            if (document.hidden) {
+
+                tabSwitchCount++;
+
+                tabStatus.textContent =
+                    "● SWITCHED";
+
+                tabStatus.className =
+                    "status-value danger";
+
+                registerViolation(
+                    "Assessment tab lost visibility."
+                );
+
+            }
+            else {
+
+                tabStatus.textContent =
+                    "● ACTIVE";
+
+                tabStatus.className =
+                    "status-value safe";
+
+                logEvent(
+                    "Candidate returned to assessment tab.",
+                    "warning"
+                );
+
+                setTimeout(() => {
+
+                    warningBanner.style.display =
+                        "none";
+
+                }, 1500);
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       FULLSCREEN MONITORING
+    ========================================== */
+
+    document.addEventListener(
+        "fullscreenchange",
+        () => {
+
+            if (!assessmentRunning) {
+                return;
+            }
+
+            if (document.fullscreenElement) {
+
+                fullscreenStatus.textContent =
+                    "● ACTIVE";
+
+                fullscreenStatus.className =
+                    "status-value safe";
+
+                fullscreenBtn.textContent =
+                    "Exit Fullscreen";
+
+                logEvent(
+                    "Fullscreen mode active.",
+                    "normal"
+                );
+
+            }
+            else {
+
+                fullscreenStatus.textContent =
+                    "● EXITED";
+
+                fullscreenStatus.className =
+                    "status-value danger";
+
+                fullscreenBtn.textContent =
+                    "Enter Fullscreen";
+
+                registerViolation(
+                    "Fullscreen mode exited."
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       FULLSCREEN BUTTON
+    ========================================== */
+
+    fullscreenBtn.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                if (!document.fullscreenElement) {
+
+                    await document.documentElement.requestFullscreen();
+
+                }
+                else {
+
+                    await document.exitFullscreen();
+
+                }
+
+            }
+            catch (error) {
+
+                logEvent(
+                    `Fullscreen error: ${error.message}`,
+                    "warning"
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       START ASSESSMENT
+    ========================================== */
+
+    startBtn.addEventListener(
+        "click",
+        async () => {
+
+            startBtn.disabled =
+                true;
+
+            instructionsView.style.display =
+                "none";
+
+            assessmentView.style.display =
+                "block";
+
+            assessmentRunning =
+                true;
+
+            startTime =
+                Date.now();
+
+            timerInterval =
+                setInterval(
+                    updateTimer,
+                    1000
+                );
+
+            logEvent(
+                "Assessment session initialized.",
+                "normal"
+            );
+
+            const sensorsReady =
+                await initializeSensors();
+
+            if (!sensorsReady) {
+
+                assessmentRunning =
+                    false;
+
+                submitAssessment();
+
+                return;
+
+            }
+
+            /*
+                Ask for fullscreen after user click.
+                Browsers allow fullscreen requests
+                only from a user interaction.
+            */
+
+            try {
+
+                await document.documentElement.requestFullscreen();
+
+            }
+            catch (error) {
+
+                fullscreenStatus.textContent =
+                    "● NOT ACTIVE";
+
+                fullscreenStatus.className =
+                    "status-value warning";
+
+                logEvent(
+                    "Fullscreen permission was not enabled.",
+                    "warning"
+                );
+
+            }
+
+            logEvent(
+                "Secure assessment monitoring started.",
+                "normal"
+            );
+
+        }
+    );
+
+
+    /* ==========================================
+       CLEAR LOGS
+    ========================================== */
+
+    clearLogsBtn.addEventListener(
+        "click",
+        () => {
+
+            logs.innerHTML = "";
+
+            logEvent(
+                "Event log cleared by operator.",
+                "warning"
+            );
+
+        }
+    );
+
+
+    /* ==========================================
+       SUBMIT ASSESSMENT
+    ========================================== */
+
+    submitBtn.addEventListener(
+        "click",
+        () => {
+
+            submitAssessment();
+
+        }
+    );
+
+
+    function submitAssessment() {
+
+        if (!assessmentRunning) {
+            return;
+        }
+
+        assessmentRunning =
+            false;
+
+
+        clearInterval(
+            timerInterval
+        );
+
+        clearInterval(
+            audioInterval
+        );
+
+
+        /* STOP CAMERA + MIC */
+
+        if (stream) {
+
+            stream
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
+        }
+
+
+        if (audioContext) {
+
+            audioContext.close();
+
+        }
+
+
+        /* CALCULATE DURATION */
+
+        const duration =
+            Math.floor(
+                (Date.now() - startTime) / 1000
+            );
+
+
+        /* SUMMARY */
+
+        document.getElementById(
+            "summaryDuration"
+        ).textContent =
+            formatTime(duration);
+
+        document.getElementById(
+            "summaryViolations"
+        ).textContent =
+            violationCount;
+
+        document.getElementById(
+            "summaryTabSwitches"
+        ).textContent =
+            tabSwitchCount;
+
+
+        summary.style.display =
+            "block";
+
+
+        logEvent(
+            "Assessment submitted. Monitoring session ended.",
+            "normal"
+        );
+
+
+        submitBtn.disabled =
+            true;
+
+        fullscreenBtn.disabled =
+            true;
+
+
+        /*
+            Exit fullscreen if active.
+        */
+
+        if (document.fullscreenElement) {
+
+            document.exitFullscreen()
+                .catch(() => {});
+
+        }
+
+
+        /*
+            Change session header.
+        */
+
+        document.querySelector(
+            ".session-status"
+        ).innerHTML =
+            `<span class="live-dot"
+                style="background:#90a4ae;box-shadow:none;">
+             </span>
+             ASSESSMENT COMPLETED`;
+
+    }
+
+
+</script>
+
 </body>
 </html>
