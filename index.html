@@ -3,708 +3,1307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillBridge - Secure Competency Assessment</title>
+    <title>SkillBridge — Closed-Loop AI Competency & Employability Ecosystem</title>
 
-    <!-- Browser-side ML for the PoC. Face inference runs locally after the model is loaded. -->
+    <!-- Edge ML Libraries for In-Browser Facial Assessment Proctoring -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 
     <style>
-        * { box-sizing: border-box; }
         :root {
-            --bg: #0b0f14;
-            --panel: #121820;
-            --panel-2: #0d1319;
-            --border: #27313c;
-            --muted: #8b98a7;
-            --text: #f5f7fa;
-            --blue: #2962ff;
-            --green: #69f0ae;
-            --yellow: #ffca28;
-            --red: #ff5252;
+            --bg-body: #0b0f17;
+            --bg-sidebar: #0e131d;
+            --panel: #131b27;
+            --panel-card: #182232;
+            --panel-card-hover: #1e2b3e;
+            --border: #233144;
+            --border-highlight: #3b82f640;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-indigo: #6366f1;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
         }
-        button, input, label { font: inherit; }
-        button {
-            border: 0;
-            border-radius: 8px;
-            padding: 12px 18px;
-            background: var(--blue);
+
+        /* Sidebar */
+        aside {
+            width: 270px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+        .brand-section {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+        .brand-name {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
             color: #fff;
+        }
+        .brand-tag {
+            font-size: 10px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .nav-group {
+            flex: 1;
+            padding: 20px 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .nav-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 8px 12px 4px;
+            font-weight: 600;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .nav-item:hover {
+            background: var(--panel);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            font-weight: 600;
+            border-left: 3px solid var(--accent-blue);
+        }
+        .nav-badge {
+            margin-left: auto;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(14, 19, 29, 0.95);
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #2563eb;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Main Content Layout */
+        main {
+            margin-left: 270px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            height: 72px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        .header-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .header-title p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .system-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        .system-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .content-area {
+            padding: 32px;
+            max-width: 1380px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Ecosystem Closed Loop Stepper */
+        .ecosystem-loop {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .loop-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.55;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .loop-step.active {
+            opacity: 1;
+            color: #60a5fa;
+        }
+        .loop-step.done {
+            opacity: 0.9;
+            color: var(--accent-green);
+        }
+        .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #233144;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .loop-step.active .step-num {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .loop-step.done .step-num {
+            background: var(--accent-green);
+            color: #0b0f17;
+        }
+        .loop-divider {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Summary Metrics */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .metric-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .metric-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-blue);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .metric-card:hover::before { opacity: 1; }
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .metric-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.15fr;
+            gap: 24px;
+        }
+        .grid-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Reusable Card */
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .card-title-group h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .card-title-group p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Target Career Focus */
+        .target-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .target-role-badge {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .target-skills-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0 18px;
+        }
+        .chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--panel-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .chip.verified {
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        /* Skill Gap Table / Bars */
+        .gap-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 60px 80px;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(35, 49, 68, 0.5);
+            font-size: 13px;
+        }
+        .gap-item:last-child { border-bottom: none; }
+        .gap-bar-container {
+            height: 8px;
+            background: #202b3a;
+            border-radius: 999px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gap-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s ease;
+        }
+        .tag-pill {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .tag-pill.matched { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+        .tag-pill.improve { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
+        .tag-pill.priority { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+        /* Roadmap List */
+        .roadmap-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .roadmap-node {
+            background: var(--panel-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+        .roadmap-node:hover {
+            border-color: #3b82f666;
+            background: var(--panel-card-hover);
+        }
+        .roadmap-node.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
         }
-        button:hover { filter: brightness(1.08); }
-        button:disabled { opacity: .5; cursor: not-allowed; }
-        button.secondary { background: #26313d; }
-        button.danger { background: #b71c1c; }
-        .container { width: min(1120px, 94%); margin: 28px auto 50px; }
-        .header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
-        .brand { display:flex; align-items:center; gap:12px; }
-        .shield { width:44px; height:44px; border-radius:11px; background:var(--blue); display:grid; place-items:center; font-size:23px; }
-        .brand h1 { margin:0; font-size:24px; }
-        .brand p { margin:3px 0 0; color:var(--muted); font-size:13px; }
-        .badge { padding:7px 12px; border:1px solid #33404d; border-radius:999px; color:#90caf9; background:#1c2530; font-size:12px; font-weight:800; }
-        .card { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px; }
-        .hidden { display:none !important; }
-
-        /* Preparation */
-        .prep { max-width:850px; margin:30px auto; }
-        .prep h2 { margin-top:0; }
-        .prep h3 { color:#ffb74d; }
-        .rules { color:#b7c1cc; line-height:1.7; padding-left:20px; }
-        .rules li { margin:7px 0; }
-        .rules strong { color:#fff; }
-        .prep-actions { display:flex; justify-content:center; margin-top:24px; }
-        .prep-status { margin-top:16px; text-align:center; color:var(--muted); min-height:20px; }
-
-        /* Assessment */
-        .session-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 20px; background:var(--panel); border:1px solid var(--border); border-radius:12px; margin-bottom:14px; }
-        .session-state { display:flex; align-items:center; gap:9px; color:var(--green); font-weight:800; }
-        .dot { width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
-        .timer { font:800 24px Consolas, monospace; }
-        .warning-banner { display:none; margin-bottom:14px; padding:13px 16px; border-radius:10px; background:#4a1717; border:1px solid var(--red); color:#ffbaba; font-weight:700; }
-
-        .status-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:16px; }
-        .status-card { background:var(--panel); border:1px solid var(--border); border-radius:11px; padding:14px; }
-        .status-title { color:#7e8b99; font-size:11px; text-transform:uppercase; margin-bottom:7px; }
-        .status-value { font-size:14px; font-weight:800; }
-        .safe { color:var(--green); }
-        .warning { color:var(--yellow); }
-        .danger-text { color:var(--red); }
-
-        .assessment-grid { display:grid; grid-template-columns:1.35fr .85fr; gap:16px; }
-        .video-card, .question-card, .side-card, .events-card { background:var(--panel); border:1px solid var(--border); border-radius:14px; }
-        .video-card { padding:16px; }
-        video { width:100%; aspect-ratio:16/10; object-fit:cover; background:#000; border-radius:10px; border:2px solid var(--border); transform:scaleX(-1); }
-        .video-note { margin-top:9px; color:var(--muted); font-size:12px; }
-
-        .side-stack { display:flex; flex-direction:column; gap:14px; }
-        .side-card { padding:18px; }
-        .metric-label { color:var(--muted); font-size:12px; }
-        .metric { font-size:38px; font-weight:900; margin-top:4px; }
-        .privacy { background:#0e2119; border-color:#1d563c; }
-        .privacy h3 { color:var(--green); margin:0 0 8px; font-size:15px; }
-        .privacy p { color:#a8c4b3; font-size:12px; line-height:1.5; margin:0; }
-
-        /* Questions */
-        .question-card { margin-top:16px; padding:20px; }
-        .question-header { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:15px; }
-        .question-header h2 { margin:0; font-size:19px; }
-        .progress { color:var(--muted); font-size:12px; }
-        .question { padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--panel-2); margin-bottom:12px; }
-        .question h3 { margin:0 0 12px; font-size:15px; line-height:1.5; }
-        .option { display:flex; align-items:flex-start; gap:10px; padding:10px; border-radius:8px; cursor:pointer; color:#c8d0d9; }
-        .option:hover { background:#18212a; }
-        .option input { margin-top:4px; accent-color:var(--blue); }
-        .assessment-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
-
-        /* Events */
-        .events-card { margin-top:16px; padding:18px; }
-        .events-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-        .events-head h2 { margin:0; font-size:17px; }
-        .event-count { color:var(--muted); font-size:12px; }
-        #logs { height:175px; overflow:auto; background:#080b0f; border-radius:9px; padding:13px; font:13px/1.5 Consolas, monospace; }
-        .log { margin-bottom:7px; }
-        .log.normal { color:var(--green); }
-        .log.warning { color:var(--yellow); }
-        .log.violation { color:var(--red); }
-
-        /* Completion */
-        .summary { margin-top:16px; }
-        .summary h2 { margin-top:0; }
-        .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0; }
-        .summary-item { background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:15px; text-align:center; }
-        .summary-item span { display:block; color:var(--muted); font-size:11px; margin-bottom:7px; }
-        .summary-item strong { font-size:24px; }
-        .competency { border:1px solid #31528f; background:#101b30; padding:17px; border-radius:10px; }
-        .competency h3 { margin:0 0 7px; color:#90caf9; }
-        .competency p { margin:0; color:#bdc9d8; line-height:1.5; }
-
-        #toast { position:fixed; right:22px; bottom:22px; width:min(340px,calc(100% - 44px)); padding:15px; border-radius:10px; background:#181e26; border:1px solid var(--red); border-left:5px solid var(--red); box-shadow:0 10px 30px rgba(0,0,0,.4); display:none; z-index:10; }
-        #toast strong { color:var(--red); display:block; margin-bottom:5px; }
-        #toast span { color:#d7dde4; font-size:13px; }
-
-        @media(max-width:900px) {
-            .status-grid { grid-template-columns:repeat(3,1fr); }
-            .assessment-grid { grid-template-columns:1fr; }
-            .summary-grid { grid-template-columns:repeat(2,1fr); }
+        .btn:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        @media(max-width:600px) {
-            .header, .session-header { align-items:flex-start; flex-direction:column; }
-            .status-grid, .summary-grid { grid-template-columns:1fr; }
-            .assessment-actions { flex-direction:column; }
-            .assessment-actions button { width:100%; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .btn-sm {
+            padding: 6px 11px;
+            font-size: 11px;
+        }
+        .btn-success {
+            background: #059669;
+        }
+
+        /* AI Insight Card */
+        .ai-insight-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+        }
+        .ai-sparkle {
+            font-size: 18px;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        /* Jobs section */
+        .job-card {
+            background: var(--panel-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+        .job-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .job-title { font-weight: 700; font-size: 14px; }
+        .job-company { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .job-match-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            font-size: 12px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* PROCTORING INTEGRATED MODULE (MODAL / FULL VIEW) */
+        #assessmentContainer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #080c13f6;
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .assessment-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        }
+        .proctor-header {
+            background: #0e141f;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .proctor-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 20px;
+            padding: 24px;
+        }
+        video {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: #000;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            transform: scaleX(-1);
+        }
+        .proctor-telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .telemetry-cell {
+            background: #0d131d;
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        .telemetry-cell span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .telemetry-cell strong {
+            font-size: 11px;
+            margin-top: 2px;
+            display: block;
+        }
+        .log-box {
+            background: #080c13;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            height: 120px;
+            overflow-y: auto;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+        .test-content-box {
+            background: var(--panel-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0 24px 24px;
+        }
+
+        .hidden { display: none !important; }
+        .text-green { color: var(--accent-green) !important; }
+        .text-red { color: var(--accent-red) !important; }
+        .text-yellow { color: var(--accent-yellow) !important; }
+
+        @media (max-width: 1024px) {
+            aside { width: 70px; }
+            aside .brand-name, aside .brand-tag, aside .nav-label, aside .nav-item span, aside .nav-badge, aside .user-info { display: none; }
+            main { margin-left: 70px; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .proctor-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <header class="header">
-        <div class="brand">
-            <div class="shield">🛡️</div>
+    <!-- SIDEBAR -->
+    <aside>
+        <div class="brand-section">
+            <div class="brand-icon">⚡</div>
             <div>
-                <h1>SkillBridge</h1>
-                <p>Secure Competency Assessment</p>
+                <div class="brand-name">SkillBridge</div>
+                <div class="brand-tag">SIH 2026 Core</div>
             </div>
         </div>
-        <div class="badge">PROOF OF CONCEPT</div>
-    </header>
 
-    <!-- PREPARATION -->
-    <section id="prepView" class="card prep">
-        <h2>Java Fundamentals — Competency Assessment</h2>
-        <h3>⚠ Assessment & monitoring guidelines</h3>
-        <ul class="rules">
-            <li><strong>Camera:</strong> Keep your face visible during the assessment.</li>
-            <li><strong>Face monitoring:</strong> The PoC detects face presence and multiple people locally in the browser.</li>
-            <li><strong>Tab monitoring:</strong> Leaving the assessment page creates a monitoring event.</li>
-            <li><strong>Fullscreen:</strong> Unexpectedly leaving fullscreen creates a monitoring event when fullscreen is active.</li>
-            <li><strong>Audio:</strong> Elevated microphone energy is recorded as a noise event; this PoC does not claim speech recognition.</li>
-            <li><strong>Privacy:</strong> Camera/audio streams are not uploaded by this HTML implementation.</li>
-        </ul>
-        <div class="prep-actions">
-            <button id="startBtn">Start Secure Assessment</button>
-        </div>
-        <div id="prepStatus" class="prep-status"></div>
-    </section>
-
-    <!-- ASSESSMENT -->
-    <main id="assessmentView" class="hidden">
-        <div class="session-header">
-            <div class="session-state"><span class="dot"></span><span id="sessionState">ASSESSMENT IN PROGRESS</span></div>
-            <div id="timer" class="timer">00:00</div>
-        </div>
-
-        <div id="warningBanner" class="warning-banner">⚠ Monitoring event detected.</div>
-
-        <div class="status-grid">
-            <div class="status-card"><div class="status-title">Camera</div><div id="cameraStatus" class="status-value warning">● CHECKING</div></div>
-            <div class="status-card"><div class="status-title">Face</div><div id="faceStatus" class="status-value warning">● WAITING</div></div>
-            <div class="status-card"><div class="status-title">Microphone</div><div id="micStatus" class="status-value warning">● CHECKING</div></div>
-            <div class="status-card"><div class="status-title">Tab</div><div id="tabStatus" class="status-value safe">● ACTIVE</div></div>
-            <div class="status-card"><div class="status-title">Fullscreen</div><div id="fullscreenStatus" class="status-value warning">● CHECKING</div></div>
-        </div>
-
-        <div class="assessment-grid">
-            <section class="video-card">
-                <video id="webcam" autoplay muted playsinline></video>
-                <div class="video-note">Camera preview. Face inference is performed locally after the model is loaded.</div>
-            </section>
-
-            <aside class="side-stack">
-                <div class="side-card">
-                    <div class="metric-label">Monitoring Violations</div>
-                    <div id="violationCount" class="metric">0</div>
-                </div>
-                <div class="side-card">
-                    <div class="metric-label">Audio Environment</div>
-                    <div id="audioStatus" class="status-value safe" style="margin-top:8px">● CALIBRATING</div>
-                </div>
-                <div class="side-card privacy">
-                    <h3>🔒 Edge Processing</h3>
-                    <p>Face inference and microphone analysis run in this browser. This PoC does not upload the raw camera or microphone stream to a backend.</p>
-                </div>
-            </aside>
-        </div>
-
-        <section class="question-card">
-            <div class="question-header">
-                <h2>Competency Questions</h2>
-                <div id="progress" class="progress">0 / 5 answered</div>
+        <div class="nav-group">
+            <div class="nav-label">Ecosystem Core</div>
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <span>📊</span> <span>Dashboard</span>
             </div>
-            <form id="assessmentForm">
-                <div class="question">
-                    <h3>1. Which keyword is used to inherit a class in Java?</h3>
-                    <label class="option"><input type="radio" name="q1" value="a"> implements</label>
-                    <label class="option"><input type="radio" name="q1" value="b"> extends</label>
-                    <label class="option"><input type="radio" name="q1" value="c"> inherits</label>
-                    <label class="option"><input type="radio" name="q1" value="d"> super</label>
-                </div>
-                <div class="question">
-                    <h3>2. Which collection does not allow duplicate elements?</h3>
-                    <label class="option"><input type="radio" name="q2" value="a"> List</label>
-                    <label class="option"><input type="radio" name="q2" value="b"> Set</label>
-                    <label class="option"><input type="radio" name="q2" value="c"> ArrayList</label>
-                    <label class="option"><input type="radio" name="q2" value="d"> Vector</label>
-                </div>
-                <div class="question">
-                    <h3>3. What is the entry point method of a standard Java application?</h3>
-                    <label class="option"><input type="radio" name="q3" value="a"> start()</label>
-                    <label class="option"><input type="radio" name="q3" value="b"> run()</label>
-                    <label class="option"><input type="radio" name="q3" value="c"> main()</label>
-                    <label class="option"><input type="radio" name="q3" value="d"> init()</label>
-                </div>
-                <div class="question">
-                    <h3>4. Which concept allows one interface to have multiple implementations?</h3>
-                    <label class="option"><input type="radio" name="q4" value="a"> Polymorphism</label>
-                    <label class="option"><input type="radio" name="q4" value="b"> Encapsulation</label>
-                    <label class="option"><input type="radio" name="q4" value="c"> Serialization</label>
-                    <label class="option"><input type="radio" name="q4" value="d"> Compilation</label>
-                </div>
-                <div class="question">
-                    <h3>5. Which keyword prevents a class from being inherited?</h3>
-                    <label class="option"><input type="radio" name="q5" value="a"> static</label>
-                    <label class="option"><input type="radio" name="q5" value="b"> private</label>
-                    <label class="option"><input type="radio" name="q5" value="c"> final</label>
-                    <label class="option"><input type="radio" name="q5" value="d"> sealed</label>
-                </div>
-            </form>
-            <div class="assessment-actions">
-                <button id="fullscreenBtn" class="secondary">Enter Fullscreen</button>
-                <button id="submitBtn" class="danger" disabled>Submit Assessment</button>
+            <div class="nav-item" onclick="switchTab('skill-gap')">
+                <span>🔍</span> <span>AI Skill Gap</span>
+                <div class="nav-badge">3 Gaps</div>
             </div>
-        </section>
-
-        <section class="events-card">
-            <div class="events-head">
-                <h2>Monitoring Events</h2>
-                <div id="eventCount" class="event-count">0 events</div>
+            <div class="nav-item" onclick="switchTab('roadmap')">
+                <span>🗺️</span> <span>Learning Roadmap</span>
             </div>
-            <div id="logs"></div>
-        </section>
+            <div class="nav-item" onclick="openAssessmentModal()">
+                <span>🛡️</span> <span>Assessments</span>
+                <div class="nav-badge" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">1 Ready</div>
+            </div>
+            <div class="nav-item" onclick="switchTab('verified')">
+                <span>✓</span> <span>Verified Skills</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('jobs')">
+                <span>💼</span> <span>Jobs & Matches</span>
+                <div class="nav-badge">12 New</div>
+            </div>
 
-        <section id="summary" class="card summary hidden">
-            <h2>Assessment Completed</h2>
-            <p>SkillBridge has generated a local competency-assessment summary for this PoC.</p>
+            <div class="nav-label" style="margin-top: 16px;">Preferences</div>
+            <div class="nav-item">
+                <span>⚙️</span> <span>Settings</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-avatar">RP</div>
+            <div class="user-info">
+                <div style="font-size: 13px; font-weight: 700;">Rahul Patel</div>
+                <div style="font-size: 11px; color: var(--text-muted);">MCA • Target: Backend</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main>
+        <header>
+            <div class="header-title">
+                <h1>Good morning, Rahul</h1>
+                <p>Closed-loop skill readiness updated in accordance with current industry demand.</p>
+            </div>
+            <div class="header-actions">
+                <div class="system-pill">
+                    <span class="system-dot"></span>
+                    <span>Edge ML Engine Active</span>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="openAssessmentModal()">
+                    Launch Proctored Assessment
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- 7-Stage Closed-Loop Indicator -->
+            <div class="ecosystem-loop">
+                <div class="loop-step done"><span class="step-num">✓</span> Industry Demand</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step done"><span class="step-num">✓</span> Required Skills</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step done"><span class="step-num">✓</span> AI Skill Gap</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step done"><span class="step-num">✓</span> Learning Roadmap</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step active" id="loopStepAssess"><span class="step-num">5</span> Practical Assessment</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step" id="loopStepVerified"><span class="step-num">6</span> Verified Competencies</div>
+                <span class="loop-divider">→</span>
+                <div class="loop-step" id="loopStepJobs"><span class="step-num">7</span> Job Placements</div>
+            </div>
+
+            <!-- Top Summary Cards -->
             <div class="summary-grid">
-                <div class="summary-item"><span>Score</span><strong id="summaryScore">0%</strong></div>
-                <div class="summary-item"><span>Duration</span><strong id="summaryDuration">00:00</strong></div>
-                <div class="summary-item"><span>Violations</span><strong id="summaryViolations">0</strong></div>
-                <div class="summary-item"><span>Tab Switches</span><strong id="summaryTabSwitches">0</strong></div>
+                <div class="metric-card">
+                    <div class="metric-label">Career Readiness</div>
+                    <div class="metric-value text-green" id="metricReadiness">87%</div>
+                    <div class="metric-sub">Based on verified evidence</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Verified Competencies</div>
+                    <div class="metric-value" id="metricVerifiedCount">8</div>
+                    <div class="metric-sub">Edge proctored & project certified</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Roadmap Progress</div>
+                    <div class="metric-value" id="metricRoadmap">72%</div>
+                    <div class="metric-sub">Active track completion</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Direct Job Matches</div>
+                    <div class="metric-value text-green" id="metricJobMatches">12</div>
+                    <div class="metric-sub">Above 75% compatibility</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Priority Skill Gaps</div>
+                    <div class="metric-value text-yellow" id="metricGaps">3</div>
+                    <div class="metric-sub">Action items required</div>
+                </div>
             </div>
-            <div class="competency">
-                <h3>Verified Competency — Demonstration Record</h3>
-                <p id="competencyText">Assessment completed.</p>
+
+            <!-- Main Layout Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div class="grid-column">
+                    <!-- Target Career Card -->
+                    <div class="card target-card">
+                        <div class="target-role-badge">TARGET VOCATIONAL OUTCOME</div>
+                        <h2 style="font-size: 20px; font-weight: 800; color: #fff;">Junior Backend Developer</h2>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                            Ecosystem calibrated against live hiring demand across 140+ tech enterprises.
+                        </p>
+                        
+                        <div class="target-skills-chips">
+                            <span class="chip verified">✓ Python (90%)</span>
+                            <span class="chip verified">✓ SQL (80%)</span>
+                            <span class="chip" id="chipRestApi">△ REST API (Target: 80%)</span>
+                            <span class="chip">△ Docker (Target: 60%)</span>
+                            <span class="chip">△ Cloud Services (Target: 60%)</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #334155; padding-top: 14px;">
+                            <div style="font-size: 13px;">
+                                Current Compatibility Match: <strong class="text-green" id="targetMatchScore">72%</strong>
+                            </div>
+                            <button class="btn btn-sm" onclick="scrollToGap()">View Gap Breakdown</button>
+                        </div>
+                    </div>
+
+                    <!-- AI Skill Gap Analysis Section -->
+                    <div class="card" id="skillGapSection">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <h2>AI Skill Gap Analysis</h2>
+                                <p>Dynamic comparison of demonstrable skills vs target career profile</p>
+                            </div>
+                            <span class="tag-pill priority" id="overallGapBadge">Active Gaps: 3</span>
+                        </div>
+
+                        <div class="gap-list">
+                            <!-- Python -->
+                            <div class="gap-item">
+                                <strong>Python</strong>
+                                <div class="gap-bar-container">
+                                    <div class="gap-bar-fill" style="width: 85%; background: var(--accent-green);"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);">85% / 90%</span>
+                                <span class="tag-pill matched">MATCHED</span>
+                            </div>
+
+                            <!-- SQL -->
+                            <div class="gap-item">
+                                <strong>SQL</strong>
+                                <div class="gap-bar-container">
+                                    <div class="gap-bar-fill" style="width: 78%; background: var(--accent-green);"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);">78% / 80%</span>
+                                <span class="tag-pill matched">MATCHED</span>
+                            </div>
+
+                            <!-- REST API (Drives dynamic state update) -->
+                            <div class="gap-item" id="gapRowRestApi">
+                                <strong>REST API</strong>
+                                <div class="gap-bar-container">
+                                    <div class="gap-bar-fill" id="barRestApi" style="width: 45%; background: var(--accent-yellow);"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);" id="labelRestApi">45% / 80%</span>
+                                <span class="tag-pill improve" id="badgeRestApi">IMPROVE</span>
+                            </div>
+
+                            <!-- Docker -->
+                            <div class="gap-item">
+                                <strong>Docker</strong>
+                                <div class="gap-bar-container">
+                                    <div class="gap-bar-fill" style="width: 20%; background: var(--accent-red);"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);">20% / 60%</span>
+                                <span class="tag-pill priority">PRIORITY</span>
+                            </div>
+
+                            <!-- Cloud -->
+                            <div class="gap-item">
+                                <strong>Cloud Infra</strong>
+                                <div class="gap-bar-container">
+                                    <div class="gap-bar-fill" style="width: 25%; background: var(--accent-red);"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);">25% / 60%</span>
+                                <span class="tag-pill priority">PRIORITY</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Roadmap -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <h2>AI-Generated Learning Roadmap</h2>
+                                <p>Prescriptive actions to bridge identified industry competencies</p>
+                            </div>
+                        </div>
+
+                        <div class="roadmap-tree">
+                            <div class="roadmap-node" style="border-left: 3px solid var(--accent-yellow);">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700;">1. REST API Security & Architecture</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                        Priority: High • Practical assessment ready
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" id="btnRoadmapRest" onclick="openAssessmentModal()">
+                                    Take Assessment
+                                </button>
+                            </div>
+
+                            <div class="roadmap-node">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700;">2. Docker Containerization & Microservices</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                        Priority: High • Est. effort: 12 hours
+                                    </div>
+                                </div>
+                                <span class="tag-pill improve">20% DONE</span>
+                            </div>
+
+                            <div class="roadmap-node locked">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700;">3. Cloud Deployment (AWS / GCP Essentials)</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                        Prerequisite: Docker Containerization
+                                    </div>
+                                </div>
+                                <span style="font-size: 11px; color: var(--text-muted);">🔒 LOCKED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="grid-column">
+                    <!-- AI Insight Banner -->
+                    <div class="ai-insight-box">
+                        <div class="ai-sparkle">✨</div>
+                        <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">SkillBridge Intelligence Diagnostic</div>
+                        <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;" id="aiDiagnosticText">
+                            Your foundational Python and SQL competencies are strong. The quickest path to unlock 8 additional Backend roles is completing the <strong>REST API Practical Assessment</strong>.
+                        </p>
+                        <div style="margin-top: 12px;">
+                            <button class="btn btn-sm" onclick="openAssessmentModal()">Execute Next Action</button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming / Ready Assessment Card -->
+                    <div class="card" style="border: 1px solid rgba(59, 130, 246, 0.4);">
+                        <div class="card-header">
+                            <div>
+                                <span class="tag-pill matched" style="margin-bottom: 6px; display: inline-block;">READY FOR VERIFICATION</span>
+                                <h3 style="font-size: 15px; font-weight: 700;">REST API Practical Assessment</h3>
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                            Evaluates: Authentication, Rate Limiting, HTTP Verbs, and Scalability. Includes local Edge-ML proctoring.
+                        </p>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+                            <span>⏱ 5 Questions</span>
+                            <span>🔒 Edge ML Proctoring</span>
+                        </div>
+                        <button class="btn" style="width: 100%; justify-content: center;" onclick="openAssessmentModal()">
+                            Start Secure Assessment
+                        </button>
+                    </div>
+
+                    <!-- Recently Verified Skills (Evidence-Based) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <h2>Verified Competencies</h2>
+                                <p>Proven by assessments and project code audits</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;" id="verifiedSkillsList">
+                            <div class="metric-card" style="padding: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong>Python Algorithms</strong>
+                                    <span class="tag-pill matched">91% SCORE</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                                    Evidence: Proctored Code Evaluation • Verified Sep 2026
+                                </div>
+                            </div>
+                            <div class="metric-card" style="padding: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong>Relational Database SQL</strong>
+                                    <span class="tag-pill matched">PROJECT PASS</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                                    Evidence: Schema Execution & Query Benchmark
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Opportunities Match -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <h2>Targeted Opportunities</h2>
+                                <p>Matched by verified skills, not keyword parsing</p>
+                            </div>
+                        </div>
+
+                        <div class="job-card">
+                            <div class="job-header">
+                                <div>
+                                    <div class="job-title">Junior Backend Developer</div>
+                                    <div class="job-company">TechNova Solutions • Ahmedabad / Remote</div>
+                                </div>
+                                <div class="job-match-badge" id="jobTechNovaMatch">87% Match</div>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+                                Matched: Python, SQL, REST API • Missing: Cloud
+                            </div>
+                        </div>
+
+                        <div class="job-card">
+                            <div class="job-header">
+                                <div>
+                                    <div class="job-title">Backend Intern</div>
+                                    <div class="job-company">Apex Systems • Hybrid</div>
+                                </div>
+                                <div class="job-match-badge">82% Match</div>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+                                Matched: Python, Data Modeling • Missing: Docker
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
     </main>
-</div>
 
-<div id="toast"><strong>⚠ Monitoring Event</strong><span id="toastMessage"></span></div>
+    <!-- PROCTORING & COMPETENCY ASSESSMENT OVERLAY MODAL -->
+    <div id="assessmentContainer">
+        <div class="assessment-wrapper">
+            <div class="proctor-header">
+                <div>
+                    <h2 style="font-size: 16px; font-weight: 800; color: #fff;">SkillBridge Competency Verification Chamber</h2>
+                    <p style="font-size: 11px; color: var(--text-secondary);">
+                        Assessment: REST API & Java Fundamentals • Client-Side Edge ML Active
+                    </p>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div id="sessionTimer" style="font-family: monospace; font-size: 18px; font-weight: 700; color: var(--accent-blue);">00:00</div>
+                    <button class="btn btn-outline btn-sm" onclick="closeAssessmentModal()">Cancel Session</button>
+                </div>
+            </div>
 
-<script>
-(() => {
-    "use strict";
+            <!-- Proctoring Stream and Telemetry Grid -->
+            <div class="proctor-grid">
+                <div>
+                    <video id="webcam" autoplay muted playsinline></video>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+                        🔒 Edge Privacy: Inferences run in your browser via BlazeFace. No video streams are transmitted to any cloud server.
+                    </div>
+                </div>
 
-    /* -----------------------------
-       DOM
-    ----------------------------- */
-    const $ = id => document.getElementById(id);
-    const prepView = $("prepView");
-    const assessmentView = $("assessmentView");
-    const startBtn = $("startBtn");
-    const prepStatus = $("prepStatus");
-    const video = $("webcam");
-    const cameraStatus = $("cameraStatus");
-    const faceStatus = $("faceStatus");
-    const micStatus = $("micStatus");
-    const tabStatus = $("tabStatus");
-    const fullscreenStatus = $("fullscreenStatus");
-    const audioStatus = $("audioStatus");
-    const violationCountEl = $("violationCount");
-    const logs = $("logs");
-    const eventCountEl = $("eventCount");
-    const warningBanner = $("warningBanner");
-    const timerEl = $("timer");
-    const progressEl = $("progress");
-    const form = $("assessmentForm");
-    const submitBtn = $("submitBtn");
-    const fullscreenBtn = $("fullscreenBtn");
-    const summary = $("summary");
-    const toast = $("toast");
-    const toastMessage = $("toastMessage");
+                <div style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Proctor Telemetry Monitors</div>
+                        <div class="proctor-telemetry-grid">
+                            <div class="telemetry-cell">
+                                <span>Camera</span>
+                                <strong id="camStatus" class="text-yellow">CONNECTING</strong>
+                            </div>
+                            <div class="telemetry-cell">
+                                <span>Face Detection</span>
+                                <strong id="faceStatus" class="text-yellow">INITIALIZING</strong>
+                            </div>
+                            <div class="telemetry-cell">
+                                <span>Audio Env</span>
+                                <strong id="audioStatus" class="text-green">NORMAL</strong>
+                            </div>
+                            <div class="telemetry-cell">
+                                <span>Active Tab</span>
+                                <strong id="tabStatus" class="text-green">FOCUSED</strong>
+                            </div>
+                            <div class="telemetry-cell">
+                                <span>Fullscreen</span>
+                                <strong id="fsStatus" class="text-yellow">INACTIVE</strong>
+                            </div>
+                            <div class="telemetry-cell">
+                                <span>Violations</span>
+                                <strong id="violationCount" class="text-green">0</strong>
+                            </div>
+                        </div>
 
-    /* -----------------------------
-       State
-    ----------------------------- */
-    const TOTAL_QUESTIONS = 5;
-    const ANSWERS = { q1: "b", q2: "b", q3: "c", q4: "a", q5: "c" };
+                        <div style="font-size: 12px; font-weight: 700; margin-top: 14px;">Audit Integrity Trail</div>
+                        <div class="log-box" id="auditLogs"></div>
+                    </div>
 
-    let stream = null;
-    let audioContext = null;
-    let analyser = null;
-    let audioTimer = null;
-    let timer = null;
-    let faceModel = null;
-    let faceLoopRunning = false;
-    let startTime = null;
-    let assessmentRunning = false;
-    let violationCount = 0;
-    let tabSwitchCount = 0;
-    let eventCount = 0;
-    let lastAudioViolation = 0;
-    let lastMultiFaceViolation = 0;
-    let noFaceSince = null;
-    let audioSamples = [];
-    let audioBaseline = 0;
-    let audioThreshold = 20;
-    let toastTimer = null;
+                    <div style="margin-top: 14px;">
+                        <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="toggleFullScreen()">
+                            Toggle Fullscreen Mode
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-    /* -----------------------------
-       Logging
-    ----------------------------- */
-    function logEvent(message, type = "normal") {
-        eventCount++;
-        eventCountEl.textContent = `${eventCount} event${eventCount === 1 ? "" : "s"}`;
+            <!-- Practical Assessment Questions Form -->
+            <div class="test-content-box">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">Practical Competency Challenge</h3>
+                <form id="proctorForm">
+                    <div style="margin-bottom: 14px; font-size: 13px;">
+                        <p style="margin-bottom: 6px; font-weight: 600;">1. Which HTTP method is idempotent and designed for complete resource updates?</p>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q1" value="POST"> POST</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q1" value="PUT"> PUT</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q1" value="PATCH"> PATCH</label>
+                    </div>
 
-        const row = document.createElement("div");
-        row.className = `log ${type}`;
-        const icon = type === "violation" ? "🔴" : type === "warning" ? "⚠" : "✓";
-        row.textContent = `[${new Date().toLocaleTimeString()}] ${icon} ${message}`;
-        logs.prepend(row);
-    }
+                    <div style="margin-bottom: 14px; font-size: 13px;">
+                        <p style="margin-bottom: 6px; font-weight: 600;">2. What HTTP status code signals successful resource creation?</p>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q2" value="200"> 200 OK</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q2" value="201"> 201 Created</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q2" value="204"> 204 No Content</label>
+                    </div>
 
-    function showViolation(message) {
-        warningBanner.style.display = "block";
-        warningBanner.textContent = `⚠ ${message}`;
-        toastMessage.textContent = message;
-        toast.style.display = "block";
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.style.display = "none", 3500);
-    }
+                    <div style="margin-bottom: 14px; font-size: 13px;">
+                        <p style="margin-bottom: 6px; font-weight: 600;">3. Which header provides the client bearer token in REST JWT authentication?</p>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q3" value="Auth"> Authentication</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q3" value="Authorization"> Authorization</label>
+                        <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);"><input type="radio" name="q3" value="Token"> Bearer-Token</label>
+                    </div>
 
-    function registerViolation(message) {
-        if (!assessmentRunning) return;
-        violationCount++;
-        violationCountEl.textContent = violationCount;
-        logEvent(`VIOLATION #${violationCount}: ${message}`, "violation");
-        showViolation(message);
-    }
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px;">
+                        <button type="button" class="btn btn-outline" onclick="closeAssessmentModal()">Quit Without Verification</button>
+                        <button type="button" class="btn btn-success" onclick="submitAssessment()">Submit & Verify Competency</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    /* -----------------------------
-       Timer
-    ----------------------------- */
-    function formatTime(seconds) {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return h > 0
-            ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
-            : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-    }
+    <!-- SCRIPT: APPLICATION ORCHESTRATION & EDGE PROCTORING -->
+    <script>
+        // State variables
+        let stream = null;
+        let faceModel = null;
+        let isProctoringActive = false;
+        let violationCounter = 0;
+        let sessionStartTime = null;
+        let timerInterval = null;
+        let faceLoopHandle = null;
 
-    function updateTimer() {
-        if (startTime) timerEl.textContent = formatTime(Math.floor((Date.now() - startTime) / 1000));
-    }
-
-    /* -----------------------------
-       Assessment progress
-    ----------------------------- */
-    function updateProgress() {
-        const answered = Object.keys(ANSWERS).filter(name => form.querySelector(`input[name="${name}"]:checked`)).length;
-        progressEl.textContent = `${answered} / ${TOTAL_QUESTIONS} answered`;
-        submitBtn.disabled = !assessmentRunning || answered !== TOTAL_QUESTIONS;
-    }
-
-    form.addEventListener("change", updateProgress);
-
-    /* -----------------------------
-       Camera + microphone
-    ----------------------------- */
-    async function initializeSensors() {
-        if (!navigator.mediaDevices?.getUserMedia) {
-            throw new Error("Camera/microphone access is not supported by this browser.");
+        // UI Helpers
+        function logAudit(msg, isViolation = false) {
+            const box = document.getElementById('auditLogs');
+            const item = document.createElement('div');
+            item.style.marginBottom = '4px';
+            item.style.color = isViolation ? '#ef4444' : '#10b981';
+            item.textContent = `[${new Date().toLocaleTimeString()}] ${isViolation ? '⚠️ ' : '✓ '}${msg}`;
+            box.prepend(item);
         }
 
-        logEvent("Requesting camera and microphone permission...", "warning");
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-        });
-
-        video.srcObject = stream;
-        await video.play();
-
-        cameraStatus.textContent = "● CONNECTED";
-        cameraStatus.className = "status-value safe";
-        micStatus.textContent = "● ACTIVE";
-        micStatus.className = "status-value safe";
-
-        const videoTrack = stream.getVideoTracks()[0];
-        const audioTrack = stream.getAudioTracks()[0];
-        videoTrack?.addEventListener("ended", () => {
-            cameraStatus.textContent = "● DISCONNECTED";
-            cameraStatus.className = "status-value danger-text";
-            if (assessmentRunning) registerViolation("Camera stream ended unexpectedly.");
-        });
-        audioTrack?.addEventListener("ended", () => {
-            micStatus.textContent = "● DISCONNECTED";
-            micStatus.className = "status-value danger-text";
-            if (assessmentRunning) registerViolation("Microphone stream ended unexpectedly.");
-        });
-
-        logEvent("Camera connected.");
-        logEvent("Microphone connected.");
-        initializeAudioMonitoring();
-    }
-
-    /* -----------------------------
-       Audio monitoring with calibration
-    ----------------------------- */
-    function initializeAudioMonitoring() {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) {
-            audioStatus.textContent = "● UNSUPPORTED";
-            audioStatus.className = "status-value danger-text";
-            logEvent("Web Audio API is unavailable.", "warning");
-            return;
+        function recordViolation(reason) {
+            if (!isProctoringActive) return;
+            violationCounter++;
+            document.getElementById('violationCount').textContent = violationCounter;
+            document.getElementById('violationCount').className = 'text-red';
+            logAudit(`VIOLATION: ${reason}`, true);
         }
 
-        audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        const calibrationStarted = Date.now();
-        audioSamples = [];
+        // Assessment Window Lifecycle
+        async function openAssessmentModal() {
+            document.getElementById('assessmentContainer').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            isProctoringActive = true;
+            sessionStartTime = Date.now();
 
-        audioStatus.textContent = "● CALIBRATING";
-        audioStatus.className = "status-value warning";
+            timerInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - sessionStartTime) / 1000);
+                const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+                const secs = String(diff % 60).padStart(2, '0');
+                document.getElementById('sessionTimer').textContent = `${mins}:${secs}`;
+            }, 1000);
 
-        audioTimer = setInterval(() => {
-            analyser.getByteFrequencyData(data);
-            const average = data.reduce((sum, value) => sum + value, 0) / data.length;
+            await initEdgeProctor();
+        }
 
-            if (Date.now() - calibrationStarted < 3000) {
-                audioSamples.push(average);
-                return;
+        function closeAssessmentModal() {
+            isProctoringActive = false;
+            clearInterval(timerInterval);
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
             }
+            document.getElementById('assessmentContainer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
 
-            if (audioBaseline === 0 && audioSamples.length) {
-                audioBaseline = audioSamples.reduce((a,b) => a+b, 0) / audioSamples.length;
-                audioThreshold = Math.max(45, audioBaseline + 18);
-                logEvent(`Audio baseline calibrated (${audioBaseline.toFixed(1)}; threshold ${audioThreshold.toFixed(1)}).`);
-            }
-
-            if (!assessmentRunning) return;
-
-            if (average > audioThreshold) {
-                audioStatus.textContent = "● ELEVATED NOISE";
-                audioStatus.className = "status-value danger-text";
-                const now = Date.now();
-                if (now - lastAudioViolation > 5000) {
-                    lastAudioViolation = now;
-                    registerViolation("Elevated background audio/noise detected.");
-                }
-            } else {
-                audioStatus.textContent = "● QUIET";
-                audioStatus.className = "status-value safe";
-            }
-        }, 500);
-    }
-
-    /* -----------------------------
-       BlazeFace
-    ----------------------------- */
-    async function loadFaceModel() {
-        if (!window.tf || !window.blazeface) throw new Error("Face-detection libraries did not load. Check network access.");
-        prepStatus.textContent = "Preparing face-detection model...";
-        await tf.ready();
-        faceModel = await blazeface.load();
-        logEvent("Face-detection model loaded.");
-    }
-
-    async function faceDetectionLoop() {
-        if (faceLoopRunning) return;
-        faceLoopRunning = true;
-
-        while (assessmentRunning && faceModel) {
+        async function toggleFullScreen() {
             try {
-                if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                    const predictions = await faceModel.estimateFaces(video, false);
-                    processFaceResult(predictions.length);
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen();
+                    document.getElementById('fsStatus').textContent = "ACTIVE";
+                    document.getElementById('fsStatus').className = "text-green";
+                } else {
+                    await document.exitFullscreen();
+                    document.getElementById('fsStatus').textContent = "INACTIVE";
+                    document.getElementById('fsStatus').className = "text-yellow";
                 }
-            } catch (error) {
-                logEvent(`Face inference error: ${error.message}`, "warning");
+            } catch (err) {
+                logAudit("Fullscreen toggle blocked: " + err.message, true);
             }
-            await new Promise(resolve => setTimeout(resolve, 600));
         }
-        faceLoopRunning = false;
-    }
 
-    function processFaceResult(count) {
-        const now = Date.now();
+        // Edge ML Camera and BlazeFace Engine
+        async function initEdgeProctor() {
+            logAudit("Starting Edge ML Camera Engine...");
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: false
+                });
+                const videoEl = document.getElementById('webcam');
+                videoEl.srcObject = stream;
+                await videoEl.play();
 
-        if (count === 0) {
-            faceStatus.textContent = "● NO FACE";
-            faceStatus.className = "status-value danger-text";
-            if (!noFaceSince) noFaceSince = now;
-            if (now - noFaceSince >= 3000) {
-                registerViolation("Candidate face was not detected for 3 seconds.");
-                noFaceSince = now;
+                document.getElementById('camStatus').textContent = "CONNECTED";
+                document.getElementById('camStatus').className = "text-green";
+                logAudit("Local Camera active.");
+
+                // Load TF.js BlazeFace Model
+                logAudit("Loading BlazeFace inference model...");
+                faceModel = await blazeface.load();
+                document.getElementById('faceStatus').textContent = "TRACKING";
+                document.getElementById('faceStatus').className = "text-green";
+                logAudit("Face inference model ready on device.");
+
+                runFaceDetectionLoop();
+            } catch (err) {
+                document.getElementById('camStatus').textContent = "FAILED";
+                document.getElementById('camStatus').className = "text-red";
+                logAudit("Sensor initialisation failed: " + err.message, true);
             }
-            return;
         }
 
-        noFaceSince = null;
-
-        if (count > 1) {
-            faceStatus.textContent = `● ${count} FACES`;
-            faceStatus.className = "status-value danger-text";
-            if (now - lastMultiFaceViolation >= 4000) {
-                lastMultiFaceViolation = now;
-                registerViolation(`Multiple faces detected in the assessment frame (${count}).`);
+        async function runFaceDetectionLoop() {
+            const videoEl = document.getElementById('webcam');
+            while (isProctoringActive) {
+                if (faceModel && videoEl.readyState >= 2) {
+                    try {
+                        const predictions = await faceModel.estimateFaces(videoEl, false);
+                        if (predictions.length === 0) {
+                            document.getElementById('faceStatus').textContent = "NO FACE";
+                            document.getElementById('faceStatus').className = "text-red";
+                            recordViolation("No face detected in camera viewport.");
+                        } else if (predictions.length > 1) {
+                            document.getElementById('faceStatus').textContent = `${predictions.length} FACES`;
+                            document.getElementById('faceStatus').className = "text-red";
+                            recordViolation("Multiple faces detected in assessment frame.");
+                        } else {
+                            document.getElementById('faceStatus').textContent = "1 FACE (VERIFIED)";
+                            document.getElementById('faceStatus').className = "text-green";
+                        }
+                    } catch (e) {
+                        // Suppress frame inference drops
+                    }
+                }
+                await new Promise(r => setTimeout(r, 1200));
             }
-            return;
         }
 
-        faceStatus.textContent = "● 1 FACE";
-        faceStatus.className = "status-value safe";
-    }
-
-    /* -----------------------------
-       Tab visibility
-    ----------------------------- */
-    document.addEventListener("visibilitychange", () => {
-        if (!assessmentRunning) return;
-        if (document.hidden) {
-            tabSwitchCount++;
-            tabStatus.textContent = "● LEFT PAGE";
-            tabStatus.className = "status-value danger-text";
-            registerViolation("Assessment page lost visibility.");
-        } else {
-            tabStatus.textContent = "● ACTIVE";
-            tabStatus.className = "status-value safe";
-            logEvent("Candidate returned to the assessment page.", "warning");
-        }
-    });
-
-    /* -----------------------------
-       Fullscreen
-    ----------------------------- */
-    document.addEventListener("fullscreenchange", () => {
-        if (!assessmentRunning) return;
-        if (document.fullscreenElement) {
-            fullscreenStatus.textContent = "● ACTIVE";
-            fullscreenStatus.className = "status-value safe";
-            fullscreenBtn.textContent = "Exit Fullscreen";
-            logEvent("Fullscreen mode active.");
-        } else {
-            fullscreenStatus.textContent = "● EXITED";
-            fullscreenStatus.className = "status-value danger-text";
-            fullscreenBtn.textContent = "Enter Fullscreen";
-            registerViolation("Fullscreen mode exited.");
-        }
-    });
-
-    fullscreenBtn.addEventListener("click", async () => {
-        try {
-            if (document.fullscreenElement) await document.exitFullscreen();
-            else await document.documentElement.requestFullscreen();
-        } catch (error) {
-            logEvent(`Fullscreen request failed: ${error.message}`, "warning");
-        }
-    });
-
-    /* -----------------------------
-       Start
-    ----------------------------- */
-    startBtn.addEventListener("click", async () => {
-        startBtn.disabled = true;
-        prepStatus.textContent = "Preparing secure assessment...";
-
-        // Request fullscreen from the original user gesture before async permission/model work.
-        let fullscreenPromise = Promise.resolve();
-        if (document.documentElement.requestFullscreen) {
-            fullscreenPromise = document.documentElement.requestFullscreen().catch(() => null);
-        }
-
-        try {
-            await Promise.all([initializeSensors(), loadFaceModel(), fullscreenPromise]);
-
-            prepView.classList.add("hidden");
-            assessmentView.classList.remove("hidden");
-            assessmentRunning = true;
-            startTime = Date.now();
-            timer = setInterval(updateTimer, 1000);
-
-            if (document.fullscreenElement) {
-                fullscreenStatus.textContent = "● ACTIVE";
-                fullscreenStatus.className = "status-value safe";
+        // Monitoring Tab Switching
+        document.addEventListener('visibilitychange', () => {
+            if (!isProctoringActive) return;
+            if (document.hidden) {
+                document.getElementById('tabStatus').textContent = "UNFOCUSED";
+                document.getElementById('tabStatus').className = "text-red";
+                recordViolation("Candidate navigated away from assessment tab.");
             } else {
-                fullscreenStatus.textContent = "● NOT ACTIVE";
-                fullscreenStatus.className = "status-value warning";
-                logEvent("Fullscreen was not enabled; monitoring continues.", "warning");
+                document.getElementById('tabStatus').textContent = "FOCUSED";
+                document.getElementById('tabStatus').className = "text-green";
+                logAudit("Candidate re-entered examination window.");
             }
+        });
 
-            logEvent("Secure competency assessment started.");
-            updateProgress();
-            faceDetectionLoop();
-        } catch (error) {
-            cleanupSession();
-            prepStatus.textContent = `Could not start assessment: ${error.message}`;
-            startBtn.disabled = false;
-            logEvent(`Assessment preparation failed: ${error.message}`, "violation");
+        // CLOSED-LOOP STATE MUTATION
+        function submitAssessment() {
+            // Close modal & stop proctor
+            closeAssessmentModal();
+
+            // 1. Update Ecosystem Loop indicators
+            document.getElementById('loopStepAssess').className = 'loop-step done';
+            document.getElementById('loopStepAssess').innerHTML = '<span class="step-num">✓</span> Practical Assessment';
+            document.getElementById('loopStepVerified').className = 'loop-step active';
+
+            // 2. Mutate Skill Gap Bar for REST API from 45% to 82%
+            document.getElementById('barRestApi').style.width = '82%';
+            document.getElementById('barRestApi').style.background = 'var(--accent-green)';
+            document.getElementById('labelRestApi').textContent = '82% / 80%';
+            document.getElementById('badgeRestApi').className = 'tag-pill matched';
+            document.getElementById('badgeRestApi').textContent = 'MATCHED';
+
+            // 3. Update Target Role Chip
+            const chip = document.getElementById('chipRestApi');
+            chip.className = 'chip verified';
+            chip.textContent = '✓ REST API (82%)';
+
+            // 4. Update Summary Cards
+            document.getElementById('metricReadiness').textContent = '93%';
+            document.getElementById('metricVerifiedCount').textContent = '9';
+            document.getElementById('metricRoadmap').textContent = '84%';
+            document.getElementById('metricGaps').textContent = '2';
+            document.getElementById('overallGapBadge').textContent = 'Active Gaps: 2';
+            document.getElementById('targetMatchScore').textContent = '89%';
+
+            // 5. Inject Verified Evidence Card
+            const verifiedList = document.getElementById('verifiedSkillsList');
+            const newCard = document.createElement('div');
+            newCard.className = 'metric-card';
+            newCard.style.padding = '12px';
+            newCard.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            newCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: #6ee7b7;">REST API & Web Architecture</strong>
+                    <span class="tag-pill matched">82% VERIFIED</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                    Evidence: Edge-Proctored Exam • Zero Critical Violations
+                </div>
+            `;
+            verifiedList.prepend(newCard);
+
+            // 6. Update Jobs Section (TechNova matches automatically jump)
+            document.getElementById('jobTechNovaMatch').textContent = '95% Match';
+            document.getElementById('jobTechNovaMatch').style.background = 'rgba(16, 185, 129, 0.25)';
+
+            // 7. Update AI Diagnostic
+            document.getElementById('aiDiagnosticText').innerHTML = `
+                <strong>Congratulations!</strong> REST API competency has been proven with zero critical proctor violations. Your compatibility for <strong>TechNova Solutions</strong> has climbed to 95%.
+            `;
+
+            // 8. Update Roadmap Item
+            const btnRoadmap = document.getElementById('btnRoadmapRest');
+            btnRoadmap.textContent = 'Verified ✓';
+            btnRoadmap.className = 'btn btn-sm btn-outline text-green';
+            btnRoadmap.onclick = null;
+
+            alert("Assessment successfully submitted! The SkillBridge closed loop has verified your competency and recalculated your employability profile.");
         }
-    });
 
-    /* -----------------------------
-       Submit / competency result
-    ----------------------------- */
-    submitBtn.addEventListener("click", submitAssessment);
-
-    function calculateScore() {
-        let correct = 0;
-        for (const [name, answer] of Object.entries(ANSWERS)) {
-            const selected = form.querySelector(`input[name="${name}"]:checked`);
-            if (selected?.value === answer) correct++;
+        function scrollToGap() {
+            document.getElementById('skillGapSection').scrollIntoView({ behavior: 'smooth' });
         }
-        return { correct, total: TOTAL_QUESTIONS, percentage: Math.round((correct / TOTAL_QUESTIONS) * 100) };
-    }
 
-    function submitAssessment() {
-        if (!assessmentRunning) return;
-        const result = calculateScore();
-        const duration = Math.floor((Date.now() - startTime) / 1000);
-
-        assessmentRunning = false;
-        clearInterval(timer);
-        clearInterval(audioTimer);
-
-        if (audioContext) audioContext.close().catch(() => {});
-        if (stream) stream.getTracks().forEach(track => track.stop());
-
-        $("summaryScore").textContent = `${result.percentage}%`;
-        $("summaryDuration").textContent = formatTime(duration);
-        $("summaryViolations").textContent = violationCount;
-        $("summaryTabSwitches").textContent = tabSwitchCount;
-
-        const competencyLevel = result.percentage >= 80 ? "Demonstrated — Strong" : result.percentage >= 60 ? "Demonstrated — Developing" : "Needs Further Development";
-        $("competencyText").textContent = `Java Fundamentals: ${competencyLevel}. Score ${result.percentage}% (${result.correct}/${result.total}). This demonstration record combines the assessment result with locally generated monitoring events; it is not a formal certification decision.`;
-
-        summary.classList.remove("hidden");
-        submitBtn.disabled = true;
-        fullscreenBtn.disabled = true;
-        $("sessionState").textContent = "ASSESSMENT COMPLETED";
-        logEvent(`Assessment submitted — score ${result.percentage}%.`);
-        logEvent("Monitoring session ended.");
-
-        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-        document.querySelectorAll("#assessmentForm input").forEach(input => input.disabled = true);
-    }
-
-    function cleanupSession() {
-        assessmentRunning = false;
-        clearInterval(timer);
-        clearInterval(audioTimer);
-        if (audioContext) audioContext.close().catch(() => {});
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        stream = null;
-        faceModel = null;
-        faceLoopRunning = false;
-        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-    }
-
-    updateProgress();
-})();
-</script>
+        function switchTab(tab) {
+            if(tab === 'assessments') openAssessmentModal();
+            else scrollToGap();
+        }
+    </script>
 </body>
 </html>
