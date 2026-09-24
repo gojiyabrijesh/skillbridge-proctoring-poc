@@ -2416,6 +2416,17 @@
       restApiVerified: false
     };
 
+    // Read the supplied assessment result when returning from assessment.html.
+    try {
+      const savedAssessmentResult = localStorage.getItem('skillbridge_assessment_result');
+      if (savedAssessmentResult) {
+        const parsedAssessmentResult = JSON.parse(savedAssessmentResult);
+        window.addEventListener('DOMContentLoaded', () => applySuppliedAssessmentResult(parsedAssessmentResult));
+      }
+    } catch (error) {
+      console.warn('Could not restore assessment result:', error);
+    }
+
     // Navigation Router
     function navigateTo(viewId) {
       const allViews = ['dashboard', 'skills', 'skill-gap', 'roadmap', 'assessments', 'projects', 'verified-skills', 'jobs', 'profile'];
@@ -2534,10 +2545,9 @@
       }, 4000);
     }
 
-    // Practical Assessment Modal Handlers
+    // Assessment integration: use the supplied secure assessment HTML.
     function openAssessmentModal() {
-      const modal = document.getElementById('assessment-modal');
-      if (modal) modal.classList.remove('hidden');
+      window.location.href = 'assessment.html';
     }
 
     function closeAssessmentModal() {
@@ -2545,7 +2555,45 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    // CORE PROTOTYPE DEMO: Submitting assessment updates the entire closed loop!
+    // Apply a result returned by the supplied assessment page.
+    function applySuppliedAssessmentResult(result) {
+      if (!result || result.assessment !== 'java-fundamentals') return;
+
+      const score = Number(result.score) || 0;
+      const passed = score >= 80;
+
+      // Persist the demo state in the dashboard UI without changing the supplied test logic.
+      SkillBridgeState.metrics.careerReadiness = passed ? 92 : Math.max(SkillBridgeState.metrics.careerReadiness, score);
+      SkillBridgeState.metrics.verifiedSkillsCount = passed ? 9 : SkillBridgeState.metrics.verifiedSkillsCount;
+      SkillBridgeState.metrics.skillGapsCount = passed ? 2 : SkillBridgeState.metrics.skillGapsCount;
+
+      const metricReadiness = document.getElementById('metric-readiness');
+      const metricReadinessBar = document.getElementById('metric-readiness-bar');
+      const metricVerified = document.getElementById('metric-verified-count');
+      const metricGaps = document.getElementById('metric-gap-count');
+
+      if (metricReadiness) metricReadiness.innerText = `${SkillBridgeState.metrics.careerReadiness}%`;
+      if (metricReadinessBar) metricReadinessBar.style.width = `${SkillBridgeState.metrics.careerReadiness}%`;
+      if (metricVerified) metricVerified.innerText = String(SkillBridgeState.metrics.verifiedSkillsCount);
+      if (metricGaps) metricGaps.innerText = String(SkillBridgeState.metrics.skillGapsCount);
+
+      const notification = {
+        id: Date.now(),
+        title: passed ? 'Competency Verified: Java Fundamentals' : 'Assessment Completed: Java Fundamentals',
+        msg: `Assessment score: ${score}%. ${passed ? 'Competency verified for the prototype.' : 'Further development recommended.'}`,
+        time: 'Just now',
+        icon: passed ? 'fa-certificate' : 'fa-flask-vial',
+        color: passed ? 'text-emerald-600 bg-emerald-50' : 'text-indigo-600 bg-indigo-50'
+      };
+
+      SkillBridgeState.notifications.unshift(notification);
+      renderNotifications();
+      showToast(passed ? `🎉 Java Fundamentals competency verified (${score}%).` : `Assessment completed with ${score}%.`, passed ? 'success' : 'info');
+
+      localStorage.removeItem('skillbridge_assessment_result');
+    }
+
+    // CORE PROTOTYPE DEMO: legacy dashboard modal submission handler retained for compatibility.
     function submitAssessmentSuccess() {
       closeAssessmentModal();
       SkillBridgeState.restApiVerified = true;

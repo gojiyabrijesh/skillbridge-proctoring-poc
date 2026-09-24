@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillBridge - Secure Competency Assessment</title>
+
+    <!-- Browser-side ML for the PoC. Face inference runs locally after the model is loaded. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --bg: #0b0f14;
+            --panel: #121820;
+            --panel-2: #0d1319;
+            --border: #27313c;
+            --muted: #8b98a7;
+            --text: #f5f7fa;
+            --blue: #2962ff;
+            --green: #69f0ae;
+            --yellow: #ffca28;
+            --red: #ff5252;
+        }
+        body {
+            margin: 0;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        button, input, label { font: inherit; }
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            background: var(--blue);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { filter: brightness(1.08); }
+        button:disabled { opacity: .5; cursor: not-allowed; }
+        button.secondary { background: #26313d; }
+        button.danger { background: #b71c1c; }
+        .container { width: min(1120px, 94%); margin: 28px auto 50px; }
+        .header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
+        .brand { display:flex; align-items:center; gap:12px; }
+        .shield { width:44px; height:44px; border-radius:11px; background:var(--blue); display:grid; place-items:center; font-size:23px; }
+        .brand h1 { margin:0; font-size:24px; }
+        .brand p { margin:3px 0 0; color:var(--muted); font-size:13px; }
+        .badge { padding:7px 12px; border:1px solid #33404d; border-radius:999px; color:#90caf9; background:#1c2530; font-size:12px; font-weight:800; }
+        .card { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px; }
+        .hidden { display:none !important; }
+
+        /* Preparation */
+        .prep { max-width:850px; margin:30px auto; }
+        .prep h2 { margin-top:0; }
+        .prep h3 { color:#ffb74d; }
+        .rules { color:#b7c1cc; line-height:1.7; padding-left:20px; }
+        .rules li { margin:7px 0; }
+        .rules strong { color:#fff; }
+        .prep-actions { display:flex; justify-content:center; margin-top:24px; }
+        .prep-status { margin-top:16px; text-align:center; color:var(--muted); min-height:20px; }
+
+        /* Assessment */
+        .session-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 20px; background:var(--panel); border:1px solid var(--border); border-radius:12px; margin-bottom:14px; }
+        .session-state { display:flex; align-items:center; gap:9px; color:var(--green); font-weight:800; }
+        .dot { width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+        .timer { font:800 24px Consolas, monospace; }
+        .warning-banner { display:none; margin-bottom:14px; padding:13px 16px; border-radius:10px; background:#4a1717; border:1px solid var(--red); color:#ffbaba; font-weight:700; }
+
+        .status-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:16px; }
+        .status-card { background:var(--panel); border:1px solid var(--border); border-radius:11px; padding:14px; }
+        .status-title { color:#7e8b99; font-size:11px; text-transform:uppercase; margin-bottom:7px; }
+        .status-value { font-size:14px; font-weight:800; }
+        .safe { color:var(--green); }
+        .warning { color:var(--yellow); }
+        .danger-text { color:var(--red); }
+
+        .assessment-grid { display:grid; grid-template-columns:1.35fr .85fr; gap:16px; }
+        .video-card, .question-card, .side-card, .events-card { background:var(--panel); border:1px solid var(--border); border-radius:14px; }
+        .video-card { padding:16px; }
+        video { width:100%; aspect-ratio:16/10; object-fit:cover; background:#000; border-radius:10px; border:2px solid var(--border); transform:scaleX(-1); }
+        .video-note { margin-top:9px; color:var(--muted); font-size:12px; }
+
+        .side-stack { display:flex; flex-direction:column; gap:14px; }
+        .side-card { padding:18px; }
+        .metric-label { color:var(--muted); font-size:12px; }
+        .metric { font-size:38px; font-weight:900; margin-top:4px; }
+        .privacy { background:#0e2119; border-color:#1d563c; }
+        .privacy h3 { color:var(--green); margin:0 0 8px; font-size:15px; }
+        .privacy p { color:#a8c4b3; font-size:12px; line-height:1.5; margin:0; }
+
+        /* Questions */
+        .question-card { margin-top:16px; padding:20px; }
+        .question-header { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:15px; }
+        .question-header h2 { margin:0; font-size:19px; }
+        .progress { color:var(--muted); font-size:12px; }
+        .question { padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--panel-2); margin-bottom:12px; }
+        .question h3 { margin:0 0 12px; font-size:15px; line-height:1.5; }
+        .option { display:flex; align-items:flex-start; gap:10px; padding:10px; border-radius:8px; cursor:pointer; color:#c8d0d9; }
+        .option:hover { background:#18212a; }
+        .option input { margin-top:4px; accent-color:var(--blue); }
+        .assessment-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+
+        /* Events */
+        .events-card { margin-top:16px; padding:18px; }
+        .events-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+        .events-head h2 { margin:0; font-size:17px; }
+        .event-count { color:var(--muted); font-size:12px; }
+        #logs { height:175px; overflow:auto; background:#080b0f; border-radius:9px; padding:13px; font:13px/1.5 Consolas, monospace; }
+        .log { margin-bottom:7px; }
+        .log.normal { color:var(--green); }
+        .log.warning { color:var(--yellow); }
+        .log.violation { color:var(--red); }
+
+        /* Completion */
+        .summary { margin-top:16px; }
+        .summary h2 { margin-top:0; }
+        .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0; }
+        .summary-item { background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:15px; text-align:center; }
+        .summary-item span { display:block; color:var(--muted); font-size:11px; margin-bottom:7px; }
+        .summary-item strong { font-size:24px; }
+        .competency { border:1px solid #31528f; background:#101b30; padding:17px; border-radius:10px; }
+        .competency h3 { margin:0 0 7px; color:#90caf9; }
+        .competency p { margin:0; color:#bdc9d8; line-height:1.5; }
+
+        #toast { position:fixed; right:22px; bottom:22px; width:min(340px,calc(100% - 44px)); padding:15px; border-radius:10px; background:#181e26; border:1px solid var(--red); border-left:5px solid var(--red); box-shadow:0 10px 30px rgba(0,0,0,.4); display:none; z-index:10; }
+        #toast strong { color:var(--red); display:block; margin-bottom:5px; }
+        #toast span { color:#d7dde4; font-size:13px; }
+
+        @media(max-width:900px) {
+            .status-grid { grid-template-columns:repeat(3,1fr); }
+            .assessment-grid { grid-template-columns:1fr; }
+            .summary-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:600px) {
+            .header, .session-header { align-items:flex-start; flex-direction:column; }
+            .status-grid, .summary-grid { grid-template-columns:1fr; }
+            .assessment-actions { flex-direction:column; }
+            .assessment-actions button { width:100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header class="header">
+        <div class="brand">
+            <div class="shield">🛡️</div>
+            <div>
+                <h1>SkillBridge</h1>
+                <p>Secure Competency Assessment</p>
+            </div>
+        </div>
+        <div class="badge">PROOF OF CONCEPT</div>
+    </header>
+
+    <!-- PREPARATION -->
+    <section id="prepView" class="card prep">
+        <h2>Java Fundamentals — Competency Assessment</h2>
+        <h3>⚠ Assessment & monitoring guidelines</h3>
+        <ul class="rules">
+            <li><strong>Camera:</strong> Keep your face visible during the assessment.</li>
+            <li><strong>Face monitoring:</strong> The PoC detects face presence and multiple people locally in the browser.</li>
+            <li><strong>Tab monitoring:</strong> Leaving the assessment page creates a monitoring event.</li>
+            <li><strong>Fullscreen:</strong> Unexpectedly leaving fullscreen creates a monitoring event when fullscreen is active.</li>
+            <li><strong>Audio:</strong> Elevated microphone energy is recorded as a noise event; this PoC does not claim speech recognition.</li>
+            <li><strong>Privacy:</strong> Camera/audio streams are not uploaded by this HTML implementation.</li>
+        </ul>
+        <div class="prep-actions">
+            <button id="startBtn">Start Secure Assessment</button>
+        </div>
+        <div id="prepStatus" class="prep-status"></div>
+    </section>
+
+    <!-- ASSESSMENT -->
+    <main id="assessmentView" class="hidden">
+        <div class="session-header">
+            <div class="session-state"><span class="dot"></span><span id="sessionState">ASSESSMENT IN PROGRESS</span></div>
+            <div id="timer" class="timer">00:00</div>
+        </div>
+
+        <div id="warningBanner" class="warning-banner">⚠ Monitoring event detected.</div>
+
+        <div class="status-grid">
+            <div class="status-card"><div class="status-title">Camera</div><div id="cameraStatus" class="status-value warning">● CHECKING</div></div>
+            <div class="status-card"><div class="status-title">Face</div><div id="faceStatus" class="status-value warning">● WAITING</div></div>
+            <div class="status-card"><div class="status-title">Microphone</div><div id="micStatus" class="status-value warning">● CHECKING</div></div>
+            <div class="status-card"><div class="status-title">Tab</div><div id="tabStatus" class="status-value safe">● ACTIVE</div></div>
+            <div class="status-card"><div class="status-title">Fullscreen</div><div id="fullscreenStatus" class="status-value warning">● CHECKING</div></div>
+        </div>
+
+        <div class="assessment-grid">
+            <section class="video-card">
+                <video id="webcam" autoplay muted playsinline></video>
+                <div class="video-note">Camera preview. Face inference is performed locally after the model is loaded.</div>
+            </section>
+
+            <aside class="side-stack">
+                <div class="side-card">
+                    <div class="metric-label">Monitoring Violations</div>
+                    <div id="violationCount" class="metric">0</div>
+                </div>
+                <div class="side-card">
+                    <div class="metric-label">Audio Environment</div>
+                    <div id="audioStatus" class="status-value safe" style="margin-top:8px">● CALIBRATING</div>
+                </div>
+                <div class="side-card privacy">
+                    <h3>🔒 Edge Processing</h3>
+                    <p>Face inference and microphone analysis run in this browser. This PoC does not upload the raw camera or microphone stream to a backend.</p>
+                </div>
+            </aside>
+        </div>
+
+        <section class="question-card">
+            <div class="question-header">
+                <h2>Competency Questions</h2>
+                <div id="progress" class="progress">0 / 5 answered</div>
+            </div>
+            <form id="assessmentForm">
+                <div class="question">
+                    <h3>1. Which keyword is used to inherit a class in Java?</h3>
+                    <label class="option"><input type="radio" name="q1" value="a"> implements</label>
+                    <label class="option"><input type="radio" name="q1" value="b"> extends</label>
+                    <label class="option"><input type="radio" name="q1" value="c"> inherits</label>
+                    <label class="option"><input type="radio" name="q1" value="d"> super</label>
+                </div>
+                <div class="question">
+                    <h3>2. Which collection does not allow duplicate elements?</h3>
+                    <label class="option"><input type="radio" name="q2" value="a"> List</label>
+                    <label class="option"><input type="radio" name="q2" value="b"> Set</label>
+                    <label class="option"><input type="radio" name="q2" value="c"> ArrayList</label>
+                    <label class="option"><input type="radio" name="q2" value="d"> Vector</label>
+                </div>
+                <div class="question">
+                    <h3>3. What is the entry point method of a standard Java application?</h3>
+                    <label class="option"><input type="radio" name="q3" value="a"> start()</label>
+                    <label class="option"><input type="radio" name="q3" value="b"> run()</label>
+                    <label class="option"><input type="radio" name="q3" value="c"> main()</label>
+                    <label class="option"><input type="radio" name="q3" value="d"> init()</label>
+                </div>
+                <div class="question">
+                    <h3>4. Which concept allows one interface to have multiple implementations?</h3>
+                    <label class="option"><input type="radio" name="q4" value="a"> Polymorphism</label>
+                    <label class="option"><input type="radio" name="q4" value="b"> Encapsulation</label>
+                    <label class="option"><input type="radio" name="q4" value="c"> Serialization</label>
+                    <label class="option"><input type="radio" name="q4" value="d"> Compilation</label>
+                </div>
+                <div class="question">
+                    <h3>5. Which keyword prevents a class from being inherited?</h3>
+                    <label class="option"><input type="radio" name="q5" value="a"> static</label>
+                    <label class="option"><input type="radio" name="q5" value="b"> private</label>
+                    <label class="option"><input type="radio" name="q5" value="c"> final</label>
+                    <label class="option"><input type="radio" name="q5" value="d"> sealed</label>
+                </div>
+            </form>
+            <div class="assessment-actions">
+                <button id="fullscreenBtn" class="secondary">Enter Fullscreen</button>
+                <button id="submitBtn" class="danger" disabled>Submit Assessment</button>
+            </div>
+        </section>
+
+        <section class="events-card">
+            <div class="events-head">
+                <h2>Monitoring Events</h2>
+                <div id="eventCount" class="event-count">0 events</div>
+            </div>
+            <div id="logs"></div>
+        </section>
+
+        <section id="summary" class="card summary hidden">
+            <h2>Assessment Completed</h2>
+            <p>SkillBridge has generated a local competency-assessment summary for this PoC.</p>
+            <div class="summary-grid">
+                <div class="summary-item"><span>Score</span><strong id="summaryScore">0%</strong></div>
+                <div class="summary-item"><span>Duration</span><strong id="summaryDuration">00:00</strong></div>
+                <div class="summary-item"><span>Violations</span><strong id="summaryViolations">0</strong></div>
+                <div class="summary-item"><span>Tab Switches</span><strong id="summaryTabSwitches">0</strong></div>
+            </div>
+            <div class="competency">
+                <h3>Verified Competency — Demonstration Record</h3>
+                <p id="competencyText">Assessment completed.</p>
+            </div>
+            <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+                <button id="backToDashboardBtn" class="secondary">Back to Student Dashboard</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="toast"><strong>⚠ Monitoring Event</strong><span id="toastMessage"></span></div>
+
+<script>
+(() => {
+    "use strict";
+
+    /* -----------------------------
+       DOM
+    ----------------------------- */
+    const $ = id => document.getElementById(id);
+    const prepView = $("prepView");
+    const assessmentView = $("assessmentView");
+    const startBtn = $("startBtn");
+    const prepStatus = $("prepStatus");
+    const video = $("webcam");
+    const cameraStatus = $("cameraStatus");
+    const faceStatus = $("faceStatus");
+    const micStatus = $("micStatus");
+    const tabStatus = $("tabStatus");
+    const fullscreenStatus = $("fullscreenStatus");
+    const audioStatus = $("audioStatus");
+    const violationCountEl = $("violationCount");
+    const logs = $("logs");
+    const eventCountEl = $("eventCount");
+    const warningBanner = $("warningBanner");
+    const timerEl = $("timer");
+    const progressEl = $("progress");
+    const form = $("assessmentForm");
+    const submitBtn = $("submitBtn");
+    const fullscreenBtn = $("fullscreenBtn");
+    const summary = $("summary");
+    const toast = $("toast");
+    const toastMessage = $("toastMessage");
+
+    /* -----------------------------
+       State
+    ----------------------------- */
+    const TOTAL_QUESTIONS = 5;
+    const ANSWERS = { q1: "b", q2: "b", q3: "c", q4: "a", q5: "c" };
+
+    let stream = null;
+    let audioContext = null;
+    let analyser = null;
+    let audioTimer = null;
+    let timer = null;
+    let faceModel = null;
+    let faceLoopRunning = false;
+    let startTime = null;
+    let assessmentRunning = false;
+    let violationCount = 0;
+    let tabSwitchCount = 0;
+    let eventCount = 0;
+    let lastAudioViolation = 0;
+    let lastMultiFaceViolation = 0;
+    let noFaceSince = null;
+    let audioSamples = [];
+    let audioBaseline = 0;
+    let audioThreshold = 20;
+    let toastTimer = null;
+
+    /* -----------------------------
+       Logging
+    ----------------------------- */
+    function logEvent(message, type = "normal") {
+        eventCount++;
+        eventCountEl.textContent = `${eventCount} event${eventCount === 1 ? "" : "s"}`;
+
+        const row = document.createElement("div");
+        row.className = `log ${type}`;
+        const icon = type === "violation" ? "🔴" : type === "warning" ? "⚠" : "✓";
+        row.textContent = `[${new Date().toLocaleTimeString()}] ${icon} ${message}`;
+        logs.prepend(row);
+    }
+
+    function showViolation(message) {
+        warningBanner.style.display = "block";
+        warningBanner.textContent = `⚠ ${message}`;
+        toastMessage.textContent = message;
+        toast.style.display = "block";
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.style.display = "none", 3500);
+    }
+
+    function registerViolation(message) {
+        if (!assessmentRunning) return;
+        violationCount++;
+        violationCountEl.textContent = violationCount;
+        logEvent(`VIOLATION #${violationCount}: ${message}`, "violation");
+        showViolation(message);
+    }
+
+    /* -----------------------------
+       Timer
+    ----------------------------- */
+    function formatTime(seconds) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return h > 0
+            ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+            : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function updateTimer() {
+        if (startTime) timerEl.textContent = formatTime(Math.floor((Date.now() - startTime) / 1000));
+    }
+
+    /* -----------------------------
+       Assessment progress
+    ----------------------------- */
+    function updateProgress() {
+        const answered = Object.keys(ANSWERS).filter(name => form.querySelector(`input[name="${name}"]:checked`)).length;
+        progressEl.textContent = `${answered} / ${TOTAL_QUESTIONS} answered`;
+        submitBtn.disabled = !assessmentRunning || answered !== TOTAL_QUESTIONS;
+    }
+
+    form.addEventListener("change", updateProgress);
+
+    /* -----------------------------
+       Camera + microphone
+    ----------------------------- */
+    async function initializeSensors() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error("Camera/microphone access is not supported by this browser.");
+        }
+
+        logEvent("Requesting camera and microphone permission...", "warning");
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        cameraStatus.textContent = "● CONNECTED";
+        cameraStatus.className = "status-value safe";
+        micStatus.textContent = "● ACTIVE";
+        micStatus.className = "status-value safe";
+
+        const videoTrack = stream.getVideoTracks()[0];
+        const audioTrack = stream.getAudioTracks()[0];
+        videoTrack?.addEventListener("ended", () => {
+            cameraStatus.textContent = "● DISCONNECTED";
+            cameraStatus.className = "status-value danger-text";
+            if (assessmentRunning) registerViolation("Camera stream ended unexpectedly.");
+        });
+        audioTrack?.addEventListener("ended", () => {
+            micStatus.textContent = "● DISCONNECTED";
+            micStatus.className = "status-value danger-text";
+            if (assessmentRunning) registerViolation("Microphone stream ended unexpectedly.");
+        });
+
+        logEvent("Camera connected.");
+        logEvent("Microphone connected.");
+        initializeAudioMonitoring();
+    }
+
+    /* -----------------------------
+       Audio monitoring with calibration
+    ----------------------------- */
+    function initializeAudioMonitoring() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            audioStatus.textContent = "● UNSUPPORTED";
+            audioStatus.className = "status-value danger-text";
+            logEvent("Web Audio API is unavailable.", "warning");
+            return;
+        }
+
+        audioContext = new AudioContext();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        const calibrationStarted = Date.now();
+        audioSamples = [];
+
+        audioStatus.textContent = "● CALIBRATING";
+        audioStatus.className = "status-value warning";
+
+        audioTimer = setInterval(() => {
+            analyser.getByteFrequencyData(data);
+            const average = data.reduce((sum, value) => sum + value, 0) / data.length;
+
+            if (Date.now() - calibrationStarted < 3000) {
+                audioSamples.push(average);
+                return;
+            }
+
+            if (audioBaseline === 0 && audioSamples.length) {
+                audioBaseline = audioSamples.reduce((a,b) => a+b, 0) / audioSamples.length;
+                audioThreshold = Math.max(45, audioBaseline + 18);
+                logEvent(`Audio baseline calibrated (${audioBaseline.toFixed(1)}; threshold ${audioThreshold.toFixed(1)}).`);
+            }
+
+            if (!assessmentRunning) return;
+
+            if (average > audioThreshold) {
+                audioStatus.textContent = "● ELEVATED NOISE";
+                audioStatus.className = "status-value danger-text";
+                const now = Date.now();
+                if (now - lastAudioViolation > 5000) {
+                    lastAudioViolation = now;
+                    registerViolation("Elevated background audio/noise detected.");
+                }
+            } else {
+                audioStatus.textContent = "● QUIET";
+                audioStatus.className = "status-value safe";
+            }
+        }, 500);
+    }
+
+    /* -----------------------------
+       BlazeFace
+    ----------------------------- */
+    async function loadFaceModel() {
+        if (!window.tf || !window.blazeface) throw new Error("Face-detection libraries did not load. Check network access.");
+        prepStatus.textContent = "Preparing face-detection model...";
+        await tf.ready();
+        faceModel = await blazeface.load();
+        logEvent("Face-detection model loaded.");
+    }
+
+    async function faceDetectionLoop() {
+        if (faceLoopRunning) return;
+        faceLoopRunning = true;
+
+        while (assessmentRunning && faceModel) {
+            try {
+                if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                    const predictions = await faceModel.estimateFaces(video, false);
+                    processFaceResult(predictions.length);
+                }
+            } catch (error) {
+                logEvent(`Face inference error: ${error.message}`, "warning");
+            }
+            await new Promise(resolve => setTimeout(resolve, 600));
+        }
+        faceLoopRunning = false;
+    }
+
+    function processFaceResult(count) {
+        const now = Date.now();
+
+        if (count === 0) {
+            faceStatus.textContent = "● NO FACE";
+            faceStatus.className = "status-value danger-text";
+            if (!noFaceSince) noFaceSince = now;
+            if (now - noFaceSince >= 3000) {
+                registerViolation("Candidate face was not detected for 3 seconds.");
+                noFaceSince = now;
+            }
+            return;
+        }
+
+        noFaceSince = null;
+
+        if (count > 1) {
+            faceStatus.textContent = `● ${count} FACES`;
+            faceStatus.className = "status-value danger-text";
+            if (now - lastMultiFaceViolation >= 4000) {
+                lastMultiFaceViolation = now;
+                registerViolation(`Multiple faces detected in the assessment frame (${count}).`);
+            }
+            return;
+        }
+
+        faceStatus.textContent = "● 1 FACE";
+        faceStatus.className = "status-value safe";
+    }
+
+    /* -----------------------------
+       Tab visibility
+    ----------------------------- */
+    document.addEventListener("visibilitychange", () => {
+        if (!assessmentRunning) return;
+        if (document.hidden) {
+            tabSwitchCount++;
+            tabStatus.textContent = "● LEFT PAGE";
+            tabStatus.className = "status-value danger-text";
+            registerViolation("Assessment page lost visibility.");
+        } else {
+            tabStatus.textContent = "● ACTIVE";
+            tabStatus.className = "status-value safe";
+            logEvent("Candidate returned to the assessment page.", "warning");
+        }
+    });
+
+    /* -----------------------------
+       Fullscreen
+    ----------------------------- */
+    document.addEventListener("fullscreenchange", () => {
+        if (!assessmentRunning) return;
+        if (document.fullscreenElement) {
+            fullscreenStatus.textContent = "● ACTIVE";
+            fullscreenStatus.className = "status-value safe";
+            fullscreenBtn.textContent = "Exit Fullscreen";
+            logEvent("Fullscreen mode active.");
+        } else {
+            fullscreenStatus.textContent = "● EXITED";
+            fullscreenStatus.className = "status-value danger-text";
+            fullscreenBtn.textContent = "Enter Fullscreen";
+            registerViolation("Fullscreen mode exited.");
+        }
+    });
+
+    fullscreenBtn.addEventListener("click", async () => {
+        try {
+            if (document.fullscreenElement) await document.exitFullscreen();
+            else await document.documentElement.requestFullscreen();
+        } catch (error) {
+            logEvent(`Fullscreen request failed: ${error.message}`, "warning");
+        }
+    });
+
+    /* -----------------------------
+       Start
+    ----------------------------- */
+    startBtn.addEventListener("click", async () => {
+        startBtn.disabled = true;
+        prepStatus.textContent = "Preparing secure assessment...";
+
+        // Request fullscreen from the original user gesture before async permission/model work.
+        let fullscreenPromise = Promise.resolve();
+        if (document.documentElement.requestFullscreen) {
+            fullscreenPromise = document.documentElement.requestFullscreen().catch(() => null);
+        }
+
+        try {
+            await Promise.all([initializeSensors(), loadFaceModel(), fullscreenPromise]);
+
+            prepView.classList.add("hidden");
+            assessmentView.classList.remove("hidden");
+            assessmentRunning = true;
+            startTime = Date.now();
+            timer = setInterval(updateTimer, 1000);
+
+            if (document.fullscreenElement) {
+                fullscreenStatus.textContent = "● ACTIVE";
+                fullscreenStatus.className = "status-value safe";
+            } else {
+                fullscreenStatus.textContent = "● NOT ACTIVE";
+                fullscreenStatus.className = "status-value warning";
+                logEvent("Fullscreen was not enabled; monitoring continues.", "warning");
+            }
+
+            logEvent("Secure competency assessment started.");
+            updateProgress();
+            faceDetectionLoop();
+        } catch (error) {
+            cleanupSession();
+            prepStatus.textContent = `Could not start assessment: ${error.message}`;
+            startBtn.disabled = false;
+            logEvent(`Assessment preparation failed: ${error.message}`, "violation");
+        }
+    });
+
+    /* -----------------------------
+       Submit / competency result
+    ----------------------------- */
+    submitBtn.addEventListener("click", submitAssessment);
+
+    function calculateScore() {
+        let correct = 0;
+        for (const [name, answer] of Object.entries(ANSWERS)) {
+            const selected = form.querySelector(`input[name="${name}"]:checked`);
+            if (selected?.value === answer) correct++;
+        }
+        return { correct, total: TOTAL_QUESTIONS, percentage: Math.round((correct / TOTAL_QUESTIONS) * 100) };
+    }
+
+    function submitAssessment() {
+        if (!assessmentRunning) return;
+        const result = calculateScore();
+        const duration = Math.floor((Date.now() - startTime) / 1000);
+
+        assessmentRunning = false;
+        clearInterval(timer);
+        clearInterval(audioTimer);
+
+        if (audioContext) audioContext.close().catch(() => {});
+        if (stream) stream.getTracks().forEach(track => track.stop());
+
+        $("summaryScore").textContent = `${result.percentage}%`;
+        $("summaryDuration").textContent = formatTime(duration);
+        $("summaryViolations").textContent = violationCount;
+        $("summaryTabSwitches").textContent = tabSwitchCount;
+
+        const competencyLevel = result.percentage >= 80 ? "Demonstrated — Strong" : result.percentage >= 60 ? "Demonstrated — Developing" : "Needs Further Development";
+        $("competencyText").textContent = `Java Fundamentals: ${competencyLevel}. Score ${result.percentage}% (${result.correct}/${result.total}). This demonstration record combines the assessment result with locally generated monitoring events; it is not a formal certification decision.`;
+
+        summary.classList.remove("hidden");
+
+        localStorage.setItem("skillbridge_assessment_result", JSON.stringify({
+            assessment: "java-fundamentals",
+            score: result.percentage,
+            correct: result.correct,
+            total: result.total,
+            violations: violationCount,
+            tabSwitches: tabSwitchCount,
+            duration: duration,
+            completedAt: new Date().toISOString()
+        }));
+
+        submitBtn.disabled = true;
+        fullscreenBtn.disabled = true;
+        $("sessionState").textContent = "ASSESSMENT COMPLETED";
+        logEvent(`Assessment submitted — score ${result.percentage}%.`);
+        logEvent("Monitoring session ended.");
+
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        document.querySelectorAll("#assessmentForm input").forEach(input => input.disabled = true);
+    }
+
+    $("backToDashboardBtn").addEventListener("click", () => {
+        window.location.href = "student-dashboard.html";
+    });
+
+    function cleanupSession() {
+        assessmentRunning = false;
+        clearInterval(timer);
+        clearInterval(audioTimer);
+        if (audioContext) audioContext.close().catch(() => {});
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        faceModel = null;
+        faceLoopRunning = false;
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    }
+
+    updateProgress();
+})();
+</script>
+</body>
+</html>
