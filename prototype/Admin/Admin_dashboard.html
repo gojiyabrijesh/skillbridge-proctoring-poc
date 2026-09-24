@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillBridge — Admin & Government Observatory | System Intelligence</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            },
+            surface: '#f8fafc',
+            bordercol: '#e2e8f0'
+          },
+          borderRadius: {
+            'card': '16px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .nav-active {
+      background-color: #eff6ff !important;
+      color: #2563eb !important;
+      font-weight: 600 !important;
+    }
+  </style>
+</head>
+<body class="bg-surface text-slate-900 font-sans min-h-screen flex antialiased">
+
+  <!-- ========================================================================= -->
+  <!-- 4. FIXED LEFT SIDEBAR (Width: 245px)                                     -->
+  <!-- ========================================================================= -->
+  <aside id="sidebar" class="w-[245px] bg-white border-r border-bordercol flex flex-col fixed inset-y-0 left-0 z-30 transition-transform duration-200 ease-in-out md:translate-x-0 -translate-x-full">
+    <!-- Brand Header -->
+    <div class="h-[68px] px-5 flex items-center gap-3 border-b border-bordercol">
+      <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+        S
+      </div>
+      <div>
+        <div class="font-bold text-slate-900 text-base leading-tight tracking-tight">SkillBridge</div>
+        <div class="text-[10px] text-slate-400 font-medium">System Observatory</div>
+      </div>
+    </div>
+
+    <!-- Navigation List -->
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-4 text-xs">
+      
+      <!-- Group 1: OVERVIEW -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overview</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left nav-active">
+            <span class="text-sm">⌂</span>
+            <span>Dashboard</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 2: INTELLIGENCE -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Intelligence</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('intelligence')" id="nav-intelligence" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◉</span>
+            <span>AI Skill Intelligence</span>
+          </button>
+          <button onclick="navigateTo('industry-demand')" id="nav-industry-demand" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">↗</span>
+            <span>Industry Demand</span>
+          </button>
+          <button onclick="navigateTo('emerging')" id="nav-emerging" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◌</span>
+            <span>Emerging Skills</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 3: ECOSYSTEM -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ecosystem</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('institutions')" id="nav-institutions" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">▣</span>
+            <span>Institutions</span>
+          </button>
+          <button onclick="navigateTo('faculty')" id="nav-faculty" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◉</span>
+            <span>Trainers / Faculty</span>
+          </button>
+          <button onclick="navigateTo('students')" id="nav-students" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◎</span>
+            <span>Students</span>
+          </button>
+          <button onclick="navigateTo('industry')" id="nav-industry" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◆</span>
+            <span>Industry</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 4: OUTCOMES -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outcomes</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('skill-outcomes')" id="nav-skill-outcomes" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">✓</span>
+            <span>Skill Outcomes</span>
+          </button>
+          <button onclick="navigateTo('employment-outcomes')" id="nav-employment-outcomes" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">↗</span>
+            <span>Employment Outcomes</span>
+          </button>
+          <button onclick="navigateTo('feedback')" id="nav-feedback" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">↻</span>
+            <span>Employer Feedback</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 5: PROGRAM INSIGHTS -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Program Insights</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('regional')" id="nav-regional" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">▤</span>
+            <span>Regional Skill Gaps</span>
+          </button>
+          <button onclick="navigateTo('program-insights')" id="nav-program-insights" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◆</span>
+            <span>Program Insights</span>
+          </button>
+          <button onclick="navigateTo('recommendations')" id="nav-recommendations" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">◈</span>
+            <span>Recommendations</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 6: ADMINISTRATION -->
+      <div>
+        <div class="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Administration</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('monitoring')" id="nav-monitoring" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">⚙</span>
+            <span>System Monitoring</span>
+          </button>
+          <button onclick="navigateTo('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">○</span>
+            <span>Admin Profile</span>
+          </button>
+          <button onclick="logoutDemo()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition text-left">
+            <span class="text-sm">↪</span>
+            <span>Logout</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Closed-Loop Mini Indicator -->
+    <div class="p-3 border-t border-bordercol bg-slate-50/50 m-3 rounded-card">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[11px] font-medium text-slate-700">System Coordination Active</span>
+      </div>
+      <div class="text-[10px] text-slate-400 mt-1 leading-tight">Continuous feedback routing between industry demand & curricula.</div>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/30 z-20 hidden md:hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE CONTAINER (Offset by sidebar width: 245px)                -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 md:ml-[245px] flex flex-col min-h-screen min-w-0">
+
+    <!-- ========================================================================= -->
+    <!-- 5. TOP HEADER (Height: 68px)                                             -->
+    <!-- ========================================================================= -->
+    <header class="h-[68px] bg-white border-b border-bordercol px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-500 hover:text-slate-800 p-1.5 rounded-lg border border-slate-200">
+          ☰
+        </button>
+        <span class="font-semibold text-slate-800 text-sm sm:text-base">Admin Dashboard</span>
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          System Status: Operational
+        </span>
+      </div>
+
+      <!-- Right Profile Section -->
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden sm:block">
+          <div class="text-xs font-bold text-slate-900 leading-tight">SkillBridge Administrator</div>
+          <div class="text-[11px] text-slate-400 font-medium">System Admin · Gujarat, India</div>
+        </div>
+        <div onclick="navigateTo('profile')" class="cursor-pointer w-9 h-9 rounded-full bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xs hover:border-brand-600 transition">
+          SA
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT CANVAS -->
+    <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: DASHBOARD (HOME)                                                -->
+      <!-- ===================================================================== -->
+      <section id="view-dashboard" class="space-y-6">
+
+        <!-- 6. WELCOME SECTION -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Good morning, Administrator 👋</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor skill demand, education alignment, training readiness and employment outcomes across the SkillBridge ecosystem.</p>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-50 text-brand-700 border border-brand-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span>
+              System Intelligence · Regional Scope
+            </span>
+          </div>
+        </div>
+
+        <!-- 7. TOP STATISTICS (Illustrative Prototype Values) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Institutions</div>
+            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">24</div>
+            <div class="text-[11px] text-slate-400 mt-2">Connected institutions (Prototype)</div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Students</div>
+            <div class="text-2xl sm:text-3xl font-bold text-brand-600 mt-2">8,420</div>
+            <div class="text-[11px] text-slate-400 mt-2">Active student profiles</div>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Verified Skills</div>
+            <div class="text-2xl sm:text-3xl font-bold text-emerald-600 mt-2">12,680</div>
+            <div class="text-[11px] text-slate-400 mt-2">Competency records</div>
+          </div>
+          <!-- Card 4 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Employment Outcomes</div>
+            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">2,146</div>
+            <div class="text-[11px] text-slate-400 mt-2">Prototype outcome records</div>
+          </div>
+        </div>
+
+        <!-- 8 & 9. AI SKILL INTELLIGENCE & SYSTEM-WIDE SKILL GAPS ROW -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- 8. AI SKILL INTELLIGENCE (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">AI Skill Intelligence</h2>
+                  <p class="text-xs text-slate-500">System-wide view of industry skill demand and education alignment</p>
+                </div>
+                <span class="text-[10px] font-bold bg-blue-50 text-brand-700 px-2.5 py-1 rounded-full border border-blue-200">
+                  Prototype Skill Demand Data
+                </span>
+              </div>
+
+              <!-- Top Demand Badges -->
+              <div class="space-y-1.5">
+                <span class="text-[11px] font-semibold text-slate-600">Top-Demand Industry Skills:</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">Python <span class="text-[10px] font-bold text-emerald-600">High</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">SQL <span class="text-[10px] font-bold text-emerald-600">High</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">REST API <span class="text-[10px] font-bold text-emerald-600">High</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">Docker <span class="text-[10px] font-bold text-amber-600">Growing</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">Cloud <span class="text-[10px] font-bold text-amber-600">Growing</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">Data Analytics <span class="text-[10px] font-bold text-emerald-600">High</span></span>
+                  <span class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg font-medium">AI / ML <span class="text-[10px] font-bold text-brand-600">Growing</span></span>
+                </div>
+              </div>
+
+              <!-- Emerging Trend Indicators -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <div class="text-[11px] font-bold text-slate-700">Emerging Skill Signals (Surging in Regional JDs):</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                  <div class="p-2 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">REST API</span> <span class="text-emerald-600 font-bold">↑</span>
+                  </div>
+                  <div class="p-2 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">Cloud</span> <span class="text-emerald-600 font-bold">↑</span>
+                  </div>
+                  <div class="p-2 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">AI / ML</span> <span class="text-emerald-600 font-bold">↑</span>
+                  </div>
+                  <div class="p-2 bg-white rounded-lg border border-slate-200">
+                    <span class="font-bold text-slate-800">Cybersecurity</span> <span class="text-emerald-600 font-bold">↑</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100">
+              <button onclick="navigateTo('intelligence')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm text-center">
+                Explore Skill Intelligence →
+              </button>
+            </div>
+          </div>
+
+          <!-- 9. SYSTEM-WIDE SKILL GAPS (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-card p-6 border border-bordercol shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">System-wide Skill Gaps</h2>
+                  <p class="text-xs text-slate-500">Priority gaps across participating institutions & learners</p>
+                </div>
+                <span class="text-[10px] font-bold bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full border border-rose-200">
+                  5 Priority Areas
+                </span>
+              </div>
+
+              <div class="space-y-2 mt-3 text-xs">
+                <div class="flex justify-between items-center p-2.5 bg-rose-50/60 border border-rose-200 rounded-xl">
+                  <span class="font-semibold text-rose-900">REST API Development</span>
+                  <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">High Gap</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 bg-rose-50/60 border border-rose-200 rounded-xl">
+                  <span class="font-semibold text-rose-900">Docker Containerization</span>
+                  <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">High Gap</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 bg-amber-50/60 border border-amber-200 rounded-xl">
+                  <span class="font-semibold text-amber-900">Cloud Deployment</span>
+                  <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Medium Gap</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 bg-amber-50/60 border border-amber-200 rounded-xl">
+                  <span class="font-semibold text-amber-900">Cybersecurity Architecture</span>
+                  <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Medium Gap</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span class="font-semibold text-slate-800">Data Engineering</span>
+                  <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Medium Gap</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('regional')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+              View Regional Skill Gaps →
+            </button>
+          </div>
+        </div>
+
+        <!-- 10, 11, 12. REGIONAL, INSTITUTION READINESS, FACULTY READINESS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- 10. REGIONAL SKILL INTELLIGENCE -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Regional Skill Intelligence</h3>
+                  <p class="text-[11px] text-slate-500">Region: Gujarat Node</p>
+                </div>
+                <span class="text-[9px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Illustrative Data</span>
+              </div>
+
+              <div class="space-y-2 my-3 text-xs">
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Vadodara</span>
+                    <span class="text-brand-600 text-[11px]">Backend Focus</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">High Backend & API Demand</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Ahmedabad</span>
+                    <span class="text-brand-600 text-[11px]">Software Dev</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">High Enterprise App Demand</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Surat</span>
+                    <span class="text-emerald-600 text-[11px]">Growing</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Growing Technology Demand</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Rajkot</span>
+                    <span class="text-slate-600 text-[11px]">IT / Engineering</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Emerging Embedded / Web</div>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('regional')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              Explore Regional Insights →
+            </button>
+          </div>
+
+          <!-- 11. INSTITUTION SKILL READINESS -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Institution Skill Readiness</div>
+              <p class="text-[11px] text-slate-500">Non-ranking academic alignment monitoring</p>
+
+              <div class="space-y-2.5 my-3 text-xs">
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between items-center font-bold">
+                    <span class="text-slate-800">ITM University</span>
+                    <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">78% Aligned</span>
+                  </div>
+                  <div class="text-[10px] text-slate-500 mt-1">Priority Gap: REST API & Cloud Lab</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between items-center font-bold">
+                    <span class="text-slate-800">Institution B</span>
+                    <span class="text-brand-700 bg-brand-50 px-2 py-0.5 rounded text-[11px]">72% Aligned</span>
+                  </div>
+                  <div class="text-[10px] text-slate-500 mt-1">Priority Gap: Cloud Deployment</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between items-center font-bold">
+                    <span class="text-slate-800">Institution C</span>
+                    <span class="text-amber-700 bg-amber-100 px-2 py-0.5 rounded text-[11px]">69% Alignment</span>
+                  </div>
+                  <div class="text-[10px] text-amber-700 mt-1">Needs Attention: Container Labs</div>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="flex justify-between items-center font-bold">
+                    <span class="text-slate-800">Institution D</span>
+                    <span class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded text-[11px]">65% Alignment</span>
+                  </div>
+                  <div class="text-[10px] text-rose-700 mt-1">Priority Gap: Faculty Upskilling</div>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('institutions')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Institutions →
+            </button>
+          </div>
+
+          <!-- 12. FACULTY READINESS -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Faculty Skill Readiness</div>
+              <p class="text-[11px] text-slate-500">System-wide instructor capability indicators</p>
+
+              <div class="grid grid-cols-2 gap-2 my-3 text-center text-xs">
+                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                  <div class="text-xl font-bold text-emerald-700">72%</div>
+                  <div class="text-[10px] text-emerald-800 mt-0.5">Industry Aligned</div>
+                </div>
+                <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                  <div class="text-xl font-bold text-amber-700">28%</div>
+                  <div class="text-[10px] text-amber-800 mt-0.5">Upskill Rec.</div>
+                </div>
+              </div>
+
+              <div class="space-y-1 text-xs text-slate-600">
+                <span class="font-semibold text-slate-800 text-[11px]">Priority Faculty Training Areas:</span>
+                <div class="flex flex-wrap gap-1 pt-1">
+                  <span class="px-2 py-0.5 bg-slate-100 rounded text-[11px]">REST API</span>
+                  <span class="px-2 py-0.5 bg-slate-100 rounded text-[11px]">Docker</span>
+                  <span class="px-2 py-0.5 bg-slate-100 rounded text-[11px]">Cloud</span>
+                  <span class="px-2 py-0.5 bg-slate-100 rounded text-[11px]">AI / ML</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('faculty')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Faculty Insights →
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 13, 14, 15. STUDENT OUTCOMES, EMPLOYMENT OUTCOMES, EMPLOYER FEEDBACK -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- 13. STUDENT SKILL OUTCOMES -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Student Skill Outcomes</h3>
+                  <p class="text-[11px] text-slate-500">Aggregate learner competency</p>
+                </div>
+                <span class="text-[9px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Prototype Data</span>
+              </div>
+
+              <div class="space-y-1.5 my-3 text-xs">
+                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
+                  <span class="text-slate-600">Students Assessed:</span>
+                  <span class="font-bold text-slate-800">6,240</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-emerald-50 rounded-lg">
+                  <span class="text-emerald-900 font-medium">Verified Competency:</span>
+                  <span class="font-bold text-emerald-700">4,180</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-amber-50 rounded-lg">
+                  <span class="text-amber-900 font-medium">Priority Upskilling:</span>
+                  <span class="font-bold text-amber-700">1,420</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-blue-50 rounded-lg">
+                  <span class="text-blue-900 font-medium">Job-Matched:</span>
+                  <span class="font-bold text-brand-700">2,760</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('students')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Student Outcomes →
+            </button>
+          </div>
+
+          <!-- 14. EMPLOYMENT OUTCOMES -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Employment Outcomes</h3>
+                  <p class="text-[11px] text-slate-500">Recorded pipeline outcomes</p>
+                </div>
+                <span class="text-[9px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Demo Records</span>
+              </div>
+
+              <div class="space-y-1.5 my-3 text-xs">
+                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
+                  <span class="text-slate-600">Skill-Matched Candidates:</span>
+                  <span class="font-bold text-slate-800">2,760</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
+                  <span class="text-slate-600">Interviewed:</span>
+                  <span class="font-bold text-slate-800">1,420</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-emerald-50 rounded-lg">
+                  <span class="text-emerald-900 font-medium">Offers / Employment Records:</span>
+                  <span class="font-bold text-emerald-700">2,146</span>
+                </div>
+                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
+                  <span class="text-slate-600">Employer Feedback Records:</span>
+                  <span class="font-bold text-slate-800">1,280</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('employment-outcomes')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Employment Records →
+            </button>
+          </div>
+
+          <!-- 15. EMPLOYER FEEDBACK INSIGHTS -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Employer Feedback Insights</div>
+              <p class="text-[11px] text-slate-500">Post-hire signals driving curriculum improvement</p>
+
+              <div class="grid grid-cols-2 gap-2 my-3 text-center text-xs">
+                <div class="p-2 bg-slate-50 rounded-lg">
+                  <div class="font-bold text-slate-800">4.1 / 5</div>
+                  <div class="text-[10px] text-slate-400">Technical</div>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg">
+                  <div class="font-bold text-slate-800">3.9 / 5</div>
+                  <div class="text-[10px] text-slate-400">Problem Solving</div>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg">
+                  <div class="font-bold text-slate-800">4.0 / 5</div>
+                  <div class="text-[10px] text-slate-400">Communication</div>
+                </div>
+                <div class="p-2 bg-amber-50 rounded-lg border border-amber-100">
+                  <div class="font-bold text-amber-700">3.5 / 5</div>
+                  <div class="text-[10px] text-amber-700 font-medium">Production</div>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-500">
+                <strong class="text-slate-800">Recurring Gap:</strong> Production readiness. System recommends expanding practical deployment exposure.
+              </div>
+            </div>
+
+            <button onclick="navigateTo('feedback')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Employer Feedback →
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 16 & 17. AI PROGRAM INSIGHTS & THE CLOSED-LOOP ECOSYSTEM FLOW -->
+        <div class="bg-white rounded-card p-6 border-2 border-indigo-200 shadow-sm space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded">Ecosystem Intelligence</span>
+                <span class="text-[10px] text-slate-400 font-mono">Prototype Generated</span>
+              </div>
+              <h2 class="text-base font-bold text-slate-900 mt-1">AI Program & Policy Insights</h2>
+              <p class="text-xs text-slate-500">System-level recommendations generated from aggregated prototype data (Advisory insights)</p>
+            </div>
+            <button onclick="navigateTo('recommendations')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm self-start sm:self-auto">
+              View Recommendations →
+            </button>
+          </div>
+
+          <!-- 4 Program Recommendations -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded">Priority: High</span>
+              <div class="font-bold text-slate-900 text-xs mt-1">Increase Practical REST API Training</div>
+              <p class="text-[11px] text-slate-500">Address recurring gap identified across participating student profiles.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded">Priority: High</span>
+              <div class="font-bold text-slate-900 text-xs mt-1">Expand Containerization Exposure</div>
+              <p class="text-[11px] text-slate-500">Integrate Docker labs into standard technical curricula.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Priority: Medium</span>
+              <div class="font-bold text-slate-900 text-xs mt-1">Strengthen Cloud Deployment Practice</div>
+              <p class="text-[11px] text-slate-500">Provide sandbox environments to bridge production readiness deficit.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Priority: Medium</span>
+              <div class="font-bold text-slate-900 text-xs mt-1">Expand Industry-Linked Projects</div>
+              <p class="text-[11px] text-slate-500">Scale the Real Industry Problem Marketplace across institutions.</p>
+            </div>
+          </div>
+
+          <!-- 17. Compact Closed-Loop Visual Flow -->
+          <div class="pt-3 border-t border-slate-100">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">The Closed-Loop Ecosystem Sequence:</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-[10px] font-semibold text-slate-700">
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">1. Industry Demand</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">2. AI Intelligence</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">3. Curriculum Gaps</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">4. Faculty & Labs</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">5. Student Skills</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">6. Verified Proof</div>
+              <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg">7. Post-Hire Review</div>
+              <div class="p-2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg">8. System Fix ↺</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 32. QUICK ACTIONS CARD -->
+        <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Quick Actions</h2>
+            <p class="text-[11px] text-slate-500">Core administrative intelligence navigation</p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <button onclick="navigateTo('intelligence')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm">◉</span>
+              <span class="text-xs font-semibold text-slate-800">Skill Intelligence</span>
+            </button>
+            <button onclick="navigateTo('regional')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm">▤</span>
+              <span class="text-xs font-semibold text-slate-800">Regional Gaps</span>
+            </button>
+            <button onclick="navigateTo('institutions')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm">▣</span>
+              <span class="text-xs font-semibold text-slate-800">Institutions</span>
+            </button>
+            <button onclick="navigateTo('faculty')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm">◉</span>
+              <span class="text-xs font-semibold text-slate-800">Faculty Needs</span>
+            </button>
+            <button onclick="navigateTo('students')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm">◎</span>
+              <span class="text-xs font-semibold text-slate-800">Student Outcomes</span>
+            </button>
+            <button onclick="navigateTo('feedback')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2">
+              <span class="text-brand-600 text-sm font-bold">↻</span>
+              <span class="text-xs font-semibold text-slate-800">Employer Feedback</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: AI SKILL INTELLIGENCE (/admin/intelligence)                     -->
+      <!-- ===================================================================== -->
+      <section id="view-intelligence" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">AI Skill Intelligence</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Analyze emerging industry skill requirements and compare them with education and competency data.</p>
+          </div>
+          <span class="text-xs font-mono text-slate-400 bg-white border border-slate-200 px-3 py-1 rounded-xl">Prototype Intelligence Dataset</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Current High-Demand Skills -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
+            <h3 class="font-bold text-sm text-slate-900">Current High-Demand Skills</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Python Programming</span>
+                <span class="text-emerald-700 bg-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded">High Demand</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Relational SQL & Indexing</span>
+                <span class="text-emerald-700 bg-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded">High Demand</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">REST API Architecture</span>
+                <span class="text-emerald-700 bg-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded">High Demand</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Data Analytics</span>
+                <span class="text-emerald-700 bg-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded">High Demand</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emerging Skills -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
+            <h3 class="font-bold text-sm text-slate-900">Emerging Skills (Growing Trend)</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Docker Containerization</span>
+                <span class="text-brand-700 bg-brand-50 text-[10px] font-bold px-2 py-0.5 rounded">+48% Growth</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Cloud Deployment</span>
+                <span class="text-brand-700 bg-brand-50 text-[10px] font-bold px-2 py-0.5 rounded">+42% Growth</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Generative AI / LLM APIs</span>
+                <span class="text-brand-700 bg-brand-50 text-[10px] font-bold px-2 py-0.5 rounded">+65% Growth</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium">Cybersecurity Architecture</span>
+                <span class="text-brand-700 bg-brand-50 text-[10px] font-bold px-2 py-0.5 rounded">+30% Growth</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lower Priority / Declining -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
+            <h3 class="font-bold text-sm text-slate-900">Lower-Priority / Deprecating Signals</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium text-slate-500">Legacy Struts 1.x</span>
+                <span class="text-rose-700 bg-rose-100 text-[10px] font-bold px-2 py-0.5 rounded">Deprecate</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium text-slate-500">Static Web / Basic HTML4</span>
+                <span class="text-amber-700 bg-amber-100 text-[10px] font-bold px-2 py-0.5 rounded">Reduce</span>
+              </div>
+              <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                <span class="font-medium text-slate-500">Manual Testing Scripting</span>
+                <span class="text-amber-700 bg-amber-100 text-[10px] font-bold px-2 py-0.5 rounded">Reduce</span>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2">* Identified from absence in modern job postings across participating tech firms.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: INDUSTRY DEMAND (/admin/industry-demand)                        -->
+      <!-- ===================================================================== -->
+      <section id="view-industry-demand" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Demand</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Understand the skills employers are requesting across participating industry data.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">Domain Focus</span>
+              <h2 class="text-base font-bold text-slate-900 mt-1">Backend & Platform Engineering</h2>
+            </div>
+            <button onclick="showToast('Loading detailed industry requisitions...')" class="text-xs font-semibold text-brand-600 hover:underline">
+              View Skill Analysis →
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2 text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Python</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">SQL</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">REST API</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Docker</div>
+              <div class="text-amber-700 font-semibold text-[11px] mt-1">Medium Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Cloud</div>
+              <div class="text-amber-700 font-semibold text-[11px] mt-1">Medium Demand</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-xs">
+            <div class="p-2.5 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 text-[10px] block">Role Demand</span>
+              <span class="font-semibold text-slate-800">Junior Backend Developers, API Engineers</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 text-[10px] block">Experience Requirement</span>
+              <span class="font-semibold text-slate-800">0–2 Years (Freshers with verified evidence)</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg">
+              <span class="text-slate-400 text-[10px] block">Location Clusters</span>
+              <span class="font-semibold text-slate-800">Vadodara, Ahmedabad, Surat</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: EMERGING SKILLS (/admin/emerging)                               -->
+      <!-- ===================================================================== -->
+      <section id="view-emerging" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Emerging Skills</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Identify skills showing increased demand in the prototype industry dataset.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <!-- Card 1 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-sm text-slate-900">Cloud Deployment</h3>
+              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">High Growth</span>
+            </div>
+            <div class="text-[11px] text-slate-600">Demand Signal: AWS/Azure microservices requested in 62% of modern postings.</div>
+            <div class="text-[11px] text-slate-600">Current Education Coverage: 25% across participating institutions.</div>
+            <div class="text-[11px] text-rose-700 font-semibold">Potential Gap: 37% Deficit in practical hosting.</div>
+            <div class="p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-900 font-medium">
+              Action: Recommend virtual cloud sandboxes in institutional labs.
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-sm text-slate-900">AI / ML Integration</h3>
+              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">High Growth</span>
+            </div>
+            <div class="text-[11px] text-slate-600">Demand Signal: LLM API orchestration & transformer utilization.</div>
+            <div class="text-[11px] text-slate-600">Current Education Coverage: Basic theory without prompt/API practicals.</div>
+            <div class="text-[11px] text-rose-700 font-semibold">Potential Gap: Applied API usage missing.</div>
+            <div class="p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-900 font-medium">
+              Action: Integrate real-world AI micro-challenges into MCA/B.Tech syllabi.
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-sm text-slate-900">Cybersecurity</h3>
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Medium Growth</span>
+            </div>
+            <div class="text-[11px] text-slate-600">Demand Signal: JWT security, token handling, and CORS policies.</div>
+            <div class="text-[11px] text-slate-600">Current Education Coverage: Standard cryptography theory.</div>
+            <div class="text-[11px] text-amber-700 font-semibold">Potential Gap: Hands-on API protection exercises.</div>
+            <div class="p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-900 font-medium">
+              Action: Embed security modules into Web API coursework.
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: INSTITUTIONS (/admin/institutions)                              -->
+      <!-- ===================================================================== -->
+      <section id="view-institutions" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Institutions</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor institutional alignment with identified skill requirements (Non-competitive monitoring).</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- ITM University -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-base text-slate-900">ITM University</h3>
+                <p class="text-xs text-slate-500">Vadodara, Gujarat · Higher Education Institution</p>
+              </div>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+                78% Alignment
+              </span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Priority Gap</span>
+                <span class="font-bold text-rose-600">REST API</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Faculty Readiness</span>
+                <span class="font-bold text-slate-800">72%</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Student Readiness</span>
+                <span class="font-bold text-slate-800">68%</span>
+              </div>
+            </div>
+            <button onclick="showToast('Inspecting ITM University syllabus alignment ledger...')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+              View Institution Details
+            </button>
+          </div>
+
+          <!-- Institution B -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-base text-slate-900">Institution B</h3>
+                <p class="text-xs text-slate-500">Ahmedabad Node · Technical Institute</p>
+              </div>
+              <span class="text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full">
+                72% Alignment
+              </span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Priority Gap</span>
+                <span class="font-bold text-rose-600">Cloud Lab</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Faculty Readiness</span>
+                <span class="font-bold text-slate-800">68%</span>
+              </div>
+              <div class="p-2 bg-slate-50 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">Student Readiness</span>
+                <span class="font-bold text-slate-800">64%</span>
+              </div>
+            </div>
+            <button onclick="showToast('Inspecting Institution B syllabus alignment ledger...')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+              View Institution Details
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: FACULTY INSIGHTS (/admin/faculty)                               -->
+      <!-- ===================================================================== -->
+      <section id="view-faculty" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Faculty Insights</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor faculty readiness against industry-relevant competencies.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs">
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm">
+            <div class="text-3xl font-extrabold text-slate-900">320</div>
+            <div class="text-slate-500 font-semibold mt-1">Total Faculty Tracked</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm">
+            <div class="text-3xl font-extrabold text-emerald-600">230</div>
+            <div class="text-emerald-800 font-semibold mt-1">Industry-Aligned (72%)</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm">
+            <div class="text-3xl font-extrabold text-amber-600">90</div>
+            <div class="text-amber-800 font-semibold mt-1">Upskilling Recommended (28%)</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-3">
+          <h3 class="font-bold text-sm text-slate-900">Priority Faculty Development Areas</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <span class="font-bold text-slate-800">REST API</span>
+              <div class="text-[11px] text-slate-500 mt-0.5">42 Instructors need FDP</div>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <span class="font-bold text-slate-800">Docker</span>
+              <div class="text-[11px] text-slate-500 mt-0.5">38 Instructors need FDP</div>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <span class="font-bold text-slate-800">Cloud</span>
+              <div class="text-[11px] text-slate-500 mt-0.5">35 Instructors need FDP</div>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <span class="font-bold text-slate-800">AI / ML</span>
+              <div class="text-[11px] text-slate-500 mt-0.5">24 Instructors need FDP</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: STUDENTS (/admin/students)                                      -->
+      <!-- ===================================================================== -->
+      <section id="view-students" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Student Outcomes (System View)</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor aggregate student competency and development (Privacy-safe aggregate metrics).</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center text-xs">
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">8,420</div>
+            <div class="text-[11px] text-slate-500 mt-1">Active Profiles</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">6,240</div>
+            <div class="text-[11px] text-slate-500 mt-1">Assessed</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-emerald-600">4,180</div>
+            <div class="text-[11px] text-emerald-700 mt-1">Verified Competencies</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-amber-600">1,420</div>
+            <div class="text-[11px] text-amber-700 mt-1">Priority Upskilling</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm col-span-2 sm:col-span-1">
+            <div class="text-2xl font-bold text-brand-600">2,760</div>
+            <div class="text-[11px] text-brand-700 mt-1">Job-Matched</div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white rounded-card border border-bordercol shadow-sm text-xs text-slate-600">
+          <strong class="text-slate-900">Privacy Safeguard:</strong> The admin observatory monitors cohort-level competency data without exposing personal student identification records.
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: INDUSTRY (/admin/industry)                                      -->
+      <!-- ===================================================================== -->
+      <section id="view-industry" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Ecosystem</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor participating industry demand and corporate engagement.</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center text-xs">
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">48</div>
+            <div class="text-[11px] text-slate-500 mt-1">Industry Partners</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">126</div>
+            <div class="text-[11px] text-slate-500 mt-1">Active Job Reqs</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-brand-600">42</div>
+            <div class="text-[11px] text-brand-700 mt-1">Skill Signals</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-emerald-600">18</div>
+            <div class="text-[11px] text-emerald-700 mt-1">Micro-Challenges</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm col-span-2 sm:col-span-1">
+            <div class="text-2xl font-bold text-slate-900">1,280</div>
+            <div class="text-[11px] text-slate-500 mt-1">Feedback Records</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: REGIONAL SKILL GAPS (/admin/regional)                           -->
+      <!-- ===================================================================== -->
+      <section id="view-regional" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Regional Skill Gaps</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Identify geographic areas where education and industry requirements show gaps (Prototype Dataset).</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900 text-sm">Vadodara Region</span>
+              <span class="text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded">High Backend Demand</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">Primary Gap: REST API Development & Cloud Hosting.</p>
+            <div class="text-slate-500 text-[10px]">Connected Higher Ed Nodes: ITM University, Partner Colls.</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900 text-sm">Ahmedabad Region</span>
+              <span class="text-brand-700 font-bold bg-brand-50 px-2 py-0.5 rounded">High Software Demand</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">Primary Gap: AI / ML Integration & Data Engineering.</p>
+            <div class="text-slate-500 text-[10px]">Connected Higher Ed Nodes: Institution B, Tech Univ.</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900 text-sm">Surat Region</span>
+              <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">Growing Tech</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">Primary Gap: Enterprise Web & Database Tuning.</p>
+            <div class="text-slate-500 text-[10px]">Connected Higher Ed Nodes: South Gujarat Nodes.</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900 text-sm">Rajkot Region</span>
+              <span class="text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded">IT / Engineering</span>
+            </div>
+            <p class="text-slate-600 text-[11px]">Primary Gap: Core Programming & API Security.</p>
+            <div class="text-slate-500 text-[10px]">Connected Higher Ed Nodes: Saurashtra Nodes.</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: SKILL OUTCOMES (/admin/skill-outcomes)                          -->
+      <!-- ===================================================================== -->
+      <section id="view-skill-outcomes" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Skill Outcomes</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Aggregate breakdown of verified practical competency across the network.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <span class="text-slate-400 block text-[10px]">Students Assessed</span>
+              <span class="font-bold text-slate-900 text-base">6,240</span>
+            </div>
+            <div class="p-3 bg-emerald-50 rounded-xl">
+              <span class="text-emerald-800 block text-[10px]">Verified Competencies</span>
+              <span class="font-bold text-emerald-700 text-base">4,180</span>
+            </div>
+            <div class="p-3 bg-brand-50 rounded-xl">
+              <span class="text-brand-800 block text-[10px]">Challenges Completed</span>
+              <span class="font-bold text-brand-700 text-base">840</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: EMPLOYMENT OUTCOMES (/admin/employment-outcomes)                -->
+      <!-- ===================================================================== -->
+      <section id="view-employment-outcomes" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Employment Outcomes</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Track candidate progression from AI matching to verified employment records (Prototype Records).</p>
+        </div>
+
+        <!-- The Pipeline Visual -->
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+          <h3 class="font-bold text-sm text-slate-900">Education-to-Employment Conversion Funnel</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">1. Skill Profile Matches</span>
+              <span class="font-bold text-slate-900 text-lg">2,760</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">2. Shortlisted & Interviewed</span>
+              <span class="font-bold text-brand-600 text-lg">1,420</span>
+            </div>
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+              <span class="text-emerald-800 block text-[10px]">3. Employment Records</span>
+              <span class="font-bold text-emerald-700 text-lg">2,146</span>
+            </div>
+            <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+              <span class="text-indigo-800 block text-[10px]">4. Employer Feedback Records</span>
+              <span class="font-bold text-indigo-700 text-lg">1,280</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: EMPLOYER FEEDBACK (/admin/feedback)                             -->
+      <!-- ===================================================================== -->
+      <section id="view-feedback" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Employer Feedback Insights</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Post-hire evaluations identify recurring skill deficiencies across graduates.</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">4.1 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Technical Skills</div>
+            <div class="text-[10px] text-emerald-600 mt-0.5">Solid fundamentals</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">3.9 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Problem Solving</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Good logic</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">4.0 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Communication</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Team ready</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-amber-600">3.5 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Production Readiness</div>
+            <div class="text-[10px] text-amber-600 mt-0.5">Needs intervention</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border-2 border-indigo-200 shadow-sm space-y-2 text-xs">
+          <span class="text-[10px] font-bold text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded">Recurring Feedback</span>
+          <h3 class="font-bold text-slate-900 text-sm">Production Readiness Deficit</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Employers consistently report that graduates require supplementary training in Docker, cloud hosting, and production API authentication. SkillBridge recommends expanding practical containerization labs across connected higher education colleges.
+          </p>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: PROGRAM INSIGHTS (/admin/program-insights)                      -->
+      <!-- ===================================================================== -->
+      <section id="view-program-insights" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Program Insights</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">System-level recommendations generated from aggregated prototype data.</p>
+          </div>
+          <button onclick="showToast('Insight report generated and queued for download.')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+            Generate Insight Report
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm space-y-1">
+            <span class="font-bold text-slate-900">Insight 01: REST API Skill Deficit</span>
+            <p class="text-slate-600">REST API skills show a recurring gap across 55% of participating student profiles.</p>
+            <div class="text-brand-700 font-semibold text-[11px]">Recommended System Action: Increase practical API development exposure in MCA/B.Tech syllabi.</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm space-y-1">
+            <span class="font-bold text-slate-900">Insight 02: Containerization Capability</span>
+            <p class="text-slate-600">Docker competency is currently below identified enterprise industry requirements.</p>
+            <div class="text-brand-700 font-semibold text-[11px]">Recommended System Action: Introduce containerization labs in 3rd semester technical coursework.</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm space-y-1">
+            <span class="font-bold text-slate-900">Insight 03: Cloud Deployment Readiness</span>
+            <p class="text-slate-600">Cloud deployment appears as a recurring requirement across 60% of modern software job postings.</p>
+            <div class="text-brand-700 font-semibold text-[11px]">Recommended System Action: Expand cloud sandbox provisioning across affiliated college computer labs.</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: RECOMMENDATIONS (/admin/recommendations)                        -->
+      <!-- ===================================================================== -->
+      <section id="view-recommendations" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Policy & Program Recommendations</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Advisory recommendations for academic councils and skilling administrators.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 text-xs">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+            <span class="font-bold text-slate-900">1. Institutional Lab Modernization</span>
+            <p class="text-slate-600">Support colleges in provisioning cloud-based sandbox environments to overcome GPU and server hardware constraints.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+            <span class="font-bold text-slate-900">2. Corporate Faculty Development Immersion</span>
+            <p class="text-slate-600">Sponsor 5-day hands-on FDP programs matching faculty members with active cloud and API enterprise developers.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+            <span class="font-bold text-slate-900">3. Expansion of the Micro-Challenge Marketplace</span>
+            <p class="text-slate-600">Replace generic student projects with corporate problem statements to foster verified skill badges.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: SYSTEM MONITORING (/admin/monitoring)                           -->
+      <!-- ===================================================================== -->
+      <section id="view-monitoring" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">System Monitoring</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Operational status of the SkillBridge closed-loop architecture.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <span>Platform Core Status:</span>
+              <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">Operational</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <span>Student Module:</span>
+              <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">Operational</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <span>Industry Module:</span>
+              <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">Operational</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <span>College Module:</span>
+              <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">Operational</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <span>Trainer Module:</span>
+              <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">Operational</span>
+            </div>
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl flex justify-between items-center">
+              <span class="font-bold text-blue-900">AI Skill Engine:</span>
+              <span class="font-bold text-brand-700 bg-blue-100 px-2 py-0.5 rounded text-[11px]">Prototype Active</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+            Last ecosystem synchronization: Today, 2026.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: ADMIN PROFILE (/admin/profile)                                  -->
+      <!-- ===================================================================== -->
+      <section id="view-profile" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Admin Profile</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">System Administrator Identity and Permissions.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-200 text-brand-700 flex items-center justify-center font-black text-xl">
+              SA
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">SkillBridge Administrator</h2>
+              <p class="text-xs text-slate-500">Skill Development / Education Administration · Gujarat Node</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 font-medium">Administrator Role</span>
+              <div class="font-semibold text-slate-800 mt-1">System & Policy Intelligence</div>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 font-medium">Assigned Region</span>
+              <div class="font-semibold text-slate-800 mt-1">Gujarat, India</div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-xs font-semibold text-slate-700">System Permissions:</span>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">System Analytics</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Institution Insights</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Industry Insights</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Program Insights</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs flex items-center gap-2.5">
+      <span class="text-emerald-400 font-bold" id="toast-icon">✓</span>
+      <span id="toast-message">Action completed successfully.</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: ROUTING & DEMO STATE MACHINE                                 -->
+  <!-- ========================================================================= -->
+  <script>
+    // Valid view routes
+    const routes = [
+      'dashboard',
+      'intelligence',
+      'industry-demand',
+      'emerging',
+      'institutions',
+      'faculty',
+      'students',
+      'industry',
+      'regional',
+      'skill-outcomes',
+      'employment-outcomes',
+      'feedback',
+      'program-insights',
+      'recommendations',
+      'monitoring',
+      'profile'
+    ];
+    let currentRoute = 'dashboard';
+
+    // Navigation function
+    function navigateTo(route) {
+      if (!routes.includes(route)) return;
+      currentRoute = route;
+
+      // Update visibility of main view sections
+      routes.forEach(r => {
+        const viewEl = document.getElementById(`view-${r}`);
+        const navEl = document.getElementById(`nav-${r}`);
+
+        if (viewEl) {
+          if (r === route) {
+            viewEl.classList.remove('hidden');
+          } else {
+            viewEl.classList.add('hidden');
+          }
+        }
+
+        if (navEl) {
+          if (r === route) {
+            navEl.classList.add('nav-active');
+          } else {
+            navEl.classList.remove('nav-active');
+          }
+        }
+      });
+
+      // Close mobile sidebar on navigation
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebar-backdrop').classList.add('hidden');
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toggle Sidebar for mobile view
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    }
+
+    // Trigger Toast Notification
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toast-message');
+      const icon = document.getElementById('toast-icon');
+
+      msg.innerText = message;
+      icon.innerText = isSuccess ? '✓' : 'ℹ';
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    // Logout Demo Action
+    function logoutDemo() {
+      if (confirm("Reset prototype session and return to dashboard?")) {
+        navigateTo('dashboard');
+        showToast("Session reset to initial demo state.");
+      }
+    }
+  </script>
+</body>
+</html>

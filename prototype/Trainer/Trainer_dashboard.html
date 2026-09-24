@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillBridge — Trainer & Faculty Dashboard | Dr. Priya Mehta</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            },
+            surface: '#f8fafc',
+            bordercol: '#e2e8f0'
+          },
+          borderRadius: {
+            'card': '16px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .nav-active {
+      background-color: #eff6ff !important;
+      color: #2563eb !important;
+      font-weight: 600 !important;
+    }
+  </style>
+</head>
+<body class="bg-surface text-slate-900 font-sans min-h-screen flex antialiased">
+
+  <!-- ========================================================================= -->
+  <!-- 4. FIXED LEFT SIDEBAR (Width: 245px)                                     -->
+  <!-- ========================================================================= -->
+  <aside id="sidebar" class="w-[245px] bg-white border-r border-bordercol flex flex-col fixed inset-y-0 left-0 z-30 transition-transform duration-200 ease-in-out md:translate-x-0 -translate-x-full">
+    <!-- Brand Header -->
+    <div class="h-[68px] px-5 flex items-center gap-3 border-b border-bordercol">
+      <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center font-black text-white text-base shadow-sm">
+        S
+      </div>
+      <div>
+        <div class="font-bold text-slate-900 text-base leading-tight tracking-tight">SkillBridge</div>
+        <div class="text-[10px] text-slate-400 font-medium">Faculty & Trainer Hub</div>
+      </div>
+    </div>
+
+    <!-- Navigation List -->
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-xs">
+      
+      <!-- Group 1: DASHBOARD -->
+      <div>
+        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dashboard</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left nav-active">
+            <span class="text-sm">⌂</span>
+            <span>Dashboard</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 2: TEACHING -->
+      <div>
+        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Teaching</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('courses')" id="nav-courses" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">▣</span>
+            <span>My Courses</span>
+          </button>
+          <button onclick="navigateTo('skill-gap')" id="nav-skill-gap" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◌</span>
+            <span>AI Skill Gap</span>
+          </button>
+          <button onclick="navigateTo('content')" id="nav-content" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">↗</span>
+            <span>Learning Content</span>
+          </button>
+          <button onclick="navigateTo('assessments')" id="nav-assessments" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">✓</span>
+            <span>Assessments</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 3: FACULTY DEVELOPMENT -->
+      <div>
+        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faculty Development</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('competencies')" id="nav-competencies" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◉</span>
+            <span>My Competencies</span>
+          </button>
+          <button onclick="navigateTo('upskilling')" id="nav-upskilling" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">◆</span>
+            <span>Upskilling / FDP</span>
+          </button>
+          <button onclick="navigateTo('industry-skills')" id="nav-industry-skills" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">⌕</span>
+            <span>Industry Skills</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 4: STUDENT SUPPORT -->
+      <div>
+        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Student Support</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('students')" id="nav-students" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">▣</span>
+            <span>Student Progress</span>
+          </button>
+          <button onclick="navigateTo('student-gaps')" id="nav-student-gaps" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm text-rose-500 font-bold">◉</span>
+            <span>At-Risk / Skill Gaps</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Group 5: FEEDBACK & PROFILE -->
+      <div>
+        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outcomes & Account</div>
+        <nav class="space-y-1">
+          <button onclick="navigateTo('feedback')" id="nav-feedback" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm font-bold">↻</span>
+            <span>Industry Feedback</span>
+          </button>
+          <button onclick="navigateTo('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+            <span class="text-sm">○</span>
+            <span>Profile</span>
+          </button>
+          <button onclick="logoutDemo()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition text-left">
+            <span class="text-sm">↪</span>
+            <span>Logout</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Closed-Loop Mini Indicator -->
+    <div class="p-3 border-t border-bordercol bg-slate-50/50 m-3 rounded-card">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[11px] font-medium text-slate-600">Faculty Enablement Active</span>
+      </div>
+      <div class="text-[10px] text-slate-400 mt-1 leading-tight">Syncing corporate skill requirements with classroom delivery.</div>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/30 z-20 hidden md:hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE CONTAINER (Offset by sidebar width: 245px)                -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 md:ml-[245px] flex flex-col min-h-screen min-w-0">
+
+    <!-- ========================================================================= -->
+    <!-- 5. TOP HEADER (Height: 68px)                                             -->
+    <!-- ========================================================================= -->
+    <header class="h-[68px] bg-white border-b border-bordercol px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-500 hover:text-slate-800 p-1.5 rounded-lg border border-slate-200">
+          ☰
+        </button>
+        <span class="font-semibold text-slate-800 text-sm sm:text-base">Trainer Dashboard</span>
+      </div>
+
+      <!-- Right Profile Section -->
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden sm:block">
+          <div class="text-xs font-bold text-slate-900 leading-tight">Dr. Priya Mehta</div>
+          <div class="text-[11px] text-slate-400 font-medium">Trainer / Faculty · ITM University</div>
+        </div>
+        <div onclick="navigateTo('profile')" class="cursor-pointer w-9 h-9 rounded-full bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center font-bold text-xs hover:border-brand-600 transition">
+          PM
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT CANVAS -->
+    <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: DASHBOARD (HOME)                                                -->
+      <!-- ===================================================================== -->
+      <section id="view-dashboard" class="space-y-6">
+
+        <!-- 6. WELCOME SECTION -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Good morning, Dr. Priya 👋</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Here’s your faculty competency, teaching progress and the next industry-aligned skills SkillBridge recommends.</p>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-50 text-brand-700 border border-brand-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span>
+              Trainer · Backend Development
+            </span>
+          </div>
+        </div>
+
+        <!-- 7. TOP STATISTICS (Demo / Prototype Values) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Faculty Competency</div>
+            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">76%</div>
+            <div class="text-[11px] text-slate-400 mt-2">Industry-aligned skill coverage</div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Active Courses</div>
+            <div class="text-2xl sm:text-3xl font-bold text-brand-600 mt-2">04</div>
+            <div class="text-[11px] text-slate-400 mt-2">Currently teaching</div>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Students</div>
+            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">86</div>
+            <div class="text-[11px] text-slate-400 mt-2">Across active courses</div>
+          </div>
+          <!-- Card 4 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
+            <div class="text-xs font-medium text-slate-500">Students Needing Support</div>
+            <div class="text-2xl sm:text-3xl font-bold text-rose-600 mt-2">14</div>
+            <div class="text-[11px] text-slate-400 mt-2">Priority skill gaps detected</div>
+          </div>
+        </div>
+
+        <!-- 8 & 9. AI FACULTY SKILL GAP & AI UPSKILLING RECOMMENDATION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- 8. AI FACULTY SKILL GAP (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">AI Faculty Skill Gap</h2>
+                  <p class="text-xs text-slate-500">Compare your current competency with emerging industry requirements</p>
+                </div>
+                <span class="text-[10px] font-bold bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full border border-rose-200">
+                  3 Priority Upskilling Areas
+                </span>
+              </div>
+
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                <span class="font-semibold text-slate-700">Target Teaching Area:</span> Backend Development (Information Technology)
+              </div>
+
+              <!-- Skill Progress Bars Comparison -->
+              <div class="space-y-3 pt-1">
+                <!-- Python -->
+                <div>
+                  <div class="flex justify-between text-xs font-medium mb-1">
+                    <span>Python</span>
+                    <span class="text-slate-500 font-mono text-[11px]">Current: 90% | Industry Need: 90%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 90%"></div>
+                  </div>
+                </div>
+                <!-- SQL -->
+                <div>
+                  <div class="flex justify-between text-xs font-medium mb-1">
+                    <span>SQL</span>
+                    <span class="text-slate-500 font-mono text-[11px]">Current: 88% | Industry Need: 85%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 88%"></div>
+                  </div>
+                </div>
+                <!-- REST API (Gap) -->
+                <div>
+                  <div class="flex justify-between text-xs font-medium mb-1">
+                    <span class="text-rose-700 font-semibold">REST API (Priority Gap)</span>
+                    <span class="text-rose-600 font-mono text-[11px]">Current: 55% | Industry Need: 80%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-rose-500 h-2 rounded-full" style="width: 55%"></div>
+                  </div>
+                </div>
+                <!-- Docker (Gap) -->
+                <div>
+                  <div class="flex justify-between text-xs font-medium mb-1">
+                    <span class="text-rose-700 font-semibold">Docker (Priority Gap)</span>
+                    <span class="text-rose-600 font-mono text-[11px]">Current: 30% | Industry Need: 60%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-rose-500 h-2 rounded-full" style="width: 30%"></div>
+                  </div>
+                </div>
+                <!-- Cloud (Gap) -->
+                <div>
+                  <div class="flex justify-between text-xs font-medium mb-1">
+                    <span class="text-rose-700 font-semibold">Cloud (Priority Gap)</span>
+                    <span class="text-rose-600 font-mono text-[11px]">Current: 35% | Industry Need: 60%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-rose-500 h-2 rounded-full" style="width: 35%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100">
+              <button onclick="navigateTo('skill-gap')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm text-center">
+                View Skill Gap →
+              </button>
+            </div>
+          </div>
+
+          <!-- 9. AI UPSKILLING RECOMMENDATION (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-card p-6 border border-bordercol shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">AI Upskilling Recommendation</h2>
+                  <p class="text-xs text-slate-500">Recommended learning based on industry demand</p>
+                </div>
+                <span class="text-[10px] font-bold bg-blue-50 text-brand-700 px-2.5 py-1 rounded-full border border-blue-200">
+                  FDP Pipeline
+                </span>
+              </div>
+
+              <div class="space-y-2.5 mt-3 text-xs">
+                <div class="p-3 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-rose-900">1. REST API Development</span>
+                    <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">High Priority</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">Enterprise authentication, JWT, and async controllers.</p>
+                </div>
+
+                <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-amber-900">2. Docker & Containers</span>
+                    <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">High Priority</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">Containerizing Python services for production microservices.</p>
+                </div>
+
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-800">3. Cloud Deployment</span>
+                    <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Medium Priority</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Cloud database provisioning and cluster monitoring.</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-900 mt-3">
+                <strong>Strategic Suggestion:</strong> Focus on REST API Development first, followed by Docker and Cloud Deployment.
+              </div>
+            </div>
+
+            <button onclick="navigateTo('upskilling')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+              View Upskilling Plan →
+            </button>
+          </div>
+        </div>
+
+        <!-- 10, 11, 12, 13. FOUR COLUMN MIDDLE ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- 10. INDUSTRY SKILL DEMAND -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Industry Skill Demand</div>
+              <div class="text-[11px] text-slate-500">Relevant to your teaching area</div>
+
+              <div class="space-y-1.5 my-3 text-xs">
+                <div class="flex justify-between p-1.5 bg-slate-50 rounded-lg">
+                  <span class="font-medium text-slate-800">Python</span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">High</span>
+                </div>
+                <div class="flex justify-between p-1.5 bg-slate-50 rounded-lg">
+                  <span class="font-medium text-slate-800">SQL</span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">High</span>
+                </div>
+                <div class="flex justify-between p-1.5 bg-slate-50 rounded-lg">
+                  <span class="font-medium text-slate-800">REST API</span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">High</span>
+                </div>
+                <div class="flex justify-between p-1.5 bg-slate-50 rounded-lg">
+                  <span class="font-medium text-slate-800">Docker</span>
+                  <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Medium</span>
+                </div>
+                <div class="flex justify-between p-1.5 bg-slate-50 rounded-lg">
+                  <span class="font-medium text-slate-800">Cloud</span>
+                  <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Medium</span>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-400">Industry requirements inform faculty development and classroom delivery.</div>
+            </div>
+
+            <button onclick="navigateTo('industry-skills')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              Explore Industry Skills →
+            </button>
+          </div>
+
+          <!-- 11. ACTIVE COURSES -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">My Courses</div>
+              <div class="text-[11px] text-slate-500">Current teaching assignments</div>
+
+              <div class="space-y-2.5 my-3 text-xs">
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Backend Development</span>
+                    <span class="text-brand-600">68%</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">32 Students enrolled</div>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Database Systems</span>
+                    <span class="text-brand-600">74%</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">28 Students enrolled</div>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Web API Development</span>
+                    <span class="text-brand-600">52%</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">26 Students enrolled</div>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('courses')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Courses →
+            </button>
+          </div>
+
+          <!-- 12. AI LEARNING CONTENT -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">AI Learning Content</div>
+              <div class="text-[11px] text-slate-500">Industry-aligned teaching resources</div>
+
+              <div class="space-y-2 my-3 text-xs">
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between items-center">
+                  <div>
+                    <div class="font-bold text-slate-800">REST API Architecture</div>
+                    <div class="text-[10px] text-slate-400">Concept Guide</div>
+                  </div>
+                  <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded">Ready</span>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between items-center">
+                  <div>
+                    <div class="font-bold text-slate-800">Docker Fundamentals</div>
+                    <div class="text-[10px] text-slate-400">Practical Lab</div>
+                  </div>
+                  <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded">Ready</span>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between items-center">
+                  <div>
+                    <div class="font-bold text-slate-800">Cloud Deployment</div>
+                    <div class="text-[10px] text-slate-400">Hands-on Tutorial</div>
+                  </div>
+                  <span class="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded">New</span>
+                </div>
+              </div>
+
+              <div class="text-[10px] text-slate-400">Industry Demand → Faculty Learning → Better Teaching.</div>
+            </div>
+
+            <button onclick="navigateTo('content')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+              View Learning Content →
+            </button>
+          </div>
+
+          <!-- 13. UPCOMING ASSESSMENT -->
+          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-bold text-slate-900">Upcoming Assessment</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded">Ready</span>
+              </div>
+              <div class="text-[11px] text-slate-500">Course: Web API Development</div>
+
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl my-3 space-y-1.5 text-xs">
+                <div class="font-bold text-slate-800">REST API Fundamentals</div>
+                <div class="flex justify-between text-slate-500 text-[11px]">
+                  <span>Questions: 10</span>
+                  <span>Duration: 20 min</span>
+                </div>
+                <div class="text-[10px] text-emerald-600 font-semibold pt-1 border-t border-slate-200">
+                  Target: Assessment of HTTP verbs, status codes & auth
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <button onclick="navigateTo('assessments')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition shadow-sm">
+                Open Assessment →
+              </button>
+              <button onclick="openModal('ai-assessment-modal')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
+                ⚡ Create AI Assessment
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 14 & 15. STUDENT PROGRESS & PRIORITY STUDENT SKILL GAPS -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- 14. STUDENT PROGRESS (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">Student Progress</h2>
+                  <p class="text-xs text-slate-500">Current competency development across enrolled cohorts</p>
+                </div>
+                <span class="text-xs font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-100">
+                  86 Total Learners
+                </span>
+              </div>
+
+              <!-- 4-Stat Cohort Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <div class="text-xl font-bold text-slate-900">72</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Assessed</div>
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                  <div class="text-xl font-bold text-emerald-700">48</div>
+                  <div class="text-[11px] text-emerald-600 mt-0.5">Target Met</div>
+                </div>
+                <div class="p-3 bg-rose-50 rounded-xl border border-rose-100">
+                  <div class="text-xl font-bold text-rose-700">14</div>
+                  <div class="text-[11px] text-rose-600 mt-0.5">Need Support</div>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                  <div class="text-xl font-bold text-brand-700">10</div>
+                  <div class="text-[11px] text-brand-600 mt-0.5">Project Ready</div>
+                </div>
+              </div>
+
+              <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-950 flex items-start gap-2">
+                <span class="text-amber-600 font-bold mt-0.5">⚠</span>
+                <div>
+                  <strong>Key Teaching Highlight:</strong> REST API remains the largest student skill gap across all active courses. Recommend scheduling a dedicated lab session.
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100">
+              <button onclick="navigateTo('students')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-xl text-xs transition text-center">
+                View Student Progress →
+              </button>
+            </div>
+          </div>
+
+          <!-- 15. STUDENT SKILL GAPS (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-card p-6 border border-bordercol shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <h2 class="text-base font-bold text-slate-900">Priority Student Skill Gaps</h2>
+                <span class="text-[10px] font-bold bg-rose-50 text-rose-700 px-2 py-0.5 rounded">Actionable</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Identifies where additional teaching or practical lab activities are required</p>
+
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  <span class="font-medium text-slate-800">REST API</span>
+                  <span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">14 students</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  <span class="font-medium text-slate-800">Docker</span>
+                  <span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">11 students</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  <span class="font-medium text-slate-800">Cloud</span>
+                  <span class="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">9 students</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  <span class="font-medium text-slate-800">Problem Solving</span>
+                  <span class="font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">7 students</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  <span class="font-medium text-slate-800">Communication</span>
+                  <span class="font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">5 students</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="navigateTo('student-gaps')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+              View Skill Gaps →
+            </button>
+          </div>
+        </div>
+
+        <!-- 26. QUICK ACTIONS CARD -->
+        <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Quick Actions</h2>
+            <p class="text-[11px] text-slate-500">Key faculty enablement and teaching workflows</p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <button onclick="navigateTo('skill-gap')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
+              <span class="text-brand-600 text-sm">◌</span>
+              <span class="text-xs font-semibold text-slate-800">Analyze My Skill Gap</span>
+            </button>
+            <button onclick="navigateTo('upskilling')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
+              <span class="text-brand-600 text-sm">◆</span>
+              <span class="text-xs font-semibold text-slate-800">Start Upskilling</span>
+            </button>
+            <button onclick="navigateTo('courses')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
+              <span class="text-brand-600 text-sm">▣</span>
+              <span class="text-xs font-semibold text-slate-800">Open My Courses</span>
+            </button>
+            <button onclick="openModal('ai-assessment-modal')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
+              <span class="text-brand-600 text-sm">✓</span>
+              <span class="text-xs font-semibold text-slate-800">Create Assessment</span>
+            </button>
+            <button onclick="navigateTo('student-gaps')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5 col-span-2 sm:col-span-1">
+              <span class="text-brand-600 text-sm">◉</span>
+              <span class="text-xs font-semibold text-slate-800">View Student Gaps</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: MY COURSES (/trainer/courses)                                   -->
+      <!-- ===================================================================== -->
+      <section id="view-courses" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">My Courses</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage current teaching and monitor syllabus progression against industry benchmarks.</p>
+          </div>
+          <button onclick="showToast('Course creation template available for upcoming semester.')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+            + New Course Section
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Course 1 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[10px] font-bold text-brand-700 uppercase tracking-wider bg-brand-50 px-2 py-0.5 rounded">Core Subject</span>
+                  <h3 class="font-bold text-base text-slate-900 mt-1">Backend Development (MCA-302)</h3>
+                  <p class="text-xs text-slate-500">Semester 3 · 32 Students Enrolled</p>
+                </div>
+                <span class="text-xs font-extrabold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-100">
+                  68% Progress
+                </span>
+              </div>
+
+              <!-- Skills Covered -->
+              <div>
+                <div class="text-xs font-semibold text-slate-700 mb-1.5">Skills Covered in Coursework:</div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">Python</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">SQL</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">REST APIs</span>
+                </div>
+              </div>
+
+              <!-- Skills Requiring Exposure -->
+              <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                <div class="text-[11px] font-bold text-amber-900">Skills Requiring More Practical Exposure:</div>
+                <div class="flex gap-1.5 pt-0.5">
+                  <span class="px-2 py-0.5 bg-white text-amber-800 text-[11px] rounded font-semibold border border-amber-200">Docker</span>
+                  <span class="px-2 py-0.5 bg-white text-amber-800 text-[11px] rounded font-semibold border border-amber-200">Cloud</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 flex gap-3">
+              <button onclick="showToast('Opened Backend Development coursework & student list.')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+                Open Course
+              </button>
+            </div>
+          </div>
+
+          <!-- Course 2 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">Core Subject</span>
+                  <h3 class="font-bold text-base text-slate-900 mt-1">Database Systems (MCA-204)</h3>
+                  <p class="text-xs text-slate-500">Semester 2 · 28 Students Enrolled</p>
+                </div>
+                <span class="text-xs font-extrabold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-100">
+                  74% Progress
+                </span>
+              </div>
+
+              <!-- Skills Covered -->
+              <div>
+                <div class="text-xs font-semibold text-slate-700 mb-1.5">Skills Covered in Coursework:</div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">PostgreSQL</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">Indexing</span>
+                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs rounded font-medium">Relational Models</span>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600">
+                Coursework has strong alignment with current enterprise hiring requirements.
+              </div>
+            </div>
+
+            <div class="pt-2 flex gap-3">
+              <button onclick="showToast('Opened Database Systems coursework & student list.')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+                Open Course
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: AI FACULTY SKILL GAP (/trainer/skill-gap)                       -->
+      <!-- ===================================================================== -->
+      <section id="view-skill-gap" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">AI Faculty Skill Gap</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Compare your current competencies with emerging market demand to determine training pathways.</p>
+          </div>
+          <button onclick="navigateTo('upskilling')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+            View Upskilling Recommendations →
+          </button>
+        </div>
+
+        <div class="bg-white rounded-card border border-bordercol shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <span class="font-bold text-xs text-slate-700">Faculty Competency vs. Industry Need Matrix</span>
+            <span class="text-[11px] text-slate-400">Benchmark: Backend & Cloud Roles 2026</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="py-3 px-4 font-semibold">Skill Area</th>
+                  <th class="py-3 px-4 font-semibold">Faculty Competency</th>
+                  <th class="py-3 px-4 font-semibold">Industry Need</th>
+                  <th class="py-3 px-4 font-semibold">Gap Classification</th>
+                  <th class="py-3 px-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-medium">
+                <tr>
+                  <td class="py-3.5 px-4 font-bold text-slate-900">Python</td>
+                  <td class="py-3.5 px-4 text-slate-600">90%</td>
+                  <td class="py-3.5 px-4 text-slate-600">90%</td>
+                  <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Aligned</span></td>
+                  <td class="py-3.5 px-4 text-slate-400">Ready to Teach</td>
+                </tr>
+                <tr>
+                  <td class="py-3.5 px-4 font-bold text-slate-900">SQL</td>
+                  <td class="py-3.5 px-4 text-slate-600">88%</td>
+                  <td class="py-3.5 px-4 text-slate-600">85%</td>
+                  <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Aligned</span></td>
+                  <td class="py-3.5 px-4 text-slate-400">Ready to Teach</td>
+                </tr>
+                <tr class="bg-rose-50/30">
+                  <td class="py-3.5 px-4 font-bold text-rose-900">REST API</td>
+                  <td class="py-3.5 px-4 text-slate-600">55%</td>
+                  <td class="py-3.5 px-4 text-slate-600">80%</td>
+                  <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">Priority Gap (25%)</span></td>
+                  <td class="py-3.5 px-4"><button onclick="navigateTo('upskilling')" class="text-xs text-brand-600 font-bold hover:underline">FDP Recommended</button></td>
+                </tr>
+                <tr class="bg-rose-50/30">
+                  <td class="py-3.5 px-4 font-bold text-rose-900">Docker</td>
+                  <td class="py-3.5 px-4 text-slate-600">30%</td>
+                  <td class="py-3.5 px-4 text-slate-600">60%</td>
+                  <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">Priority Gap (30%)</span></td>
+                  <td class="py-3.5 px-4"><button onclick="navigateTo('upskilling')" class="text-xs text-brand-600 font-bold hover:underline">FDP Recommended</button></td>
+                </tr>
+                <tr class="bg-rose-50/30">
+                  <td class="py-3.5 px-4 font-bold text-rose-900">Cloud</td>
+                  <td class="py-3.5 px-4 text-slate-600">35%</td>
+                  <td class="py-3.5 px-4 text-slate-600">60%</td>
+                  <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">Priority Gap (25%)</span></td>
+                  <td class="py-3.5 px-4"><button onclick="navigateTo('upskilling')" class="text-xs text-brand-600 font-bold hover:underline">FDP Recommended</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-500">
+            * Note: Competency levels reflect self-reported and assessment data. AI generates advisory training recommendations; faculty development is voluntary and institutional.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: LEARNING CONTENT (/trainer/content)                             -->
+      <!-- ===================================================================== -->
+      <section id="view-content" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Learning Content</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Industry-aligned resources for classroom teaching and faculty self-development.</p>
+          </div>
+          <button onclick="showToast('Learning module builder ready.')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+            + Create Learning Module
+          </button>
+        </div>
+
+        <!-- Categories Filter Tabs -->
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button class="px-3 py-1.5 bg-brand-50 text-brand-700 border border-brand-200 font-semibold rounded-xl">All Modules</button>
+          <button class="px-3 py-1.5 bg-white text-slate-600 border border-slate-200 font-medium rounded-xl hover:bg-slate-50">Concept Guides</button>
+          <button class="px-3 py-1.5 bg-white text-slate-600 border border-slate-200 font-medium rounded-xl hover:bg-slate-50">Practical Labs</button>
+          <button class="px-3 py-1.5 bg-white text-slate-600 border border-slate-200 font-medium rounded-xl hover:bg-slate-50">Projects</button>
+          <button class="px-3 py-1.5 bg-white text-slate-600 border border-slate-200 font-medium rounded-xl hover:bg-slate-50">Assessments</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <!-- Card 1 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-3 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">Concept Guide</span>
+              <h3 class="font-bold text-slate-900 text-sm">REST API Architecture</h3>
+              <p class="text-slate-500 text-[11px]">Covers HTTP status codes, stateless sessions, and OpenAPI specs.</p>
+            </div>
+            <button onclick="showToast('Opening REST API Architecture guide...')" class="w-full py-1.5 bg-slate-50 hover:bg-brand-50 text-slate-700 font-semibold rounded-lg border border-slate-200">
+              Access Guide
+            </button>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-3 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Practical Lab</span>
+              <h3 class="font-bold text-slate-900 text-sm">Docker Fundamentals</h3>
+              <p class="text-slate-500 text-[11px]">Dockerfile authoring, image optimization, and volume mapping exercises.</p>
+            </div>
+            <button onclick="showToast('Opening Docker Practical Lab manual...')" class="w-full py-1.5 bg-slate-50 hover:bg-brand-50 text-slate-700 font-semibold rounded-lg border border-slate-200">
+              Access Lab
+            </button>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-3 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Hands-on Tutorial</span>
+              <h3 class="font-bold text-slate-900 text-sm">Cloud Deployment</h3>
+              <p class="text-slate-500 text-[11px]">Step-by-step setup of cloud container runtimes and database hosting.</p>
+            </div>
+            <button onclick="showToast('Opening Cloud Deployment tutorial...')" class="w-full py-1.5 bg-slate-50 hover:bg-brand-50 text-slate-700 font-semibold rounded-lg border border-slate-200">
+              Access Tutorial
+            </button>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm space-y-3 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Security Project</span>
+              <h3 class="font-bold text-slate-900 text-sm">Production API Security</h3>
+              <p class="text-slate-500 text-[11px]">Rate limiting, CORS policies, and token encryption labs.</p>
+            </div>
+            <button onclick="showToast('Opening API Security project template...')" class="w-full py-1.5 bg-slate-50 hover:bg-brand-50 text-slate-700 font-semibold rounded-lg border border-slate-200">
+              Access Project
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: ASSESSMENTS (/trainer/assessments)                              -->
+      <!-- ===================================================================== -->
+      <section id="view-assessments" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Assessments</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Create and manage competency-focused evaluations for your students.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openModal('ai-assessment-modal')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+              <span>⚡ Generate with AI</span>
+            </button>
+            <button onclick="showToast('Manual assessment builder ready.')" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+              + Create Assessment
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Assessment 1 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Status: Ready</span>
+                <h3 class="font-bold text-base text-slate-900 mt-1">REST API Fundamentals</h3>
+                <p class="text-xs text-slate-500">Course: Web API Development (MCA-302)</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-bold text-slate-700">10 Questions</span>
+                <div class="text-[11px] text-slate-400">20 Minutes</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-600">
+              Evaluates student mastery of HTTP response codes, query parsing, JWT security, and endpoint structuring.
+            </p>
+
+            <div class="flex gap-2 pt-2 border-t border-slate-100">
+              <button onclick="showToast('Assessment published to students.')" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 rounded-xl text-xs transition">
+                Publish to Batch
+              </button>
+              <button onclick="showToast('Previewing assessment questions...')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
+                Preview
+              </button>
+            </div>
+          </div>
+
+          <!-- Assessment 2 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Status: Draft</span>
+                <h3 class="font-bold text-base text-slate-900 mt-1">Docker Fundamentals</h3>
+                <p class="text-xs text-slate-500">Course: Backend Development (MCA-302)</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-bold text-slate-700">8 Questions</span>
+                <div class="text-[11px] text-slate-400">15 Minutes</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-600">
+              Focuses on multi-stage builds, container isolation, environment variable injection, and volume mapping.
+            </p>
+
+            <div class="flex gap-2 pt-2 border-t border-slate-100">
+              <button onclick="showToast('Assessment editor opened.')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+                Edit Questions
+              </button>
+              <button onclick="showToast('Assessment ready for final review.')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
+                Mark Ready
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: MY COMPETENCIES (/trainer/competencies)                         -->
+      <!-- ===================================================================== -->
+      <section id="view-competencies" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">My Competencies</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">View your current competency profile and industry-aligned skill requirements.</p>
+          </div>
+          <button onclick="navigateTo('upskilling')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
+            Generate Upskilling Plan →
+          </button>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Python -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center text-xs font-bold">
+                <span>Python</span>
+                <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">90%</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2">
+                <div class="bg-emerald-500 h-2 rounded-full" style="width: 90%"></div>
+              </div>
+              <p class="text-[11px] text-slate-500">Core Language & Algorithms Mastery</p>
+            </div>
+
+            <!-- SQL -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center text-xs font-bold">
+                <span>SQL</span>
+                <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">88%</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2">
+                <div class="bg-emerald-500 h-2 rounded-full" style="width: 88%"></div>
+              </div>
+              <p class="text-[11px] text-slate-500">Relational Modeling & Query Tuning</p>
+            </div>
+
+            <!-- REST API -->
+            <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2">
+              <div class="flex justify-between items-center text-xs font-bold text-rose-900">
+                <span>REST API (Priority Gap)</span>
+                <span class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded">55%</span>
+              </div>
+              <div class="w-full bg-rose-100 rounded-full h-2">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 55%"></div>
+              </div>
+              <p class="text-[11px] text-rose-700">Async Services & Token Auth</p>
+            </div>
+
+            <!-- Docker -->
+            <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2">
+              <div class="flex justify-between items-center text-xs font-bold text-rose-900">
+                <span>Docker (Priority Gap)</span>
+                <span class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded">30%</span>
+              </div>
+              <div class="w-full bg-rose-100 rounded-full h-2">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 30%"></div>
+              </div>
+              <p class="text-[11px] text-rose-700">Container Deployment & Isolation</p>
+            </div>
+
+            <!-- Cloud -->
+            <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2">
+              <div class="flex justify-between items-center text-xs font-bold text-rose-900">
+                <span>Cloud (Priority Gap)</span>
+                <span class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded">35%</span>
+              </div>
+              <div class="w-full bg-rose-100 rounded-full h-2">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 35%"></div>
+              </div>
+              <p class="text-[11px] text-rose-700">Cloud Run, RDS & Monitoring</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: UPSKILLING / FDP (/trainer/upskilling)                          -->
+      <!-- ===================================================================== -->
+      <section id="view-upskilling" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Upskilling / FDP</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Industry-aligned faculty development recommendations sponsored by enterprise partners.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- FDP 1 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded uppercase">High Priority</span>
+                <span class="text-xs text-slate-400 font-medium">Duration: 5 Days</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-slate-900">REST API Development</h3>
+                <p class="text-xs text-brand-700 font-medium mt-0.5">Format: Hands-on FDP</p>
+              </div>
+              <div class="space-y-1 text-xs text-slate-600">
+                <div class="font-semibold text-slate-700">Key Topics:</div>
+                <div class="text-[11px] text-slate-500">• API Architecture & Design</div>
+                <div class="text-[11px] text-slate-500">• JWT Authentication</div>
+                <div class="text-[11px] text-slate-500">• Third-party Integration</div>
+                <div class="text-[11px] text-slate-500">• Automated Testing</div>
+              </div>
+            </div>
+            <button onclick="enrollFDP('REST API Development')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+              Enroll / Request Training
+            </button>
+          </div>
+
+          <!-- FDP 2 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded uppercase">High Priority</span>
+                <span class="text-xs text-slate-400 font-medium">Duration: 3 Days</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-slate-900">Docker & Containers</h3>
+                <p class="text-xs text-brand-700 font-medium mt-0.5">Format: Lab Immersion</p>
+              </div>
+              <div class="space-y-1 text-xs text-slate-600">
+                <div class="font-semibold text-slate-700">Key Topics:</div>
+                <div class="text-[11px] text-slate-500">• Container Internals</div>
+                <div class="text-[11px] text-slate-500">• Image Optimization</div>
+                <div class="text-[11px] text-slate-500">• Docker Compose Orchestration</div>
+                <div class="text-[11px] text-slate-500">• Production Deployment</div>
+              </div>
+            </div>
+            <button onclick="enrollFDP('Docker & Containers')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+              Enroll / Request Training
+            </button>
+          </div>
+
+          <!-- FDP 3 -->
+          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded uppercase">Medium Priority</span>
+                <span class="text-xs text-slate-400 font-medium">Duration: 5 Days</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-slate-900">Cloud Deployment</h3>
+                <p class="text-xs text-brand-700 font-medium mt-0.5">Format: Corporate Workshop</p>
+              </div>
+              <div class="space-y-1 text-xs text-slate-600">
+                <div class="font-semibold text-slate-700">Key Topics:</div>
+                <div class="text-[11px] text-slate-500">• Cloud Fundamentals</div>
+                <div class="text-[11px] text-slate-500">• Containerized Deployment</div>
+                <div class="text-[11px] text-slate-500">• Cloud Monitoring & Logs</div>
+                <div class="text-[11px] text-slate-500">• Scalability Patterns</div>
+              </div>
+            </div>
+            <button onclick="enrollFDP('Cloud Deployment')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+              Enroll / Request Training
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: INDUSTRY SKILLS (/trainer/industry-skills)                      -->
+      <!-- ===================================================================== -->
+      <section id="view-industry-skills" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Skills</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Understand current employer skill demand relevant to your teaching domain.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">Teaching Domain</span>
+              <h2 class="text-base font-bold text-slate-900 mt-1">Backend Development</h2>
+            </div>
+            <button onclick="showToast('Displaying 2026 enterprise hiring trends.')" class="text-xs font-semibold text-brand-600 hover:underline">
+              View Skill Trends →
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2 text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Python</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">SQL</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">REST API</div>
+              <div class="text-emerald-700 font-semibold text-[11px] mt-1">High Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Docker</div>
+              <div class="text-amber-700 font-semibold text-[11px] mt-1">Medium Demand</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="font-bold text-slate-800">Cloud</div>
+              <div class="text-amber-700 font-semibold text-[11px] mt-1">Medium Demand</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-900 mt-2">
+            SkillBridge directly connects corporate job descriptions with faculty development and student classroom activities.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: STUDENT PROGRESS (/trainer/students)                            -->
+      <!-- ===================================================================== -->
+      <section id="view-students" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Student Progress</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor student competency development and cohort performance indicators.</p>
+        </div>
+
+        <!-- 5-Metric Cohort Overview -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center text-xs">
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">86</div>
+            <div class="text-[11px] text-slate-500 mt-1">Total Students</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-slate-900">72</div>
+            <div class="text-[11px] text-slate-500 mt-1">Assessed</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-emerald-600">48</div>
+            <div class="text-[11px] text-emerald-700 mt-1">Target Met</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm">
+            <div class="text-2xl font-bold text-rose-600">14</div>
+            <div class="text-[11px] text-rose-700 mt-1">Needs Support</div>
+          </div>
+          <div class="bg-white p-4 rounded-card border border-bordercol shadow-sm col-span-2 sm:col-span-1">
+            <div class="text-2xl font-bold text-brand-600">10</div>
+            <div class="text-[11px] text-brand-700 mt-1">Project Ready</div>
+          </div>
+        </div>
+
+        <!-- Skill Gaps Overview -->
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-slate-900">Cohort Skill Gap Summary</h2>
+            <button onclick="navigateTo('student-gaps')" class="text-xs font-semibold text-brand-600 hover:underline">
+              View Student Details →
+            </button>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>REST API</span>
+                <span class="text-rose-600 font-bold">14 students</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 60%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>Docker</span>
+                <span class="text-rose-600 font-bold">11 students</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 45%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>Cloud</span>
+                <span class="text-amber-600 font-bold">9 students</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-amber-500 h-2 rounded-full" style="width: 38%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: AT-RISK / SKILL GAPS (/trainer/student-gaps)                    -->
+      <!-- ===================================================================== -->
+      <section id="view-student-gaps" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Student Skill Gaps</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Identify students who need additional support and targeted pedagogical interventions.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Student 1: Rahul Patel -->
+          <div class="bg-white rounded-card p-6 border-2 border-rose-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded uppercase">Needs Support</span>
+                <h3 class="font-bold text-base text-slate-900 mt-1">Rahul Patel</h3>
+                <p class="text-xs text-slate-500">MCA Semester 3 · ID: #SKB-2026-092</p>
+              </div>
+              <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                Gap: REST API
+              </span>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span>Current Assessed Competency: <strong class="text-rose-600">45%</strong></span>
+                <span>Required Benchmark: <strong class="text-slate-800">80%</strong></span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 mt-1">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 45%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs text-slate-700">
+              <div class="font-semibold text-slate-900">Recommended Interventions:</div>
+              <div class="text-[11px] text-slate-600">• Assign "REST API Fundamentals" reading module</div>
+              <div class="text-[11px] text-slate-600">• Practical API Project Sandbox Week 4</div>
+            </div>
+
+            <button onclick="showToast('Targeted REST API intervention roadmap assigned to Rahul Patel.')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+              Assign Recommended Intervention
+            </button>
+          </div>
+
+          <!-- Student 2: Aarav Shah -->
+          <div class="bg-white rounded-card p-6 border-2 border-rose-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded uppercase">Needs Support</span>
+                <h3 class="font-bold text-base text-slate-900 mt-1">Aarav Shah</h3>
+                <p class="text-xs text-slate-500">MCA Semester 3 · ID: #SKB-2026-104</p>
+              </div>
+              <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                Gap: Docker
+              </span>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span>Current Assessed Competency: <strong class="text-rose-600">30%</strong></span>
+                <span>Required Benchmark: <strong class="text-slate-800">60%</strong></span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 mt-1">
+                <div class="bg-rose-500 h-2 rounded-full" style="width: 30%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs text-slate-700">
+              <div class="font-semibold text-slate-900">Recommended Interventions:</div>
+              <div class="text-[11px] text-slate-600">• Assign "Docker Fundamentals" lab exercises</div>
+              <div class="text-[11px] text-slate-600">• Containerization project sandbox guidance</div>
+            </div>
+
+            <button onclick="showToast('Targeted Docker intervention roadmap assigned to Aarav Shah.')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 rounded-xl text-xs transition">
+              Assign Recommended Intervention
+            </button>
+          </div>
+
+        </div>
+
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
+          * Note: SkillBridge avoids permanent negative student labeling. Neutral diagnostic terms ("Needs Support", "Priority Skill Gap") trigger positive upskilling roadmaps.
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: INDUSTRY FEEDBACK (/trainer/feedback)                           -->
+      <!-- ===================================================================== -->
+      <section id="view-feedback" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Feedback</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Employer feedback helps improve teaching relevance and practical student preparation.</p>
+        </div>
+
+        <!-- Scores Breakdown -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">4.1 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Technical Skills</div>
+            <div class="text-[10px] text-emerald-600 mt-0.5">✓ Solid coding logic</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">3.9 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Problem Solving</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Algorithmic readiness</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-slate-900">4.0 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Communication</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Team interaction</div>
+          </div>
+          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
+            <div class="text-2xl font-bold text-amber-600">3.5 <span class="text-xs text-slate-400">/ 5</span></div>
+            <div class="text-xs font-semibold text-slate-700 mt-1">Production Readiness</div>
+            <div class="text-[10px] text-amber-600 font-medium mt-0.5">⚠ Focus for teaching</div>
+          </div>
+        </div>
+
+        <!-- Insight & Teaching Action -->
+        <div class="bg-white rounded-card p-6 border-2 border-indigo-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded">Closed-Loop Faculty Signal</span>
+            <span class="text-xs font-semibold text-slate-400">Hiring Cohort Q3 2026</span>
+          </div>
+
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Employer Feedback Insight:</h2>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              "Employers are requesting stronger practical deployment experience. Freshers understand Python and SQL syntax but struggle with Docker multi-stage builds and cloud host deployments."
+            </p>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+            <span class="font-bold text-slate-800">Recommended Teaching Response:</span>
+            <div class="text-slate-600">Increase practical Docker and cloud deployment exposure during the Semester 3 lab coursework.</div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="openModal('teaching-action-modal')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition shadow-sm">
+              Create Teaching Action →
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- VIEW: PROFILE (/trainer/profile)                                      -->
+      <!-- ===================================================================== -->
+      <section id="view-profile" class="hidden space-y-6">
+        <div class="pb-2 border-b border-bordercol">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Faculty Profile</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage your faculty credentials and domain specializations.</p>
+        </div>
+
+        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-200 text-brand-700 flex items-center justify-center font-black text-xl">
+              PM
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">Dr. Priya Mehta</h2>
+              <p class="text-xs text-slate-500">Trainer / Faculty · ITM University, Vadodara</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 font-medium">Domain Specialization</span>
+              <div class="font-semibold text-slate-800 mt-1">Backend Development / Information Technology</div>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 font-medium">Experience Level</span>
+              <div class="font-semibold text-slate-800 mt-1">Faculty / Senior Technical Trainer</div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-xs font-semibold text-slate-700">Industry Skills Profile:</span>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Python</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">SQL</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">REST API</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Docker</span>
+              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Cloud</span>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="showToast('Profile editor available in prototype mode.')" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl text-xs transition">
+              Edit Profile
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: AI ASSESSMENT GENERATOR                                          -->
+  <!-- ========================================================================= -->
+  <div id="ai-assessment-modal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-card max-w-md w-full p-6 space-y-4 shadow-xl border border-bordercol">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">AI Assessment Generator</h3>
+          <p class="text-[11px] text-slate-500">Automate question formulation while keeping teacher control</p>
+        </div>
+        <button onclick="closeModal('ai-assessment-modal')" class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Topic</label>
+          <input type="text" id="ai-topic" value="REST API Architecture & Authentication" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-brand-600">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Difficulty</label>
+            <select class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+              <option>Intermediate (Industry Benchmark)</option>
+              <option>Beginner</option>
+              <option>Advanced Scenario</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Questions</label>
+            <select class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+              <option>10 Questions</option>
+              <option>5 Questions</option>
+              <option>15 Questions</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Target Competency</label>
+          <input type="text" value="NOS-IT-4102: Backend API & Container Architecture" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('ai-assessment-modal')" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Cancel</button>
+        <button onclick="submitGenerateAssessment()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold">Generate Assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: TEACHING ACTION (CLOSED LOOP)                                    -->
+  <!-- ========================================================================= -->
+  <div id="teaching-action-modal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-card max-w-md w-full p-6 space-y-4 shadow-xl border border-bordercol">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Create Teaching Action</h3>
+          <p class="text-[11px] text-slate-500">Respond directly to employer outcome feedback</p>
+        </div>
+        <button onclick="closeModal('teaching-action-modal')" class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Select Action</label>
+          <select class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+            <option>Add Docker Containerization Lab to Week 5</option>
+            <option>Schedule Practical REST API Micro-Challenge</option>
+            <option>Host Cloud Sandbox Deployment Workshop</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Target Course Section</label>
+          <select class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+            <option>Backend Development (MCA-302)</option>
+            <option>Web API Development (MCA-304)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Action Note for College HoD</label>
+          <textarea rows="2" class="w-full border border-slate-200 rounded-xl p-2 text-xs outline-none">Incorporating hands-on Docker multi-stage builds into MCA Lab syllabus in response to employer placement reviews.</textarea>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('teaching-action-modal')" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Cancel</button>
+        <button onclick="submitTeachingAction()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold">Commit Teaching Action</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs flex items-center gap-2.5">
+      <span class="text-emerald-400 font-bold" id="toast-icon">✓</span>
+      <span id="toast-message">Action completed successfully.</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: ROUTING & DEMO STATE MACHINE                                 -->
+  <!-- ========================================================================= -->
+  <script>
+    // Valid view routes
+    const routes = [
+      'dashboard',
+      'courses',
+      'skill-gap',
+      'content',
+      'assessments',
+      'competencies',
+      'upskilling',
+      'industry-skills',
+      'students',
+      'student-gaps',
+      'feedback',
+      'profile'
+    ];
+    let currentRoute = 'dashboard';
+
+    // Navigation function
+    function navigateTo(route) {
+      if (!routes.includes(route)) return;
+      currentRoute = route;
+
+      // Update visibility of main view sections
+      routes.forEach(r => {
+        const viewEl = document.getElementById(`view-${r}`);
+        const navEl = document.getElementById(`nav-${r}`);
+
+        if (viewEl) {
+          if (r === route) {
+            viewEl.classList.remove('hidden');
+          } else {
+            viewEl.classList.add('hidden');
+          }
+        }
+
+        if (navEl) {
+          if (r === route) {
+            navEl.classList.add('nav-active');
+          } else {
+            navEl.classList.remove('nav-active');
+          }
+        }
+      });
+
+      // Close mobile sidebar on navigation
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebar-backdrop').classList.add('hidden');
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toggle Sidebar for mobile view
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    }
+
+    // Modal controls
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // Trigger Toast Notification
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toast-message');
+      const icon = document.getElementById('toast-icon');
+
+      msg.innerText = message;
+      icon.innerText = isSuccess ? '✓' : 'ℹ';
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    // Demo Action: Enroll in FDP
+    function enrollFDP(topic) {
+      showToast(`Enrollment request submitted for "${topic}" FDP. Institutional sponsorship notified.`);
+    }
+
+    // Demo Action: Submit Generate Assessment
+    function submitGenerateAssessment() {
+      closeModal('ai-assessment-modal');
+      showToast("AI Generated 10 competency-mapped questions! Saved to Assessments (Draft).");
+      navigateTo('assessments');
+    }
+
+    // Demo Action: Submit Teaching Action (Closed Loop)
+    function submitTeachingAction() {
+      closeModal('teaching-action-modal');
+      showToast("CLOSED-LOOP EVENT: Teaching action committed! MCA-302 Lab curriculum updated with Docker exercises.");
+    }
+
+    // Logout Demo Action
+    function logoutDemo() {
+      if (confirm("Reset prototype session and return to dashboard?")) {
+        navigateTo('dashboard');
+        showToast("Session reset to initial demo state.");
+      }
+    }
+  </script>
+</body>
+</html>
