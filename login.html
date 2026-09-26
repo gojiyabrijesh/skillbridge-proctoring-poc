@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SkillBridge Login — AI-Powered Closed-Loop Education-to-Employment Ecosystem" />
+  <title>SkillBridge | Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --primary: #1769f5;
+      --primary-dark: #0e4fbd;
+      --primary-soft: #edf4ff;
+      --text: #10203a;
+      --text-muted: #69778d;
+      --border: #dce5f1;
+      --background: #f6f9fd;
+      --white: #ffffff;
+      --danger: #d64545;
+      --shadow: 0 22px 55px rgba(32, 67, 117, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(23, 105, 245, 0.06), transparent 25%),
+        radial-gradient(circle at 85% 85%, rgba(23, 105, 245, 0.05), transparent 25%),
+        var(--background);
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================
+       MAIN
+    ========================== */
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 42px 20px 28px;
+    }
+
+    .login-card {
+      width: min(100%, 450px);
+      background: var(--white);
+      border: 1px solid rgba(220, 229, 241, 0.95);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 36px;
+    }
+
+    /* =========================
+       BRAND
+    ========================== */
+
+    .brand {
+      text-align: center;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 13px;
+      border-radius: 14px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #1c74ff, #0d53c7);
+      box-shadow: 0 12px 28px rgba(23, 105, 245, 0.24);
+    }
+
+    .brand-mark::before {
+      content: "";
+      width: 21px;
+      height: 21px;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .brand-mark::after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+    }
+
+    .brand-name {
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-tagline {
+      margin-top: 7px;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    /* =========================
+       WELCOME
+    ========================== */
+
+    .welcome {
+      text-align: center;
+      margin-top: 28px;
+      margin-bottom: 27px;
+    }
+
+    .welcome h1 {
+      font-size: 25px;
+      line-height: 1.2;
+      letter-spacing: -0.035em;
+    }
+
+    .welcome p {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* =========================
+       FORM
+    ========================== */
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #263750;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input {
+      width: 100%;
+      height: 47px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+      font-size: 13px;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .input::placeholder {
+      color: #9aa7b8;
+    }
+
+    .input:focus {
+      border-color: #76a7fa;
+      box-shadow: 0 0 0 4px rgba(23, 105, 245, 0.09);
+    }
+
+    .password-input {
+      padding-right: 48px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: 0;
+      background: transparent;
+      color: #738196;
+      border-radius: 8px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .password-toggle:hover {
+      background: #f3f6fb;
+      color: var(--primary);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* =========================
+       FORM OPTIONS
+    ========================== */
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: -2px;
+      margin-bottom: 20px;
+    }
+
+    .remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #67758a;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .forgot {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .forgot:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================
+       ROLE SELECTOR
+    ========================== */
+
+    .role-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #263750;
+    }
+
+    .role-select-wrap {
+      position: relative;
+    }
+
+    .role-select {
+      appearance: none;
+      width: 100%;
+      height: 47px;
+      padding: 0 43px 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .role-select:focus {
+      border-color: #76a7fa;
+      box-shadow: 0 0 0 4px rgba(23, 105, 245, 0.09);
+    }
+
+    .role-select-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #768499;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================== */
+
+    .btn {
+      width: 100%;
+      height: 48px;
+      border-radius: 11px;
+      border: 0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #1972ff, #0e55d0);
+      box-shadow: 0 12px 28px rgba(23, 105, 245, 0.22);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 15px 32px rgba(23, 105, 245, 0.28);
+    }
+
+    .btn-demo {
+      margin-top: 10px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border: 1px solid #cfe0fd;
+    }
+
+    .btn-demo:hover {
+      background: #e4efff;
+    }
+
+    /* =========================
+       DEMO NOTE
+    ========================== */
+
+    .demo-note {
+      margin-top: 13px;
+      text-align: center;
+      color: #8995a7;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    footer {
+      padding: 18px 20px 22px;
+      text-align: center;
+      color: #8a97a8;
+      font-size: 11px;
+    }
+
+    /* =========================
+       ERROR
+    ========================== */
+
+    .error-message {
+      display: none;
+      margin-top: 10px;
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 520px) {
+      main {
+        padding: 24px 14px 18px;
+      }
+
+      .login-card {
+        padding: 28px 22px;
+        border-radius: 20px;
+      }
+
+      .brand-name {
+        font-size: 23px;
+      }
+
+      .welcome {
+        margin-top: 23px;
+      }
+
+      .welcome h1 {
+        font-size: 22px;
+      }
+
+      .form-options {
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="page">
+
+```
+<main>
+  <section class="login-card" aria-label="SkillBridge Login">
+
+    <!-- BRAND -->
+    <div class="brand">
+
+      <div class="brand-mark" aria-hidden="true"></div>
+
+      <div class="brand-name">
+        SkillBridge
+      </div>
+
+      <div class="brand-tagline">
+        Right Skills → Right Learning → Right Opportunities
+      </div>
+
+    </div>
+
+
+    <!-- WELCOME -->
+    <div class="welcome">
+      <h1>Welcome to SkillBridge</h1>
+      <p>Sign in to access your ecosystem dashboard.</p>
+    </div>
+
+
+    <!-- FORM -->
+    <form id="loginForm">
+
+      <!-- EMAIL / USER ID -->
+      <div class="form-group">
+        <label class="form-label" for="email">
+          Email / User ID
+        </label>
+
+        <input
+          class="input"
+          type="text"
+          id="email"
+          name="email"
+          autocomplete="username"
+          placeholder="Enter your email or user ID"
+        />
+      </div>
+
+
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label class="form-label" for="password">
+          Password
+        </label>
+
+        <div class="input-wrap">
+
+          <input
+            class="input password-input"
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+          />
+
+          <button
+            type="button"
+            class="password-toggle"
+            id="passwordToggle"
+            aria-label="Show password"
+            title="Show password"
+          >
+            <svg class="icon" id="eyeIcon" viewBox="0 0 24 24">
+              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+              <circle cx="12" cy="12" r="2.5"></circle>
+            </svg>
+          </button>
+
+        </div>
+      </div>
+
+
+      <!-- OPTIONS -->
+      <div class="form-options">
+
+        <label class="remember">
+          <input type="checkbox" id="remember" />
+          <span>Remember me</span>
+        </label>
+
+        <a href="#" class="forgot" id="forgotPassword">
+          Forgot Password?
+        </a>
+
+      </div>
+
+
+      <!-- ROLE -->
+      <div class="form-group">
+
+        <label class="role-label" for="role">
+          Select Role
+        </label>
+
+        <div class="role-select-wrap">
+
+          <select class="role-select" id="role" name="role">
+
+            <option value="student" selected>
+              Student
+            </option>
+
+            <option value="industry">
+              Industry
+            </option>
+
+            <option value="college">
+              College
+            </option>
+
+            <option value="trainer">
+              Trainer
+            </option>
+
+            <option value="admin">
+              Admin
+            </option>
+
+          </select>
+
+          <span class="role-select-arrow" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ERROR -->
+      <div class="error-message" id="errorMessage">
+        Please enter your email or user ID.
+      </div>
+
+
+      <!-- SIGN IN -->
+      <button type="submit" class="btn btn-primary">
+        SIGN IN →
+      </button>
+
+
+
+
+      <div class="demo-note">
+        No real account or password is required for the demo student.
+      </div>
+
+    </form>
+
+  </section>
+</main>
+
+
+<!-- FOOTER -->
+<footer>
+  SkillBridge • SIH 2026 Prototype
+</footer>
+```
+
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const roleSelect = document.getElementById("role");
+    const demoStudent = document.getElementById("demoStudent");
+    const errorMessage = document.getElementById("errorMessage");
+
+    const passwordInput = document.getElementById("password");
+    const passwordToggle = document.getElementById("passwordToggle");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    const routes = {
+      // student: "file:///d%3A/SIH/prototype/Student/Student_dashboard.html",
+      // trainer: "file:///d%3A/SIH/prototype/Trainer/Trainer_dashboard.html",
+      // industry: "file:///d%3A/SIH/prototype/Industry/Industry_dashboard.html",
+      // college: "file:///d%3A/SIH/prototype/Collage/Collage_dashboard.html",
+      //  admin: "file:///d%3A/SIH/prototype/Admin/Admin_dashboard.html"
+      student: "/skillbridge-proctoring-poc/prototype/Student/Student_dashboard.html",
+      
+      industry: "/skillbridge-proctoring-poc/prototype/Industry/Industry_dashboard.html",
+      
+      college: "/skillbridge-proctoring-poc/prototype/Collage/Collage_dashboard.html",
+      
+      trainer: "/skillbridge-proctoring-poc/prototype/Trainer/Trainer_dashboard.html",
+      
+      admin: "/skillbridge-proctoring-poc/prototype/Admin/Admin_dashboard.html"
+    };
+
+    /* =========================
+       PASSWORD SHOW / HIDE
+    ========================== */
+
+    passwordToggle.addEventListener("click", () => {
+      const isPassword = passwordInput.type === "password";
+
+      passwordInput.type = isPassword ? "text" : "password";
+
+      passwordToggle.setAttribute(
+        "aria-label",
+        isPassword ? "Hide password" : "Show password"
+      );
+
+      passwordToggle.setAttribute(
+        "title",
+        isPassword ? "Hide password" : "Show password"
+      );
+
+      eyeIcon.innerHTML = isPassword
+        ? `
+          <path d="M3 3l18 18"></path>
+          <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+          <path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6 0 9.5 7 9.5 7a18.3 18.3 0 0 1-3.1 3.8"></path>
+          <path d="M6.4 6.4C3.8 8.2 2.5 12 2.5 12s3.5 7 9.5 7c1.1 0 2.1-.2 3-.5"></path>
+        `
+        : `
+          <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+          <circle cx="12" cy="12" r="2.5"></circle>
+        `;
+    });
+
+
+    /* =========================
+       SIGN IN
+       ========================== */
+
+    loginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const selectedRole = roleSelect.value;
+
+      /*
+        Prototype behavior:
+        No real authentication is required.
+        The entered user ID is only there to mimic the login experience.
+      */
+
+      if (!email) {
+        errorMessage.classList.add("show");
+        document.getElementById("email").focus();
+        return;
+      }
+
+      errorMessage.classList.remove("show");
+
+      const destination = routes[selectedRole] || "/student/dashboard";
+
+      window.location.href = destination;
+    });
+
+
+    /* =========================
+       DEMO STUDENT
+       ========================== */
+
+    demoStudent.addEventListener("click", () => {
+      window.location.href = "/student/dashboard";
+    });
+
+
+    /* =========================
+       FORGOT PASSWORD
+       ========================== */
+
+    document.getElementById("forgotPassword").addEventListener("click", (event) => {
+      event.preventDefault();
+
+      /*
+        Prototype only:
+        No real password recovery is implemented.
+      */
+      alert("Password recovery is disabled in the SIH 2026 prototype.");
+    });
+  </script>
+
+</body>
+</html>
