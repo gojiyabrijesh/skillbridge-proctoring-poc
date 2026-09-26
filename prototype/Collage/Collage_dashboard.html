@@ -1,1397 +1,1705 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkillBridge — College & Institution Dashboard | ITM University</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillBridge — College & Institution Dashboard</title>
+  
+  <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
           },
           colors: {
             brand: {
               50: '#eff6ff',
               100: '#dbeafe',
               200: '#bfdbfe',
-              600: '#2563eb',
+              500: '#3b82f6',
+              600: '#2563eb', // SkillBridge primary blue
               700: '#1d4ed8',
               800: '#1e40af',
               900: '#1e3a8a',
-            },
-            surface: '#f8fafc',
-            bordercol: '#e2e8f0'
-          },
-          borderRadius: {
-            'card': '16px',
+            }
           }
         }
       }
     }
   </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    .nav-active {
-      background-color: #eff6ff !important;
-      color: #2563eb !important;
-      font-weight: 600 !important;
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="bg-surface text-slate-900 font-sans min-h-screen flex antialiased">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-700">
 
-  <!-- ========================================================================= -->
-  <!-- 4. FIXED LEFT SIDEBAR (Width: 245px)                                     -->
-  <!-- ========================================================================= -->
-  <aside id="sidebar" class="w-[245px] bg-white border-r border-bordercol flex flex-col fixed inset-y-0 left-0 z-30 transition-transform duration-200 ease-in-out md:translate-x-0 -translate-x-full">
-    <!-- Brand Header -->
-    <div class="h-[68px] px-5 flex items-center gap-3 border-b border-bordercol">
-      <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center font-black text-white text-base shadow-sm">
-        S
-      </div>
-      <div>
-        <div class="font-bold text-slate-900 text-base leading-tight tracking-tight">SkillBridge</div>
-        <div class="text-[10px] text-slate-400 font-medium">Institution Ecosystem</div>
-      </div>
+  <!-- Top Judge Walkthrough Bar for rapid 30-60 second closed-loop demo -->
+  <header class="bg-slate-900 text-white px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 z-50 sticky top-0 shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center px-2 py-0.5 rounded font-semibold bg-blue-600 text-white tracking-wide uppercase text-[10px]">SIH 2026 Prototype</span>
+      <span class="text-slate-300 font-medium hidden sm:inline">Institution Loop:</span>
+      <span class="text-slate-400 text-[11px] hidden xl:inline" style="color: white;">Demand &rarr; AI Gap &rarr; Curriculum Action &rarr; Faculty Enablement &rarr; Outcomes &rarr; Employer Feedback</span>
     </div>
-
-    <!-- Navigation List -->
-    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-xs">
-      
-      <!-- Group 1: DASHBOARD -->
-      <div>
-        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dashboard</div>
-        <nav class="space-y-1">
-          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left nav-active">
-            <span class="text-sm">⌂</span>
-            <span>Dashboard</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- Group 2: ACADEMIC ALIGNMENT -->
-      <div>
-        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Academic Alignment</div>
-        <nav class="space-y-1">
-          <button onclick="navigateTo('curriculum')" id="nav-curriculum" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">▣</span>
-            <span>Curriculum</span>
-          </button>
-          <button onclick="navigateTo('gap-analysis')" id="nav-gap-analysis" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">◌</span>
-            <span>AI Gap Analysis</span>
-          </button>
-          <button onclick="navigateTo('industry-demand')" id="nav-industry-demand" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">⌕</span>
-            <span>Industry Demand</span>
-          </button>
-          <button onclick="navigateTo('recommendations')" id="nav-recommendations" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">↗</span>
-            <span>Curriculum Recommendations</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- Group 3: FACULTY & INFRASTRUCTURE -->
-      <div>
-        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faculty & Infrastructure</div>
-        <nav class="space-y-1">
-          <button onclick="navigateTo('faculty')" id="nav-faculty" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">◉</span>
-            <span>Faculty Enablement</span>
-          </button>
-          <button onclick="navigateTo('infrastructure')" id="nav-infrastructure" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">◆</span>
-            <span>Labs & Infrastructure</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- Group 4: OUTCOMES -->
-      <div>
-        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outcomes</div>
-        <nav class="space-y-1">
-          <button onclick="navigateTo('outcomes')" id="nav-outcomes" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm font-bold">✓</span>
-            <span>Student Outcomes</span>
-          </button>
-          <button onclick="navigateTo('feedback')" id="nav-feedback" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm font-bold">↻</span>
-            <span>Industry Feedback</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- Group 5: INSTITUTION -->
-      <div>
-        <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Institution</div>
-        <nav class="space-y-1">
-          <button onclick="navigateTo('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
-            <span class="text-sm">○</span>
-            <span>Institution Profile</span>
-          </button>
-          <button onclick="logoutDemo()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition text-left">
-            <span class="text-sm">↪</span>
-            <span>Logout</span>
-          </button>
-        </nav>
-      </div>
+    
+    <div class="flex items-center gap-1.5 overflow-x-auto py-0.5">
+      <span  class="inline-flex items-center px-2 py-0.5 rounded font-semibold bg-blue-600 text-white tracking-wide uppercase text-[10px]">Judge Demo Steps</span>
+      <button onclick="navigateTo('skill-gap')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded text-slate-200 hover:text-white transition font-medium text-[11px]">1. AI Gap</button>
+      <button onclick="navigateTo('recommendations')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 hover:text-white transition font-medium text-[11px]">2. Recommendations</button>
+      <button onclick="navigateTo('faculty')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 hover:text-white transition font-medium text-[11px]">3. Faculty</button>
+      <button onclick="navigateTo('outcomes')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 hover:text-white transition font-medium text-[11px]">4. Outcomes</button>
+      <button onclick="navigateTo('feedback')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 hover:text-white transition font-medium text-[11px]">5. Employer Feedback</button>
+      <button onclick="openActionPlanModal()" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 rounded transition font-medium text-[11px] flex items-center gap-1 shadow-sm">
+        <i data-lucide="refresh-cw" class="w-3 h-3"></i> 6. Close Loop
+      </button>
     </div>
+  </header>
 
-    <!-- Closed-Loop Mini Indicator -->
-    <div class="p-3 border-t border-bordercol bg-slate-50/50 m-3 rounded-card">
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
-        <span class="text-[11px] font-medium text-slate-600">Loop: Education Connected</span>
+  <div class="flex-1 flex overflow-hidden">
+    <!-- Fixed Left Sidebar -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 select-none z-30 transition-all duration-200">
+      <div class="custom-scrollbar overflow-y-auto">
+        <!-- Brand Logo -->
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            <i data-lucide="landmark" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-bold text-slate-900 text-base tracking-tight leading-tight">SkillBridge</div>
+            <div class="text-[11px] text-slate-500 font-medium">College Intelligence</div>
+          </div>
+        </div>
+
+        <!-- Navigation Sections -->
+        <nav class="p-3 space-y-4" id="sidebar-nav">
+          <!-- OVERVIEW -->
+          <div>
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overview</div>
+            <button onclick="navigateTo('dashboard')" data-route="dashboard" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-blue-700 bg-blue-50 transition">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+              <span>Dashboard</span>
+            </button>
+          </div>
+
+          <!-- ACADEMIC ALIGNMENT -->
+          <div class="space-y-1">
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Academic Alignment</div>
+            <button onclick="navigateTo('curriculum')" data-route="curriculum" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+              <span>Curriculum</span>
+            </button>
+            <button onclick="navigateTo('skill-gap')" data-route="skill-gap" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="split" class="w-4 h-4 shrink-0"></i>
+              <span>AI Gap Analysis</span>
+            </button>
+            <button onclick="navigateTo('recommendations')" data-route="recommendations" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i>
+              <span>Recommendations</span>
+            </button>
+          </div>
+
+          <!-- FACULTY -->
+          <div class="space-y-1">
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Faculty</div>
+            <button onclick="navigateTo('faculty')" data-route="faculty" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="users-2" class="w-4 h-4 shrink-0"></i>
+              <span>Faculty Enablement</span>
+            </button>
+          </div>
+
+          <!-- OUTCOMES -->
+          <div class="space-y-1">
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outcomes</div>
+            <button onclick="navigateTo('outcomes')" data-route="outcomes" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="graduation-cap" class="w-4 h-4 shrink-0"></i>
+              <span>Student Outcomes</span>
+            </button>
+          </div>
+
+          <!-- INDUSTRY -->
+          <div class="space-y-1">
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Industry</div>
+            <button onclick="navigateTo('feedback')" data-route="feedback" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="message-square-quote" class="w-4 h-4 shrink-0"></i>
+              <span>Industry Feedback</span>
+            </button>
+          </div>
+
+          <!-- ACCOUNT -->
+          <div class="space-y-1">
+            <div class="px-3.5 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account</div>
+            <button onclick="navigateTo('profile')" data-route="profile" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+              <i data-lucide="building" class="w-4 h-4 shrink-0"></i>
+              <span>Institution Profile</span>
+            </button>
+          </div>
+        </nav>
       </div>
-      <div class="text-[10px] text-slate-400 mt-1 leading-tight">Curriculum synchronized with active employer signals.</div>
-    </div>
-  </aside>
 
-  <!-- Mobile Overlay -->
-  <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/30 z-20 hidden md:hidden"></div>
-
-  <!-- ========================================================================= -->
-  <!-- MAIN WORKSPACE CONTAINER (Offset by sidebar width: 245px)                -->
-  <!-- ========================================================================= -->
-  <div class="flex-1 md:ml-[245px] flex flex-col min-h-screen min-w-0">
-
-    <!-- ========================================================================= -->
-    <!-- 5. TOP HEADER (Height: 68px)                                             -->
-    <!-- ========================================================================= -->
-    <header class="h-[68px] bg-white border-b border-bordercol px-4 sm:px-8 flex items-center justify-between sticky top-0 z-10">
-      <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="md:hidden text-slate-500 hover:text-slate-800 p-1.5 rounded-lg border border-slate-200">
-          ☰
+      <!-- Bottom Session Info & Logout -->
+      <div class="p-3 border-t border-slate-100 bg-white">
+        <button onclick="showToast('Admin logged out safely. Reconnecting session...')" class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition">
+          <i data-lucide="log-out" class="w-4 h-4 shrink-0"></i>
+          <span>Logout</span>
         </button>
-        <span class="font-semibold text-slate-800 text-sm sm:text-base">College Dashboard</span>
       </div>
+    </aside>
 
-      <!-- Right Profile Section -->
-      <div class="flex items-center gap-3">
-        <div class="text-right hidden sm:block">
-          <div class="text-xs font-bold text-slate-900 leading-tight">ITM University</div>
-          <div class="text-[11px] text-slate-400 font-medium">Institution Administrator · Vadodara, Gujarat</div>
+    <!-- Main Content Container -->
+    <div class="flex-1 flex flex-col h-[calc(100vh-41px)] overflow-hidden bg-slate-50">
+      
+      <!-- Top Header -->
+      <header class="h-16 bg-white border-b border-slate-200 px-6 sm:px-8 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <h1 id="page-title" class="text-lg font-bold text-slate-900">College Dashboard</h1>
+          <span class="hidden sm:inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+            MCA – Information Technology
+          </span>
+          <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+            Prototype Demo Data
+          </span>
         </div>
-        <div onclick="navigateTo('profile')" class="cursor-pointer w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-brand-700 flex items-center justify-center font-bold text-xs hover:border-brand-600 transition">
-          IU
-        </div>
-      </div>
-    </header>
-
-    <!-- CONTENT CANVAS -->
-    <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: DASHBOARD (HOME)                                                -->
-      <!-- ===================================================================== -->
-      <section id="view-dashboard" class="space-y-6">
-
-        <!-- 6. WELCOME SECTION -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Good morning, ITM University 👋</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitor industry alignment, curriculum gaps, faculty readiness and student outcomes through SkillBridge.</p>
+        
+        <!-- Institution Identity -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('profile')" title="View Institution Profile">
+          <div class="text-right hidden sm:block">
+            <div class="text-sm font-bold text-slate-900 leading-tight">ITM University</div>
+            <div class="text-xs text-slate-500">College Administrator &bull; Vadodara</div>
           </div>
-          <div>
-            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-50 text-brand-700 border border-brand-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span>
-              Institution · Higher Education
-            </span>
+          <div class="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+            IU
           </div>
         </div>
+      </header>
 
-        <!-- 7. TOP STATISTICS (Demo / Prototype Values) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Card 1 -->
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
-            <div class="text-xs font-medium text-slate-500">Curriculum Alignment</div>
-            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">78%</div>
-            <div class="text-[11px] text-slate-400 mt-2">Based on current mapped skills</div>
+      <!-- Dynamic Views Container -->
+      <main class="flex-1 overflow-y-auto custom-scrollbar p-6 sm:p-8">
+        
+        <!-- ============================================== -->
+        <!-- VIEW: DASHBOARD (MAIN OVERVIEW) -->
+        <!-- ============================================== -->
+        <section id="view-dashboard" class="view-panel max-w-5xl mx-auto space-y-6">
+          
+          <!-- Welcome Section -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Good morning, Administrator 👋</h2>
+              <p class="text-sm text-slate-500 mt-1">
+                Monitor curriculum alignment, faculty readiness and student outcomes against evolving industry requirements.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 self-start md:self-auto flex-wrap">
+              <span class="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-800">
+                Institution: <span class="text-blue-700">ITM University</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-800">
+                Program: <span class="font-bold">MCA – IT</span>
+              </span>
+            </div>
           </div>
-          <!-- Card 2 -->
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
-            <div class="text-xs font-medium text-slate-500">Skill Gaps Identified</div>
-            <div class="text-2xl sm:text-3xl font-bold text-brand-600 mt-2">14</div>
-            <div class="text-[11px] text-slate-400 mt-2">Across priority programs</div>
-          </div>
-          <!-- Card 3 -->
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
-            <div class="text-xs font-medium text-slate-500">Faculty Readiness</div>
-            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">72%</div>
-            <div class="text-[11px] text-slate-400 mt-2">Industry-relevant competency coverage</div>
-          </div>
-          <!-- Card 4 -->
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm hover:border-slate-300 transition">
-            <div class="text-xs font-medium text-slate-500">Student Readiness</div>
-            <div class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">68%</div>
-            <div class="text-[11px] text-slate-400 mt-2">Prototype cohort indicator</div>
-          </div>
-        </div>
 
-        <!-- 8 & 9. AI CURRICULUM GAP ANALYSIS & INDUSTRY SKILL DEMAND -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-          <!-- 8. AI CURRICULUM GAP ANALYSIS (7 cols) -->
-          <div class="lg:col-span-7 bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4 flex flex-col justify-between">
-            <div class="space-y-2">
+          <!-- 4 Key Statistics Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Curriculum Alignment -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
               <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="text-base font-bold text-slate-900">AI Curriculum Gap Analysis</h2>
-                  <p class="text-xs text-slate-500">Compare current curriculum with industry skill demand</p>
-                </div>
-                <span class="text-[10px] font-bold bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full border border-rose-200">
-                  3 Priority Gaps
+                <span class="text-xs font-semibold text-slate-500">Curriculum Alignment</span>
+                <span class="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                  <i data-lucide="compass" class="w-4 h-4"></i>
                 </span>
               </div>
-
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                <div class="font-semibold text-slate-800">Current Program: <span class="font-normal text-slate-600">MCA – Information Technology</span></div>
-                <div class="text-[11px] text-slate-500 mt-0.5">Industry demand extracted from: Backend Developer, Software Developer, Cloud / API roles</div>
-              </div>
-
-              <!-- Skill Progress Bars Comparison -->
-              <div class="space-y-3 pt-2">
-                <!-- Python -->
-                <div>
-                  <div class="flex justify-between text-xs font-medium mb-1">
-                    <span>Python</span>
-                    <span class="text-slate-500 font-mono text-[11px]">Curriculum: 85% | Industry: 90%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 rounded-full h-2">
-                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 85%"></div>
-                  </div>
-                </div>
-                <!-- SQL -->
-                <div>
-                  <div class="flex justify-between text-xs font-medium mb-1">
-                    <span>SQL</span>
-                    <span class="text-slate-500 font-mono text-[11px]">Curriculum: 80% | Industry: 85%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 rounded-full h-2">
-                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 80%"></div>
-                  </div>
-                </div>
-                <!-- REST API (Gap) -->
-                <div>
-                  <div class="flex justify-between text-xs font-medium mb-1">
-                    <span class="text-rose-700 font-semibold">REST API (Priority Gap)</span>
-                    <span class="text-rose-600 font-mono text-[11px]">Curriculum: 45% | Industry: 80%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 rounded-full h-2">
-                    <div class="bg-rose-500 h-2 rounded-full" style="width: 45%"></div>
-                  </div>
-                </div>
-                <!-- Docker (Gap) -->
-                <div>
-                  <div class="flex justify-between text-xs font-medium mb-1">
-                    <span class="text-rose-700 font-semibold">Docker (Priority Gap)</span>
-                    <span class="text-rose-600 font-mono text-[11px]">Curriculum: 20% | Industry: 60%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 rounded-full h-2">
-                    <div class="bg-rose-500 h-2 rounded-full" style="width: 20%"></div>
-                  </div>
-                </div>
-                <!-- Cloud (Gap) -->
-                <div>
-                  <div class="flex justify-between text-xs font-medium mb-1">
-                    <span class="text-rose-700 font-semibold">Cloud (Priority Gap)</span>
-                    <span class="text-rose-600 font-mono text-[11px]">Curriculum: 25% | Industry: 60%</span>
-                  </div>
-                  <div class="w-full bg-slate-100 rounded-full h-2">
-                    <div class="bg-rose-500 h-2 rounded-full" style="width: 25%"></div>
-                  </div>
+              <div class="mt-3">
+                <div class="text-3xl font-bold text-slate-900">78%</div>
+                <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
+                  <span>Industry skill coverage</span>
+                  <span class="text-[10px] text-blue-600 font-medium">Demo signal</span>
                 </div>
               </div>
             </div>
 
-            <div class="pt-3 border-t border-slate-100">
-              <button onclick="navigateTo('gap-analysis')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm text-center">
-                View AI Gap Analysis →
+            <!-- Card 2: Priority Skill Gaps -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500">Priority Skill Gaps</span>
+                <span class="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+                  <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                </span>
+              </div>
+              <div class="mt-3">
+                <div class="text-3xl font-bold text-amber-600">14</div>
+                <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
+                  <span>Skills requiring attention</span>
+                  <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded">Actionable</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Faculty Readiness -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500">Faculty Readiness</span>
+                <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                  <i data-lucide="users" class="w-4 h-4"></i>
+                </span>
+              </div>
+              <div class="mt-3">
+                <div class="text-3xl font-bold text-slate-900">72%</div>
+                <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
+                  <span>Industry-aligned competency</span>
+                  <span class="text-[10px] text-slate-400">30 / 42 faculty</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Student Readiness -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500">Student Readiness</span>
+                <span class="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                  <i data-lucide="award" class="w-4 h-4"></i>
+                </span>
+              </div>
+              <div class="mt-3">
+                <div class="text-3xl font-bold text-slate-900">68%</div>
+                <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
+                  <span>Prototype competency indicator</span>
+                  <span class="text-[10px] text-slate-400">186 assessed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRIMARY SECTION: AI Curriculum Gap Analysis -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-lg font-bold text-slate-900 tracking-tight">AI Curriculum Gap Analysis</h3>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700">Primary College Focus</span>
+                </div>
+                <p class="text-sm text-slate-500 mt-0.5">
+                  Compare the current curriculum with identified industry skill requirements for <span class="font-medium text-slate-700">MCA – Information Technology</span>.
+                </p>
+              </div>
+              <div class="text-xs text-slate-400 font-medium">
+                Current Curriculum Coverage vs Industry Requirements
+              </div>
+            </div>
+
+            <!-- Compact Skill Comparison Rows -->
+            <div class="mt-6 space-y-4">
+              <!-- Python -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-800">Python</span>
+                  <span class="text-slate-600">Coverage: <span class="font-bold text-slate-900">85%</span> / Industry: <span class="text-slate-500">90%</span> &bull; <span class="text-emerald-600 font-bold">Gap: 5%</span></span>
+                </div>
+                <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="absolute top-0 bottom-0 bg-blue-600 rounded-full" style="width: 85%;"></div>
+                  <div class="absolute top-0 bottom-0 border-r-2 border-slate-900 h-full" style="left: 90%;" title="Industry Target: 90%"></div>
+                </div>
+              </div>
+
+              <!-- SQL -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-800">SQL</span>
+                  <span class="text-slate-600">Coverage: <span class="font-bold text-slate-900">80%</span> / Industry: <span class="text-slate-500">85%</span> &bull; <span class="text-emerald-600 font-bold">Gap: 5%</span></span>
+                </div>
+                <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="absolute top-0 bottom-0 bg-blue-600 rounded-full" style="width: 80%;"></div>
+                  <div class="absolute top-0 bottom-0 border-r-2 border-slate-900 h-full" style="left: 85%;" title="Industry Target: 85%"></div>
+                </div>
+              </div>
+
+              <!-- REST API (Priority Gap) -->
+              <div class="space-y-1.5 p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/60">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-900 flex items-center gap-1.5">
+                    REST API
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">Priority Gap</span>
+                  </span>
+                  <span class="text-slate-700">Coverage: <span class="font-bold text-amber-700">45%</span> / Industry: <span class="text-slate-600">80%</span> &bull; <span class="text-amber-800 font-bold">Gap: 35%</span></span>
+                </div>
+                <div class="relative w-full h-2.5 bg-amber-100/70 rounded-full overflow-hidden">
+                  <div class="absolute top-0 bottom-0 bg-amber-500 rounded-full" style="width: 45%;"></div>
+                  <div class="absolute top-0 bottom-0 border-r-2 border-slate-900 h-full" style="left: 80%;" title="Industry Target: 80%"></div>
+                </div>
+              </div>
+
+              <!-- Docker (Priority Gap) -->
+              <div class="space-y-1.5 p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/60">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-900 flex items-center gap-1.5">
+                    Docker
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">Priority Gap</span>
+                  </span>
+                  <span class="text-slate-700">Coverage: <span class="font-bold text-amber-700">20%</span> / Industry: <span class="text-slate-600">60%</span> &bull; <span class="text-amber-800 font-bold">Gap: 40%</span></span>
+                </div>
+                <div class="relative w-full h-2.5 bg-amber-100/70 rounded-full overflow-hidden">
+                  <div class="absolute top-0 bottom-0 bg-amber-500 rounded-full" style="width: 20%;"></div>
+                  <div class="absolute top-0 bottom-0 border-r-2 border-slate-900 h-full" style="left: 60%;" title="Industry Target: 60%"></div>
+                </div>
+              </div>
+
+              <!-- Cloud (Priority Gap) -->
+              <div class="space-y-1.5 p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/60">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-900 flex items-center gap-1.5">
+                    Cloud
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">Priority Gap</span>
+                  </span>
+                  <span class="text-slate-700">Coverage: <span class="font-bold text-amber-700">25%</span> / Industry: <span class="text-slate-600">60%</span> &bull; <span class="text-amber-800 font-bold">Gap: 35%</span></span>
+                </div>
+                <div class="relative w-full h-2.5 bg-amber-100/70 rounded-full overflow-hidden">
+                  <div class="absolute top-0 bottom-0 bg-amber-500 rounded-full" style="width: 25%;"></div>
+                  <div class="absolute top-0 bottom-0 border-r-2 border-slate-900 h-full" style="left: 60%;" title="Industry Target: 60%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Priority Badges & Full Analysis Link -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center flex-wrap gap-2 text-xs">
+                <span class="font-semibold text-slate-500 uppercase tracking-wider text-[11px]">3 Priority Curriculum Gaps:</span>
+                <span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 rounded-md font-semibold">REST API</span>
+                <span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 rounded-md font-semibold">Docker</span>
+                <span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 rounded-md font-semibold">Cloud</span>
+              </div>
+              <button onclick="navigateTo('skill-gap')" class="inline-flex items-center text-xs font-semibold text-blue-600 hover:text-blue-800 transition">
+                View Full Gap Analysis &rarr;
               </button>
             </div>
           </div>
 
-          <!-- 9. INDUSTRY SKILL DEMAND (5 cols) -->
-          <div class="lg:col-span-5 bg-white rounded-card p-6 border border-bordercol shadow-sm flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="text-base font-bold text-slate-900">Industry Skill Demand</h2>
-                  <p class="text-xs text-slate-500">Skills appearing across connected requirements</p>
+          <!-- 2-COLUMN ROW: AI CURRICULUM INSIGHT & INDUSTRY SKILL DEMAND -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- AI Curriculum Insight -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                      <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </span>
+                    <h4 class="text-sm font-bold text-slate-900">AI Curriculum Insight</h4>
+                  </div>
+                  <span class="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Automated Synthesis</span>
                 </div>
-                <span class="text-[10px] font-bold bg-blue-50 text-brand-700 px-2.5 py-1 rounded-full border border-blue-200">
-                  Market Signals
+                
+                <p class="text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  &ldquo;REST API, Docker and Cloud show the largest gaps between current curriculum coverage and identified industry requirements.&rdquo;
+                </p>
+
+                <div class="mt-4 space-y-2 text-xs">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Recommended Focus:</div>
+                  <div class="space-y-1.5 font-medium text-slate-700">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                      <span>REST API Development</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                      <span>Docker &amp; Containers</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                      <span>Cloud Deployment</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="navigateTo('recommendations')" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white shadow-sm transition flex items-center justify-center gap-2">
+                  View Recommendations &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Industry Skill Demand Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-base font-bold text-slate-900">Industry Skill Demand</h4>
+                  <span class="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Prototype Signals</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Skills relevant to the institution's current academic programs.</p>
+
+                <!-- Demand Matrix -->
+                <div class="grid grid-cols-2 gap-2.5 text-xs">
+                  <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="font-medium text-slate-800">Python</span>
+                    <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px]">High</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="font-medium text-slate-800">SQL</span>
+                    <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px]">High</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="font-medium text-slate-800">REST API</span>
+                    <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px]">High</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="font-medium text-slate-800">Docker</span>
+                    <span class="font-medium text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded text-[11px]">Medium</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="font-medium text-slate-800">Cloud</span>
+                    <span class="font-medium text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded text-[11px]">Medium</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl border border-purple-100 bg-purple-50/50 flex items-center justify-between">
+                    <span class="font-medium text-purple-900">AI / ML</span>
+                    <span class="font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded text-[11px]">Growing</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="navigateTo('curriculum')" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition text-center">
+                  Explore Industry Demand &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2-COLUMN ROW: CURRICULUM RECOMMENDATIONS & FACULTY ENABLEMENT -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- AI Curriculum Recommendations Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-base font-bold text-slate-900">AI Curriculum Recommendations</h4>
+                  <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Advisory</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">4 structural adjustments suggested for Board of Studies review.</p>
+
+                <!-- 4 Action Items -->
+                <div class="space-y-2.5">
+                  <div class="p-3 rounded-xl border border-emerald-100 bg-emerald-50/40 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 uppercase">ADD</span>
+                      <span class="text-xs font-bold text-slate-900">REST API Development</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-medium">Gap: 35%</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl border border-blue-100 bg-blue-50/40 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 uppercase">UPDATE</span>
+                      <span class="text-xs font-bold text-slate-900">Cloud Deployment</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-medium">Modernize Labs</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 uppercase">REDUCE</span>
+                      <span class="text-xs font-medium text-slate-800">Low-demand legacy topics</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 font-medium">Phase Out</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl border border-amber-100 bg-amber-50/40 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase">REPLACE</span>
+                      <span class="text-xs font-medium text-slate-800">Outdated implementation approach</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-medium">Modern Practice</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="openRecommendationReviewModal('REST API Development', 'ADD', 'High industry requirement and significant curriculum gap (35%).', 'Add practical REST API development module with project-based assessment.')" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition text-center">
+                  Review Recommendations &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Faculty Enablement Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-base font-bold text-slate-900">Faculty Enablement</h4>
+                  <span class="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Upskilling Matrix</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Equipping instructional staff ahead of curriculum integration.</p>
+
+                <!-- Summary Numbers -->
+                <div class="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 text-center mb-4">
+                  <div>
+                    <div class="text-lg font-bold text-slate-900">42</div>
+                    <div class="text-[10px] text-slate-500 font-medium">Total Faculty</div>
+                  </div>
+                  <div>
+                    <div class="text-lg font-bold text-emerald-600">30</div>
+                    <div class="text-[10px] text-slate-500 font-medium">Aligned</div>
+                  </div>
+                  <div>
+                    <div class="text-lg font-bold text-amber-600">12</div>
+                    <div class="text-[10px] text-slate-500 font-medium">Upskilling Needed</div>
+                  </div>
+                </div>
+
+                <div class="text-xs space-y-2">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Priority Faculty Training:</div>
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 text-xs">
+                      <span class="font-medium text-slate-800">REST API Development</span>
+                      <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">High Priority</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 text-xs">
+                      <span class="font-medium text-slate-800">Docker &amp; Containers</span>
+                      <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">High Priority</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 text-xs">
+                      <span class="font-medium text-slate-800">Cloud Deployment</span>
+                      <span class="text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">Medium Priority</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="navigateTo('faculty')" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition text-center">
+                  View Faculty Needs &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2-COLUMN ROW: STUDENT OUTCOMES & INDUSTRY FEEDBACK -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Student Outcomes Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-base font-bold text-slate-900">Student Outcomes</h4>
+                  <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Aggregate Data</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Competency benchmarks recorded across MCA student cohorts.</p>
+
+                <!-- Outcomes breakdown -->
+                <div class="space-y-2.5 text-xs">
+                  <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span class="text-slate-600 font-medium">Students Assessed</span>
+                    <span class="font-bold text-slate-900 text-sm">186</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span class="text-slate-600 font-medium">Verified Competencies</span>
+                    <span class="font-bold text-emerald-600 text-sm">124</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span class="text-slate-600 font-medium">Meeting Priority Skill Requirements</span>
+                    <span class="font-bold text-blue-600 text-sm">98</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/60">
+                    <span class="text-amber-900 font-medium">Requiring Upskilling</span>
+                    <span class="font-bold text-amber-700 text-sm">62</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="navigateTo('outcomes')" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition text-center">
+                  View Student Outcomes &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Industry Feedback Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <h4 class="text-base font-bold text-slate-900">Industry Feedback</h4>
+                  <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Employer Survey</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Employer feedback identifies recurring gaps in student preparation.</p>
+
+                <!-- Feedback Ratings -->
+                <div class="space-y-2 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-600 font-medium">Technical Skills</span>
+                    <span class="font-bold text-slate-900">4.1 / 5</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 82%;"></div>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1">
+                    <span class="text-slate-600 font-medium">Problem Solving</span>
+                    <span class="font-bold text-slate-900">3.9 / 5</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 78%;"></div>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1">
+                    <span class="text-slate-600 font-medium">Production Readiness</span>
+                    <span class="font-bold text-amber-700">3.5 / 5 (Recurring Gap)</span>
+                  </div>
+                  <div class="w-full bg-amber-100 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: 70%;"></div>
+                  </div>
+                </div>
+
+                <!-- Highlight Box -->
+                <div class="mt-4 p-3 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs">
+                  <div class="font-bold text-amber-900">Suggested Academic Response:</div>
+                  <div class="text-amber-800 text-[11px] mt-0.5">Increase practical project and container deployment exposure.</div>
+                </div>
+              </div>
+
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <button onclick="navigateTo('feedback')" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition text-center">
+                  View Industry Feedback &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: CURRICULUM -->
+        <!-- ============================================== -->
+        <section id="view-curriculum" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Curriculum</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Review academic curriculum coverage against industry-relevant skills.
+                </p>
+                <div class="mt-2 inline-flex items-center gap-2 text-xs text-slate-700 font-semibold bg-slate-100 px-3 py-1 rounded-lg">
+                  Program: <span class="text-blue-700 font-bold">MCA – Information Technology</span>
+                </div>
+              </div>
+              <button onclick="runCurriculumAnalysis()" id="btn-run-analysis" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>Analyze Curriculum &rarr;</span>
+              </button>
+            </div>
+
+            <!-- Current Curriculum Areas -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Current Academic Curriculum Areas</h4>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">Programming</div>
+                  <div class="text-[11px] text-slate-500 mt-1">Python, Java, OOP Core</div>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">Databases</div>
+                  <div class="text-[11px] text-slate-500 mt-1">SQL, Relational Modeling, RDBMS</div>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">Web Development</div>
+                  <div class="text-[11px] text-slate-500 mt-1">HTML/CSS, Basic JavaScript, Client Apps</div>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">Software Engineering</div>
+                  <div class="text-[11px] text-slate-500 mt-1">SDLC, UML Diagrams, Testing Basics</div>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">Computer Networks</div>
+                  <div class="text-[11px] text-slate-500 mt-1">OSI Model, TCP/IP, Socket Basics</div>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div class="text-sm font-semibold text-slate-900">AI / ML</div>
+                  <div class="text-[11px] text-slate-500 mt-1">Supervised Learning, Math Foundations</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Industry-Linked Skill Coverage Matrix -->
+            <div class="pt-2">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Industry-Linked Skill Coverage</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                      <th class="py-3 px-3">Industry Skill</th>
+                      <th class="py-3 px-3">Curriculum Coverage</th>
+                      <th class="py-3 px-3">Industry Requirement</th>
+                      <th class="py-3 px-3">Curriculum Gap</th>
+                      <th class="py-3 px-3 text-right">Alignment Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                    <tr>
+                      <td class="py-3.5 px-3 font-semibold text-slate-900">Python</td>
+                      <td class="py-3.5 px-3">85%</td>
+                      <td class="py-3.5 px-3">90%</td>
+                      <td class="py-3.5 px-3 text-emerald-600 font-bold">5%</td>
+                      <td class="py-3.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">Well Aligned</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-3.5 px-3 font-semibold text-slate-900">SQL</td>
+                      <td class="py-3.5 px-3">80%</td>
+                      <td class="py-3.5 px-3">85%</td>
+                      <td class="py-3.5 px-3 text-emerald-600 font-bold">5%</td>
+                      <td class="py-3.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">Well Aligned</span>
+                      </td>
+                    </tr>
+                    <tr class="bg-amber-50/40">
+                      <td class="py-3.5 px-3 font-bold text-slate-900">REST API</td>
+                      <td class="py-3.5 px-3 font-bold text-amber-700">45%</td>
+                      <td class="py-3.5 px-3">80%</td>
+                      <td class="py-3.5 px-3 text-amber-700 font-bold">35%</td>
+                      <td class="py-3.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">Significant Gap</span>
+                      </td>
+                    </tr>
+                    <tr class="bg-amber-50/40">
+                      <td class="py-3.5 px-3 font-bold text-slate-900">Docker</td>
+                      <td class="py-3.5 px-3 font-bold text-amber-700">20%</td>
+                      <td class="py-3.5 px-3">60%</td>
+                      <td class="py-3.5 px-3 text-amber-700 font-bold">40%</td>
+                      <td class="py-3.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold">Critical Gap</span>
+                      </td>
+                    </tr>
+                    <tr class="bg-amber-50/40">
+                      <td class="py-3.5 px-3 font-bold text-slate-900">Cloud</td>
+                      <td class="py-3.5 px-3 font-bold text-amber-700">25%</td>
+                      <td class="py-3.5 px-3">60%</td>
+                      <td class="py-3.5 px-3 text-amber-700 font-bold">35%</td>
+                      <td class="py-3.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">Significant Gap</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Disclaimer note -->
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
+              <span class="font-bold text-slate-700">Demonstration Scope:</span> Curriculum analysis compares syllabus topic learning hours with SkillBridge employer requirement ontologies. Recommendations require Board of Studies endorsement.
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: AI GAP ANALYSIS -->
+        <!-- ============================================== -->
+        <section id="view-skill-gap" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">AI Curriculum Gap Analysis</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Current Curriculum vs Industry Skill Requirements
+                </p>
+              </div>
+              <button onclick="navigateTo('recommendations')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Generate Recommendations &rarr;</span>
+              </button>
+            </div>
+
+            <!-- AI Insight Card -->
+            <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-start gap-3">
+              <i data-lucide="sparkles" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
+              <div>
+                <div class="text-xs font-bold text-blue-900 uppercase tracking-wider">AI Gap Insight</div>
+                <p class="text-sm font-medium text-blue-900 mt-0.5">
+                  &ldquo;REST API, Docker and Cloud are the highest-priority curriculum gaps in this prototype analysis.&rdquo;
+                </p>
+                <div class="text-xs text-blue-700 mt-1">
+                  Closing these gaps will improve institutional placement alignment index from 78% to 92%.
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                    <th class="py-3 px-3">Skill</th>
+                    <th class="py-3 px-3">Curriculum Coverage</th>
+                    <th class="py-3 px-3">Industry Requirement</th>
+                    <th class="py-3 px-3">Gap</th>
+                    <th class="py-3 px-3">Priority</th>
+                    <th class="py-3 px-3 text-right">Academic Advisory</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                  <!-- Python -->
+                  <tr>
+                    <td class="py-3.5 px-3 font-semibold text-slate-900">Python</td>
+                    <td class="py-3.5 px-3">85%</td>
+                    <td class="py-3.5 px-3">90%</td>
+                    <td class="py-3.5 px-3 text-slate-600">5%</td>
+                    <td class="py-3.5 px-3">
+                      <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold text-[11px]">Low</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right text-slate-500">Maintain current pedagogy</td>
+                  </tr>
+
+                  <!-- SQL -->
+                  <tr>
+                    <td class="py-3.5 px-3 font-semibold text-slate-900">SQL</td>
+                    <td class="py-3.5 px-3">80%</td>
+                    <td class="py-3.5 px-3">85%</td>
+                    <td class="py-3.5 px-3 text-slate-600">5%</td>
+                    <td class="py-3.5 px-3">
+                      <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold text-[11px]">Low</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right text-slate-500">Sufficient lab coverage</td>
+                  </tr>
+
+                  <!-- REST API -->
+                  <tr class="bg-amber-50/50">
+                    <td class="py-3.5 px-3 font-bold text-slate-900">REST API</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-700">45%</td>
+                    <td class="py-3.5 px-3">80%</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-800">35%</td>
+                    <td class="py-3.5 px-3">
+                      <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded font-bold text-[11px]">High</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right">
+                      <button onclick="openRecommendationReviewModal('REST API Development', 'ADD', 'High industry requirement and significant curriculum gap (35%).', 'Add practical REST API development module with project-based assessment.')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        Create Module &rarr;
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- Docker -->
+                  <tr class="bg-amber-50/50">
+                    <td class="py-3.5 px-3 font-bold text-slate-900">Docker</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-700">20%</td>
+                    <td class="py-3.5 px-3">60%</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-800">40%</td>
+                    <td class="py-3.5 px-3">
+                      <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded font-bold text-[11px]">High</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right">
+                      <button onclick="openRecommendationReviewModal('Docker & Containers', 'ADD', 'Critical gap in containerized application development.', 'Integrate 15-hour hands-on containerization lab.')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        Add Lab &rarr;
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- Cloud -->
+                  <tr class="bg-amber-50/50">
+                    <td class="py-3.5 px-3 font-bold text-slate-900">Cloud</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-700">25%</td>
+                    <td class="py-3.5 px-3">60%</td>
+                    <td class="py-3.5 px-3 font-bold text-amber-800">35%</td>
+                    <td class="py-3.5 px-3">
+                      <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-bold text-[11px]">High</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right">
+                      <button onclick="openRecommendationReviewModal('Cloud Deployment', 'UPDATE', 'Modern serverless and container hosting needed.', 'Update existing web engineering syllabus to include cloud runtime deployment.')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                        Update Syllabus &rarr;
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: CURRICULUM RECOMMENDATIONS -->
+        <!-- ============================================== -->
+        <section id="view-recommendations" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Curriculum Recommendations</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  AI-generated curriculum advisory across 4 academic intervention categories.
+                </p>
+              </div>
+              <span class="text-xs text-slate-500 font-medium bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                Requires Board of Studies Review
+              </span>
+            </div>
+
+            <!-- Important Advisory Notice -->
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2.5">
+              <i data-lucide="info" class="w-4 h-4 shrink-0 text-amber-600 mt-0.5"></i>
+              <div>
+                <span class="font-bold">Autonomous Academic Governance:</span> SkillBridge provides structured recommendations. The platform does not alter institutional syllabi automatically without academic committee approvals.
+              </div>
+            </div>
+
+            <!-- 4 Categories Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- ADD Card -->
+              <div class="p-5 rounded-2xl border border-emerald-200 bg-emerald-50/20 flex flex-col justify-between space-y-4">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">ADD</span>
+                    <span class="text-xs text-slate-500 font-medium">New Module</span>
+                  </div>
+                  <h3 class="text-base font-bold text-slate-900 mt-2">REST API Development</h3>
+                  <div class="space-y-2 mt-3 text-xs text-slate-600">
+                    <div><span class="font-semibold text-slate-800">Reason:</span> High industry requirement and significant curriculum gap (35%).</div>
+                    <div><span class="font-semibold text-slate-800">Industry Signal:</span> 82% of entry-level backend vacancies mandate REST API design.</div>
+                    <div><span class="font-semibold text-slate-800">Suggested Action:</span> Add practical REST API development module with project-based assessment.</div>
+                  </div>
+                </div>
+                <div class="pt-2 border-t border-emerald-100 flex items-center justify-between">
+                  <span class="text-[11px] text-slate-500">Proposed: 20 Lab Hours</span>
+                  <button onclick="openRecommendationReviewModal('REST API Development', 'ADD', 'High industry requirement and significant curriculum gap (35%).', 'Add practical REST API development module with project-based assessment.')" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition">
+                    Review Recommendation &rarr;
+                  </button>
+                </div>
+              </div>
+
+              <!-- UPDATE Card -->
+              <div class="p-5 rounded-2xl border border-blue-200 bg-blue-50/20 flex flex-col justify-between space-y-4">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 font-bold text-xs">UPDATE</span>
+                    <span class="text-xs text-slate-500 font-medium">Syllabus Modernization</span>
+                  </div>
+                  <h3 class="text-base font-bold text-slate-900 mt-2">Cloud Deployment</h3>
+                  <div class="space-y-2 mt-3 text-xs text-slate-600">
+                    <div><span class="font-semibold text-slate-800">Reason:</span> Current coverage focuses on theoretical virtualization rather than modern cloud runtime pipelines.</div>
+                    <div><span class="font-semibold text-slate-800">Industry Signal:</span> Modern cloud hosting &amp; CI/CD demanded across 65% of job posts.</div>
+                    <div><span class="font-semibold text-slate-800">Suggested Action:</span> Upgrade existing Network Computing syllabus to include automated cloud deployment exercises.</div>
+                  </div>
+                </div>
+                <div class="pt-2 border-t border-blue-100 flex items-center justify-between">
+                  <span class="text-[11px] text-slate-500">Proposed: 15 Hands-on Hours</span>
+                  <button onclick="openRecommendationReviewModal('Cloud Deployment', 'UPDATE', 'Current coverage focuses on theoretical virtualization.', 'Upgrade existing Network Computing syllabus to include automated cloud deployment.')" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+                    Review Recommendation &rarr;
+                  </button>
+                </div>
+              </div>
+
+              <!-- REDUCE Card -->
+              <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-4">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-bold text-xs">REDUCE</span>
+                    <span class="text-xs text-slate-500 font-medium">Credit Rationalization</span>
+                  </div>
+                  <h3 class="text-base font-bold text-slate-900 mt-2">Low-Demand Legacy Implementation Topics</h3>
+                  <div class="space-y-2 mt-3 text-xs text-slate-600">
+                    <div><span class="font-semibold text-slate-800">Reason:</span> Excessive lecture hours allocated to deprecated desktop UI frameworks.</div>
+                    <div><span class="font-semibold text-slate-800">Industry Signal:</span> &lt; 3% industry hiring relevance across regional software firms.</div>
+                    <div><span class="font-semibold text-slate-800">Suggested Action:</span> Condense legacy GUI hours from 24 to 6 hours; reallocate lab credit to API design.</div>
+                  </div>
+                </div>
+                <div class="pt-2 border-t border-slate-200 flex items-center justify-between">
+                  <span class="text-[11px] text-slate-500">Freeing: 18 Credit Hours</span>
+                  <button onclick="openRecommendationReviewModal('Legacy GUI Modules', 'REDUCE', 'Excessive lecture hours allocated to deprecated frameworks.', 'Condense hours from 24 to 6 hours; reallocate to REST API.')" class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition">
+                    Review Recommendation &rarr;
+                  </button>
+                </div>
+              </div>
+
+              <!-- REPLACE Card -->
+              <div class="p-5 rounded-2xl border border-amber-200 bg-amber-50/20 flex flex-col justify-between space-y-4">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-bold text-xs">REPLACE</span>
+                    <span class="text-xs text-slate-500 font-medium">Paradigm Shift</span>
+                  </div>
+                  <h3 class="text-base font-bold text-slate-900 mt-2">Outdated Implementation Approach</h3>
+                  <div class="space-y-2 mt-3 text-xs text-slate-600">
+                    <div><span class="font-semibold text-slate-800">Reason:</span> Monolithic local server deployment labs fail modern DevOps standards.</div>
+                    <div><span class="font-semibold text-slate-800">Industry Signal:</span> Container-native deployments standard across all employer tiers.</div>
+                    <div><span class="font-semibold text-slate-800">Suggested Action:</span> Replace local virtual machine setups with Dockerized lightweight micro-environments.</div>
+                  </div>
+                </div>
+                <div class="pt-2 border-t border-amber-100 flex items-center justify-between">
+                  <span class="text-[11px] text-slate-500">Proposed: Lab Modernization</span>
+                  <button onclick="openRecommendationReviewModal('VM Lab Setups', 'REPLACE', 'Monolithic server deployment labs fail modern standards.', 'Replace local virtual machine setups with Dockerized micro-environments.')" class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition">
+                    Review Recommendation &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: FACULTY ENABLEMENT -->
+        <!-- ============================================== -->
+        <section id="view-faculty" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Faculty Enablement</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Prepare instructional faculty with industry-aligned competencies before rolling out revised curriculum.
+                </p>
+              </div>
+              <button onclick="enrollFacultyBatch()" id="btn-faculty-batch" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span id="faculty-enroll-text">Enroll 12 Faculty in Upskilling</span>
+              </button>
+            </div>
+
+            <!-- Core Statistics -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                <div class="text-xs font-medium text-slate-500">Total Faculty</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">42</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">IT &amp; Computer Applications Dept.</div>
+              </div>
+              <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/30">
+                <div class="text-xs font-medium text-slate-600">Industry-Aligned</div>
+                <div class="text-2xl font-bold text-emerald-600 mt-1" id="stat-faculty-aligned">30</div>
+                <div class="text-[11px] text-emerald-700 mt-0.5">Certified in current industry stack</div>
+              </div>
+              <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/30">
+                <div class="text-xs font-medium text-slate-600">Upskilling Recommended</div>
+                <div class="text-2xl font-bold text-amber-600 mt-1" id="stat-faculty-needed">12</div>
+                <div class="text-[11px] text-amber-800 mt-0.5">Identified for training cohorts</div>
+              </div>
+            </div>
+
+            <!-- Priority Training Plans Table -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Priority Training Programs</h4>
+              
+              <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <!-- Training 1 -->
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-bold text-slate-900">REST API Development</h4>
+                      <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded font-semibold text-[10px]">High Priority</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">Skill Covered: FastAPI, Django REST Framework, JWT Security, Postman Testing</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-xs font-medium text-slate-600">Duration: 4 Weeks (20 hrs)</span>
+                    <button onclick="showToast('Training syllabus downloaded for Department Review.')" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                      View Training Plan &rarr;
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Training 2 -->
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-bold text-slate-900">Docker &amp; Containers</h4>
+                      <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded font-semibold text-[10px]">High Priority</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">Skill Covered: Container Architecture, Dockerfiles, Compose, Multi-container staging</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-xs font-medium text-slate-600">Duration: 3 Weeks (15 hrs)</span>
+                    <button onclick="showToast('Training syllabus downloaded for Department Review.')" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                      View Training Plan &rarr;
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Training 3 -->
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-bold text-slate-900">Cloud Deployment</h4>
+                      <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-semibold text-[10px]">Medium Priority</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">Skill Covered: Cloud runtimes, environment secrets, automated deployment checks</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-xs font-medium text-slate-600">Duration: 3 Weeks (15 hrs)</span>
+                    <button onclick="showToast('Training syllabus downloaded for Department Review.')" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                      View Training Plan &rarr;
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Training 4 -->
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-bold text-slate-900">AI / ML Applied Engineering</h4>
+                      <span class="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded font-semibold text-[10px]">Growing Need</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">Skill Covered: ML Model inference endpoints, Vector indexing, PyTorch integration</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-xs font-medium text-slate-600">Duration: 4 Weeks (20 hrs)</span>
+                    <button onclick="showToast('Training syllabus downloaded for Department Review.')" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                      View Training Plan &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Workflow Summary -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between gap-3">
+              <div>
+                <span class="font-bold text-slate-800">Faculty Enablement Pipeline:</span>
+                <span class="text-slate-600 ml-1">Curriculum Gap &rarr; Faculty Skill Gap &rarr; Faculty Upskilling &rarr; Better Student Learning</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: STUDENT OUTCOMES -->
+        <!-- ============================================== -->
+        <section id="view-outcomes" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Student Outcomes</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Aggregate competency achievement data across MCA student cohorts (Zero individual PII).
+                </p>
+              </div>
+              <button onclick="showToast('Outcome report exported for Internal Quality Assurance Cell (IQAC).')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>View Outcome Analysis &rarr;</span>
+              </button>
+            </div>
+
+            <!-- Aggregate Stat Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                <div class="text-xs font-medium text-slate-500">Students Assessed</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">186</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">MCA 2025-26 Batch</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40">
+                <div class="text-xs font-medium text-slate-600">Verified Competencies</div>
+                <div class="text-2xl font-bold text-emerald-600 mt-1">124</div>
+                <div class="text-[11px] text-emerald-800 mt-0.5">Evidence-backed records</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-blue-200 bg-blue-50/40">
+                <div class="text-xs font-medium text-slate-600">Meeting Priority Skills</div>
+                <div class="text-2xl font-bold text-blue-600 mt-1">98</div>
+                <div class="text-[11px] text-blue-800 mt-0.5">Qualified for direct hiring</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/40">
+                <div class="text-xs font-medium text-slate-600">Requiring Upskilling</div>
+                <div class="text-2xl font-bold text-amber-600 mt-1">62</div>
+                <div class="text-[11px] text-amber-800 mt-0.5">Actionable cohort gap</div>
+              </div>
+            </div>
+
+            <!-- Priority Gaps Distribution -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Student Skill Gap Distribution</h4>
+              
+              <div class="space-y-3">
+                <!-- REST API Gap -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-900">REST API</span>
+                    <span class="font-semibold text-amber-700">62 Students Requiring Intervention</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: 33.3%;"></div>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex justify-between">
+                    <span>33.3% of assessed cohort</span>
+                    <span>Action: Integrated into Semester Lab Roster</span>
+                  </div>
+                </div>
+
+                <!-- Docker Gap -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-900">Docker</span>
+                    <span class="font-semibold text-amber-700">48 Students Requiring Intervention</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: 25.8%;"></div>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex justify-between">
+                    <span>25.8% of assessed cohort</span>
+                    <span>Action: Containerization Bootcamp scheduled</span>
+                  </div>
+                </div>
+
+                <!-- Cloud Gap -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-900">Cloud</span>
+                    <span class="font-semibold text-amber-700">41 Students Requiring Intervention</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: 22.0%;"></div>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex justify-between">
+                    <span>22.0% of assessed cohort</span>
+                    <span>Action: Cloud sandboxes provisioned</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Honesty Warning -->
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
+              <span class="font-bold text-slate-700">Compliance &amp; Data Transparency:</span> These aggregate figures represent demonstration metrics from prototype skill diagnostics. No individual student identities are surfaced in institutional reporting.
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW: INDUSTRY FEEDBACK -->
+        <!-- ============================================== -->
+        <section id="view-feedback" class="view-panel hidden max-w-5xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Industry Feedback</h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Employer feedback identifies recurring gaps in student preparation and drives curriculum improvements.
+                </p>
+              </div>
+              <button onclick="openActionPlanModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Create Academic Action &rarr;</span>
+              </button>
+            </div>
+
+            <!-- Scorecard Grid -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-4 rounded-xl border border-slate-200 bg-white">
+                <div class="text-xs font-medium text-slate-500">Technical Skills</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">4.1 <span class="text-xs text-slate-400 font-normal">/ 5</span></div>
+                <div class="text-[11px] text-emerald-600 font-medium mt-0.5">Strong basic foundations</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-slate-200 bg-white">
+                <div class="text-xs font-medium text-slate-500">Problem Solving</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">3.9 <span class="text-xs text-slate-400 font-normal">/ 5</span></div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Consistent logic &amp; algorithms</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-slate-200 bg-white">
+                <div class="text-xs font-medium text-slate-500">Communication</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">4.0 <span class="text-xs text-slate-400 font-normal">/ 5</span></div>
+                <div class="text-[11px] text-emerald-600 font-medium mt-0.5">Effective collaboration</div>
+              </div>
+
+              <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/40">
+                <div class="text-xs font-medium text-amber-900 font-semibold">Production Readiness</div>
+                <div class="text-2xl font-bold text-amber-700 mt-1">3.5 <span class="text-xs text-amber-600 font-normal">/ 5</span></div>
+                <div class="text-[11px] text-amber-800 font-bold mt-0.5">Recurring gap identified</div>
+              </div>
+            </div>
+
+            <!-- Employer Qualitative Findings -->
+            <div class="p-5 rounded-2xl border border-amber-200 bg-amber-50/30 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+                  <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
                 </span>
+                <h4 class="text-sm font-bold text-slate-900">Recurring Industry Feedback Citation</h4>
               </div>
 
-              <div class="space-y-2.5 mt-4 text-xs">
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <span class="font-semibold text-slate-800">Python</span>
-                  <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">High Demand</span>
-                </div>
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <span class="font-semibold text-slate-800">SQL</span>
-                  <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">High Demand</span>
-                </div>
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <span class="font-semibold text-slate-800">REST API</span>
-                  <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">High Demand</span>
-                </div>
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <span class="font-semibold text-slate-800">Docker</span>
-                  <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Medium Demand</span>
-                </div>
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <span class="font-semibold text-slate-800">Cloud</span>
-                  <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Medium Demand</span>
-                </div>
-              </div>
+              <blockquote class="text-xs text-slate-700 italic border-l-2 border-amber-400 pl-3 py-1">
+                &ldquo;Graduates understand standard SQL queries and syntax syntax rules, but struggle with building production-grade REST APIs, containerizing backend workloads, and automated cloud deployments.&rdquo;
+              </blockquote>
 
-              <p class="text-[11px] text-slate-400 mt-3">Updated from analyzed industry and job requirement data.</p>
-            </div>
-
-            <button onclick="navigateTo('industry-demand')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-xl text-xs transition">
-              View Industry Demand →
-            </button>
-          </div>
-        </div>
-
-        <!-- 10. AI CURRICULUM RECOMMENDATIONS CARD -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 class="text-base font-bold text-slate-900">AI Curriculum Recommendations</h2>
-              <p class="text-xs text-slate-500">Recommended changes based on identified skill gaps (Suggested for institutional review)</p>
-            </div>
-            <button onclick="navigateTo('recommendations')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">
-              Review Recommendations →
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <!-- ADD -->
-            <div class="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">ADD</span>
-              <div class="font-bold text-slate-900 text-sm mt-1">REST API Development</div>
-              <div class="text-[11px] text-slate-600">Integrate hands-on API endpoint construction into semester coursework.</div>
-            </div>
-            <!-- UPDATE -->
-            <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded">UPDATE</span>
-              <div class="font-bold text-slate-900 text-sm mt-1">Cloud Deployment</div>
-              <div class="text-[11px] text-slate-600">Transition standalone server concepts into cloud-native hosting topics.</div>
-            </div>
-            <!-- REDUCE -->
-            <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">REDUCE</span>
-              <div class="font-bold text-slate-900 text-sm mt-1">Legacy / Low-Demand Topics</div>
-              <div class="text-[11px] text-slate-600">Compress lecture hours dedicated to outdated static web generation tools.</div>
-            </div>
-            <!-- REPLACE -->
-            <div class="p-3.5 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-100 px-1.5 py-0.5 rounded">REPLACE</span>
-              <div class="font-bold text-slate-900 text-sm mt-1">Outdated Implementation Approach</div>
-              <div class="text-[11px] text-slate-600">Replace obsolete IDE/monolith patterns with modular containers.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 11, 12, 13, 14. FACULTY, LABS, STUDENTS, AND FEEDBACK -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-          <!-- 11. FACULTY ENABLEMENT -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
-            <div>
-              <div class="text-sm font-bold text-slate-900">Faculty Enablement</div>
-              <div class="text-[11px] text-slate-500">Industry-aligned competency</div>
-
-              <div class="grid grid-cols-3 gap-1.5 my-3 text-center text-xs">
-                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
-                  <div class="font-bold text-slate-900 text-sm">42</div>
-                  <div class="text-[10px] text-slate-400">Total</div>
-                </div>
-                <div class="p-2 bg-emerald-50 rounded-lg border border-emerald-100">
-                  <div class="font-bold text-emerald-700 text-sm">30</div>
-                  <div class="text-[10px] text-emerald-600">Ready</div>
-                </div>
-                <div class="p-2 bg-amber-50 rounded-lg border border-amber-100">
-                  <div class="font-bold text-amber-700 text-sm">12</div>
-                  <div class="text-[10px] text-amber-600">Upskill</div>
-                </div>
-              </div>
-
-              <div class="text-[11px] text-slate-600 space-y-1">
-                <div class="font-medium text-slate-700">Priority Training:</div>
-                <div class="text-slate-500">• REST API Development</div>
-                <div class="text-slate-500">• Docker & Containers</div>
-                <div class="text-slate-500">• Cloud Deployment</div>
-              </div>
-            </div>
-
-            <button onclick="navigateTo('faculty')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
-              View Faculty Needs →
-            </button>
-          </div>
-
-          <!-- 12. LABS & INFRASTRUCTURE -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
-            <div>
-              <div class="text-sm font-bold text-slate-900">Labs & Infrastructure</div>
-              <div class="text-[11px] text-slate-500">Readiness for required skills</div>
-
-              <div class="space-y-2 my-3 text-xs">
-                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
-                  <span class="text-slate-700">Cloud Environment</span>
-                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">Available</span>
-                </div>
-                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
-                  <span class="text-slate-700">API Development Lab</span>
-                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">Available</span>
-                </div>
-                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
-                  <span class="text-slate-700">Container / Docker Lab</span>
-                  <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Partial</span>
-                </div>
-                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded-lg">
-                  <span class="text-slate-700">Cloud Deployment</span>
-                  <span class="text-[10px] font-bold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded">Needs Review</span>
+              <div class="pt-2 text-xs">
+                <div class="font-bold text-slate-800 uppercase text-[11px] tracking-wider">Suggested Academic Response:</div>
+                <p class="text-slate-600 mt-1">Increase practical exposure across 4 specific domains:</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2 font-medium text-slate-800">
+                  <span class="p-2 rounded-lg bg-white border border-slate-200 text-center">&bull; Industry Projects</span>
+                  <span class="p-2 rounded-lg bg-white border border-slate-200 text-center">&bull; API Development</span>
+                  <span class="p-2 rounded-lg bg-white border border-slate-200 text-center">&bull; Docker Labs</span>
+                  <span class="p-2 rounded-lg bg-white border border-slate-200 text-center">&bull; Cloud Activities</span>
                 </div>
               </div>
             </div>
 
-            <button onclick="navigateTo('infrastructure')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
-              View Infrastructure →
-            </button>
-          </div>
+            <!-- Academic Action Registry -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Logged Academic Actions (Closed-Loop)</h4>
+              
+              <div class="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 bg-white text-xs">
+                <div class="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div class="font-semibold text-slate-900">Action: Docker &amp; Containerization Lab Integrated</div>
+                    <div class="text-[11px] text-slate-500">Target Semester: Semester IV &bull; Replaces 10 legacy VM hours</div>
+                  </div>
+                  <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[11px] font-semibold">Active in Term</span>
+                </div>
 
-          <!-- 13. STUDENT OUTCOMES -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
-            <div>
-              <div class="text-sm font-bold text-slate-900">Student Skill Outcomes</div>
-              <div class="text-[11px] text-slate-500">Cohort readiness benchmark</div>
-
-              <div class="space-y-1.5 my-3 text-xs">
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-500">Students Assessed:</span>
-                  <span class="font-bold text-slate-800">186</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-500">With Verified Skills:</span>
-                  <span class="font-bold text-emerald-600">124</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-500">Meeting Priority Skills:</span>
-                  <span class="font-bold text-brand-600">98</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-slate-500">Requiring Upskilling:</span>
-                  <span class="font-bold text-amber-600">62</span>
+                <div class="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2" id="action-item-rest">
+                  <div>
+                    <div class="font-semibold text-slate-900">Action: Capstone Project Evaluation via Live API Contracts</div>
+                    <div class="text-[11px] text-slate-500">Target Semester: Semester V &bull; Rubric updated with automated test suits</div>
+                  </div>
+                  <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[11px] font-semibold">Board Approved</span>
                 </div>
               </div>
             </div>
-
-            <button onclick="navigateTo('outcomes')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-1.5 px-3 rounded-xl text-xs transition">
-              View Student Outcomes →
-            </button>
           </div>
+        </section>
 
-          <!-- 14. INDUSTRY FEEDBACK -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm flex flex-col justify-between space-y-3">
-            <div>
-              <div class="text-sm font-bold text-slate-900">Industry Feedback</div>
-              <div class="text-[11px] text-slate-500">Employer outcome reports</div>
-
-              <div class="grid grid-cols-2 gap-2 my-3 text-center text-xs">
-                <div class="p-2 bg-slate-50 rounded-lg">
-                  <div class="font-bold text-slate-800">4.1 / 5</div>
-                  <div class="text-[10px] text-slate-400">Technical</div>
+        <!-- ============================================== -->
+        <!-- VIEW: INSTITUTION PROFILE -->
+        <!-- ============================================== -->
+        <section id="view-profile" class="view-panel hidden max-w-4xl mx-auto space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white font-bold text-xl flex items-center justify-center shadow-sm">
+                  IU
                 </div>
-                <div class="p-2 bg-slate-50 rounded-lg">
-                  <div class="font-bold text-slate-800">3.9 / 5</div>
-                  <div class="text-[10px] text-slate-400">Problem Solving</div>
-                </div>
-                <div class="p-2 bg-slate-50 rounded-lg">
-                  <div class="font-bold text-slate-800">4.0 / 5</div>
-                  <div class="text-[10px] text-slate-400">Communication</div>
-                </div>
-                <div class="p-2 bg-amber-50 rounded-lg border border-amber-100">
-                  <div class="font-bold text-amber-700">3.5 / 5</div>
-                  <div class="text-[10px] text-amber-700 font-medium">Production</div>
-                </div>
-              </div>
-
-              <div class="text-[10px] text-slate-500">
-                <strong class="text-slate-700">Insight:</strong> Production readiness is a recurring improvement area.
-              </div>
-            </div>
-
-            <button onclick="navigateTo('feedback')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition">
-              View Industry Feedback →
-            </button>
-          </div>
-
-        </div>
-
-        <!-- 24. QUICK ACTIONS CARD -->
-        <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900">Quick Actions</h2>
-            <p class="text-[11px] text-slate-500">Institutional alignment operations</p>
-          </div>
-
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <button onclick="navigateTo('curriculum')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
-              <span class="text-brand-600 text-sm">▣</span>
-              <span class="text-xs font-semibold text-slate-800">Analyze Curriculum</span>
-            </button>
-            <button onclick="navigateTo('gap-analysis')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
-              <span class="text-brand-600 text-sm">◌</span>
-              <span class="text-xs font-semibold text-slate-800">View Skill Gaps</span>
-            </button>
-            <button onclick="navigateTo('industry-demand')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
-              <span class="text-brand-600 text-sm">⌕</span>
-              <span class="text-xs font-semibold text-slate-800">Explore Demand</span>
-            </button>
-            <button onclick="navigateTo('recommendations')" class="p-3 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 rounded-xl text-left transition flex items-center gap-2.5">
-              <span class="text-brand-600 text-sm">↗</span>
-              <span class="text-xs font-semibold text-slate-800">Review Recs</span>
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: CURRICULUM (/college/curriculum)                                -->
-      <!-- ===================================================================== -->
-      <section id="view-curriculum" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
-          <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Curriculum</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage curriculum data and compare academic coverage with industry requirements.</p>
-          </div>
-          <button onclick="triggerUploadModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm flex items-center gap-2">
-            <span>+ Upload Curriculum</span>
-          </button>
-        </div>
-
-        <!-- Academic Info -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
-            <div>
-              <span class="text-[10px] font-bold text-brand-700 uppercase tracking-wider bg-brand-50 px-2 py-0.5 rounded">Active Department</span>
-              <h2 class="text-base font-bold text-slate-900 mt-1">MCA – Information Technology</h2>
-              <p class="text-xs text-slate-500">Current Academic Curriculum · Affiliated with Higher Education Framework</p>
-            </div>
-            <button onclick="runAICurriculumAnalysis()" id="btn-run-analysis" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl text-xs transition">
-              Run AI Curriculum Analysis
-            </button>
-          </div>
-
-          <!-- Subject Core Areas -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <div class="font-bold text-slate-800">Programming (Python & Java)</div>
-              <div class="text-[11px] text-slate-500">Core Object-Oriented Principles & Algorithms</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Industry Relevance: High</span>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <div class="font-bold text-slate-800">Database Systems</div>
-              <div class="text-[11px] text-slate-500">Relational Schemas, Normalization, Basic SQL</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Industry Relevance: High</span>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <div class="font-bold text-slate-800">Web Development</div>
-              <div class="text-[11px] text-slate-500">HTML/CSS, Static Scripts, Legacy Frameworks</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Industry Relevance: Medium</span>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <div class="font-bold text-slate-800">Software Engineering</div>
-              <div class="text-[11px] text-slate-500">SDLC, Waterfall & Basic Agile Methodologies</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded">Industry Relevance: Medium</span>
-            </div>
-            <div class="p-3.5 bg-rose-50/50 rounded-xl border border-rose-200 space-y-1">
-              <div class="font-bold text-slate-800">Cloud / Deployment</div>
-              <div class="text-[11px] text-slate-500">Virtual Machines, Linux Setup, Basics</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">Industry Relevance: Needs Review</span>
-            </div>
-            <div class="p-3.5 bg-rose-50/50 rounded-xl border border-rose-200 space-y-1">
-              <div class="font-bold text-slate-800">API Development</div>
-              <div class="text-[11px] text-slate-500">Monolithic controllers, unmapped REST services</div>
-              <span class="inline-block mt-2 text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">Industry Relevance: Needs Review</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Upload Curriculum Module -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-3">
-          <h3 class="text-sm font-bold text-slate-900">Upload Curriculum</h3>
-          <p class="text-xs text-slate-500">Supported prototype formats: PDF, Excel, Structured JSON data.</p>
-          <div class="border-2 border-dashed border-slate-300 hover:border-brand-600 rounded-xl p-6 text-center cursor-pointer transition" onclick="triggerUploadModal()">
-            <div class="text-2xl text-brand-600 mb-1">📄</div>
-            <div class="text-xs font-semibold text-slate-700">Drop your syllabus file here or <span class="text-brand-600">Browse files</span></div>
-            <div class="text-[11px] text-slate-400 mt-1">Syllabus will be ingested by the AI Skill Engine for extraction</div>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: AI GAP ANALYSIS (/college/gap-analysis)                         -->
-      <!-- ===================================================================== -->
-      <section id="view-gap-analysis" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
-          <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">AI Curriculum Gap Analysis</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Identify differences between academic coverage and industry skill requirements.</p>
-          </div>
-          <button onclick="navigateTo('recommendations')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
-            Generate Recommendations →
-          </button>
-        </div>
-
-        <!-- Gap Analysis Table -->
-        <div class="bg-white rounded-card border border-bordercol shadow-sm overflow-hidden">
-          <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-            <span class="font-bold text-xs text-slate-700">Competency Comparison Matrix</span>
-            <span class="text-[11px] text-slate-400">Benchmark Model: Backend & Software Engineering 2026</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider">
-                <tr>
-                  <th class="py-3 px-4 font-semibold">Skill</th>
-                  <th class="py-3 px-4 font-semibold">Curriculum Coverage</th>
-                  <th class="py-3 px-4 font-semibold">Industry Demand</th>
-                  <th class="py-3 px-4 font-semibold">Gap Classification</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium">
-                <tr>
-                  <td class="py-3 px-4 font-bold text-slate-900">Python</td>
-                  <td class="py-3 px-4 text-slate-600">85%</td>
-                  <td class="py-3 px-4 text-slate-600">90%</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Low Gap</span></td>
-                </tr>
-                <tr>
-                  <td class="py-3 px-4 font-bold text-slate-900">SQL</td>
-                  <td class="py-3 px-4 text-slate-600">80%</td>
-                  <td class="py-3 px-4 text-slate-600">85%</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Low Gap</span></td>
-                </tr>
-                <tr class="bg-rose-50/30">
-                  <td class="py-3 px-4 font-bold text-rose-900">REST API</td>
-                  <td class="py-3 px-4 text-slate-600">45%</td>
-                  <td class="py-3 px-4 text-slate-600">80%</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">High Gap (Priority)</span></td>
-                </tr>
-                <tr class="bg-rose-50/30">
-                  <td class="py-3 px-4 font-bold text-rose-900">Docker</td>
-                  <td class="py-3 px-4 text-slate-600">20%</td>
-                  <td class="py-3 px-4 text-slate-600">60%</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">High Gap (Priority)</span></td>
-                </tr>
-                <tr class="bg-rose-50/30">
-                  <td class="py-3 px-4 font-bold text-rose-900">Cloud</td>
-                  <td class="py-3 px-4 text-slate-600">25%</td>
-                  <td class="py-3 px-4 text-slate-600">60%</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">High Gap (Priority)</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="p-4 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-500">
-            * Note: SkillBridge generates advisory insights for institutional review. Final curriculum modification authority rests with the Academic Council.
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: INDUSTRY DEMAND (/college/industry-demand)                      -->
-      <!-- ===================================================================== -->
-      <section id="view-industry-demand" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Demand</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Understand the skills currently required across connected industry roles.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <!-- Role 1 -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">High Demand Role</span>
-                <h3 class="font-bold text-sm text-slate-900 mt-1">Junior Backend Developer</h3>
-              </div>
-              <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">High</span>
-            </div>
-
-            <div class="space-y-1.5 pt-2">
-              <div class="text-[11px] font-semibold text-slate-600">Required Skills:</div>
-              <div class="flex flex-wrap gap-1 text-xs">
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Python</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">SQL</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">REST API</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Docker</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Cloud</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Role 2 -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">Software Role</span>
-                <h3 class="font-bold text-sm text-slate-900 mt-1">Software Developer</h3>
-              </div>
-              <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">High</span>
-            </div>
-
-            <div class="space-y-1.5 pt-2">
-              <div class="text-[11px] font-semibold text-slate-600">Required Skills:</div>
-              <div class="flex flex-wrap gap-1 text-xs">
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Java</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">SQL</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">REST API</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Git</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Role 3 -->
-          <div class="bg-white rounded-card p-5 border border-bordercol shadow-sm space-y-3">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Infrastructure Role</span>
-                <h3 class="font-bold text-sm text-slate-900 mt-1">Cloud Developer</h3>
-              </div>
-              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Emerging</span>
-            </div>
-
-            <div class="space-y-1.5 pt-2">
-              <div class="text-[11px] font-semibold text-slate-600">Required Skills:</div>
-              <div class="flex flex-wrap gap-1 text-xs">
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Cloud</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Docker</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">Linux</span>
-                <span class="px-2 py-0.5 bg-slate-100 rounded">APIs</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="p-4 bg-white rounded-card border border-bordercol shadow-sm text-xs text-slate-600">
-          <strong class="text-slate-800">SkillBridge Methodology:</strong> Converts unstructured industry requirements and live corporate postings into normalized skill signals that can be directly mapped against college curricula and student diagnostic data.
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: CURRICULUM RECOMMENDATIONS (/college/recommendations)           -->
-      <!-- ===================================================================== -->
-      <section id="view-recommendations" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-bordercol">
-          <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Curriculum Recommendations</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">AI-generated recommendations for institutional review.</p>
-          </div>
-          <button onclick="markAllForReview()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition shadow-sm">
-            Mark for Academic Review
-          </button>
-        </div>
-
-        <!-- 4 Distinct Recommendation Cards -->
-        <div class="space-y-4">
-
-          <!-- 1. ADD -->
-          <div class="bg-white rounded-card p-5 border-l-4 border-l-emerald-500 border border-bordercol shadow-sm space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded uppercase">ADD Recommendation</span>
-              <span class="text-xs font-semibold text-slate-400">Target: MCA Sem 3</span>
-            </div>
-            <h3 class="font-bold text-base text-slate-900">REST API Development & Cloud Deployment</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs pt-1">
-              <div><span class="text-slate-400 font-medium">Reason:</span> <span class="text-slate-700">45% vs 80% coverage gap identified in candidate backend placements.</span></div>
-              <div><span class="text-slate-400 font-medium">Industry Signal:</span> <span class="text-slate-700 font-semibold text-emerald-700">High Demand across TechNova & FinTech openings.</span></div>
-              <div><span class="text-slate-400 font-medium">Suggested Action:</span> <span class="text-slate-700">Add 30 hours of hands-on RESTful service building lab sessions.</span></div>
-            </div>
-          </div>
-
-          <!-- 2. UPDATE -->
-          <div class="bg-white rounded-card p-5 border-l-4 border-l-blue-500 border border-bordercol shadow-sm space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded uppercase">UPDATE Recommendation</span>
-              <span class="text-xs font-semibold text-slate-400">Target: MCA Sem 2</span>
-            </div>
-            <h3 class="font-bold text-base text-slate-900">Modern API Architecture & Containerized Development</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs pt-1">
-              <div><span class="text-slate-400 font-medium">Reason:</span> <span class="text-slate-700">Shift from monolithic web modules to microservices and Docker containers.</span></div>
-              <div><span class="text-slate-400 font-medium">Industry Signal:</span> <span class="text-slate-700 font-semibold text-brand-700">Docker requested in 60% of modern software vacancies.</span></div>
-              <div><span class="text-slate-400 font-medium">Suggested Action:</span> <span class="text-slate-700">Update Lab exercises from local Apache server to Docker-based deployment.</span></div>
-            </div>
-          </div>
-
-          <!-- 3. REDUCE -->
-          <div class="bg-white rounded-card p-5 border-l-4 border-l-amber-500 border border-bordercol shadow-sm space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded uppercase">REDUCE Recommendation</span>
-              <span class="text-xs font-semibold text-slate-400">Target: MCA Sem 1</span>
-            </div>
-            <h3 class="font-bold text-base text-slate-900">Low-Demand Legacy Implementation Topics</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs pt-1">
-              <div><span class="text-slate-400 font-medium">Reason:</span> <span class="text-slate-700">Syllabus allocates 12 weeks to basic static HTML/XML rendering.</span></div>
-              <div><span class="text-slate-400 font-medium">Industry Signal:</span> <span class="text-slate-700 font-semibold text-amber-700">Negligible standalone requirement in enterprise engineering.</span></div>
-              <div><span class="text-slate-400 font-medium">Suggested Action:</span> <span class="text-slate-700">Compress credit hours by 50% to free up lab capacity for modern frameworks.</span></div>
-            </div>
-          </div>
-
-          <!-- 4. REPLACE -->
-          <div class="bg-white rounded-card p-5 border-l-4 border-l-rose-500 border border-bordercol shadow-sm space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded uppercase">REPLACE Recommendation</span>
-              <span class="text-xs font-semibold text-slate-400">Target: Practical Lab Manual</span>
-            </div>
-            <h3 class="font-bold text-base text-slate-900">Outdated Tooling or Approaches Where Justified</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs pt-1">
-              <div><span class="text-slate-400 font-medium">Reason:</span> <span class="text-slate-700">Use of deprecated IDE environments and obsolete servlet connectors.</span></div>
-              <div><span class="text-slate-400 font-medium">Industry Signal:</span> <span class="text-slate-700 font-semibold text-rose-700">Recruiters note freshers cannot configure modern CLI and container setups.</span></div>
-              <div><span class="text-slate-400 font-medium">Suggested Action:</span> <span class="text-slate-700">Replace manual compile exercises with automated CI/CD sandbox toolchains.</span></div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
-          <strong>Important Governance Note:</strong> The SkillBridge engine recommends modifications; institutional academic committees and the Board of Studies make the binding administrative decision.
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: FACULTY ENABLEMENT (/college/faculty)                           -->
-      <!-- ===================================================================== -->
-      <section id="view-faculty" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Faculty Enablement</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Identify faculty competency gaps and recommended upskilling.</p>
-        </div>
-
-        <!-- Faculty Competency Grid -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
-          <h2 class="text-sm font-bold text-slate-900">Faculty Competency & Upskilling Matrix</h2>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase text-[10px] tracking-wider">
-                <tr>
-                  <th class="py-3 px-4 font-semibold">Faculty Name</th>
-                  <th class="py-3 px-4 font-semibold">Current Competency</th>
-                  <th class="py-3 px-4 font-semibold">Industry Skill Gap</th>
-                  <th class="py-3 px-4 font-semibold">Recommended Training</th>
-                  <th class="py-3 px-4 font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium">
-                <tr>
-                  <td class="py-3.5 px-4 font-bold text-slate-900">Dr. Mehta</td>
-                  <td class="py-3.5 px-4 text-slate-600">Strong Python / SQL</td>
-                  <td class="py-3.5 px-4 text-rose-600 font-semibold">REST API</td>
-                  <td class="py-3.5 px-4 text-slate-700">REST API Development Training</td>
-                  <td class="py-3.5 px-4"><button onclick="showToast('Enrolled Dr. Mehta in REST API FDP workshop.')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold rounded-lg text-xs">Assign FDP</button></td>
-                </tr>
-                <tr>
-                  <td class="py-3.5 px-4 font-bold text-slate-900">Prof. Shah</td>
-                  <td class="py-3.5 px-4 text-slate-600">Java / Web</td>
-                  <td class="py-3.5 px-4 text-rose-600 font-semibold">Cloud</td>
-                  <td class="py-3.5 px-4 text-slate-700">Cloud Deployment FDP</td>
-                  <td class="py-3.5 px-4"><button onclick="showToast('Enrolled Prof. Shah in Cloud Deployment FDP.')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold rounded-lg text-xs">Assign FDP</button></td>
-                </tr>
-                <tr>
-                  <td class="py-3.5 px-4 font-bold text-slate-900">Dr. Trivedi</td>
-                  <td class="py-3.5 px-4 text-slate-600">Database Systems</td>
-                  <td class="py-3.5 px-4 text-amber-600 font-semibold">Docker</td>
-                  <td class="py-3.5 px-4 text-slate-700">Containerization Immersion</td>
-                  <td class="py-3.5 px-4"><button onclick="showToast('Enrolled Dr. Trivedi in Docker Immersion.')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold rounded-lg text-xs">Assign FDP</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Recommended FDP / Corporate Programs -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-3">
-          <h2 class="text-sm font-bold text-slate-900">Recommended FDP / Training Programs</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <span class="text-[10px] font-bold text-brand-700">Module 1</span>
-              <div class="font-bold text-slate-800 mt-1">REST API Development</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">5-Day Corporate Hands-on</div>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <span class="text-[10px] font-bold text-brand-700">Module 2</span>
-              <div class="font-bold text-slate-800 mt-1">Docker & Containers</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">Industry Sandbox Immersion</div>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <span class="text-[10px] font-bold text-brand-700">Module 3</span>
-              <div class="font-bold text-slate-800 mt-1">Cloud Deployment</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">AWS/Azure Academic Sync</div>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <span class="text-[10px] font-bold text-brand-700">Module 4</span>
-              <div class="font-bold text-slate-800 mt-1">Modern Backend Architecture</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">Microservices & Scaling</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: LABS & INFRASTRUCTURE (/college/infrastructure)                 -->
-      <!-- ===================================================================== -->
-      <section id="view-infrastructure" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Labs & Infrastructure</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Check whether institutional infrastructure supports emerging skill requirements.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <!-- Infrastructure Status -->
-          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
-            <h2 class="text-base font-bold text-slate-900">Lab Readiness Status</h2>
-
-            <div class="space-y-3 text-xs">
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
                 <div>
-                  <div class="font-bold text-slate-800">API Development Lab</div>
-                  <div class="text-[11px] text-slate-500">Postman, Python environments, mock endpoints</div>
+                  <h2 class="text-xl font-bold text-slate-900">ITM University</h2>
+                  <div class="text-xs text-slate-500">Higher Education Institution &bull; Vadodara, Gujarat</div>
                 </div>
-                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs">Available</span>
+              </div>
+              <button onclick="showToast('Institution profile changes require Chancellor / Registrar sign-off.')" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition self-start sm:self-auto">
+                Edit Institution Profile
+              </button>
+            </div>
+
+            <!-- Institution Data Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 uppercase tracking-wider text-[10px] font-bold block mb-1">Institution Type</span>
+                <span class="text-sm font-semibold text-slate-900">Higher Education Institution</span>
+                <div class="text-slate-500 mt-0.5">Accreditation: NAAC A+ &bull; AICTE Approved</div>
               </div>
 
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <div>
-                  <div class="font-bold text-slate-800">Docker / Container Lab</div>
-                  <div class="text-[11px] text-slate-500">Virtualization enabled, needs daemon configuration</div>
-                </div>
-                <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold rounded-lg text-xs">Partial</span>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 uppercase tracking-wider text-[10px] font-bold block mb-1">Campus Location</span>
+                <span class="text-sm font-semibold text-slate-900">Vadodara, Gujarat, India</span>
+                <div class="text-slate-500 mt-0.5">Western Regional Skill Development Zone</div>
               </div>
 
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <div>
-                  <div class="font-bold text-slate-800">Cloud Environment</div>
-                  <div class="text-[11px] text-slate-500">Cloud student credits active</div>
-                </div>
-                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs">Available</span>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 uppercase tracking-wider text-[10px] font-bold block mb-1">Primary Active Program</span>
+                <span class="text-sm font-semibold text-slate-900">MCA – Information Technology</span>
+                <div class="text-slate-500 mt-0.5">Faculty: 42 &bull; Active Students Assessed: 186</div>
               </div>
 
-              <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-200 flex justify-between items-center">
-                <div>
-                  <div class="font-bold text-slate-800">Deployment Infrastructure</div>
-                  <div class="text-[11px] text-slate-500">Production server sandbox missing</div>
-                </div>
-                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 font-bold rounded-lg text-xs">Needs Review</span>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 uppercase tracking-wider text-[10px] font-bold block mb-1">SkillBridge Linkage</span>
+                <span class="text-sm font-semibold text-blue-700">Prototype Demonstration Node</span>
+                <div class="text-slate-500 mt-0.5">Status: Active &bull; Closed-Loop Feedback Active</div>
               </div>
             </div>
-          </div>
 
-          <!-- Infrastructure Review Action -->
-          <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm flex flex-col justify-between space-y-4">
-            <div>
-              <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">Actionable Gap</span>
-              <h2 class="text-base font-bold text-slate-900 mt-1">Infrastructure Review & Provisioning</h2>
-              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                SkillBridge correlates syllabus recommendations with physical and cloud lab capabilities. Before approving advanced Cloud Deployment courses, ensure that student container sandboxes are activated.
+            <!-- Data Transparency Clause -->
+            <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200 text-xs text-blue-900 space-y-1.5">
+              <div class="font-bold flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i>
+                <span>SkillBridge Ecosystem Boundaries</span>
+              </div>
+              <p class="text-blue-800 leading-relaxed text-[11px]">
+                The College Dashboard exclusively models academic curriculum alignment, faculty upskilling, and aggregate outcomes. Fees, student timetables, hostels, and administrative ERP modules remain within ITM University's native systems.
               </p>
-
-              <div class="p-3 bg-blue-50/60 border border-blue-100 rounded-xl text-xs text-blue-900 mt-3 space-y-1">
-                <span class="font-bold">Recommendation:</span>
-                <div>Provision cloud-hosted sandbox environments to eliminate on-premise hardware limits.</div>
-              </div>
-            </div>
-
-            <button onclick="showToast('Cloud Sandbox Provisioning Request routed to IT Infrastructure department.')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs transition">
-              Provision Cloud Sandboxes
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: STUDENT OUTCOMES (/college/outcomes)                            -->
-      <!-- ===================================================================== -->
-      <section id="view-outcomes" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Student Outcomes</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Track student competency and employment-readiness signals.</p>
-        </div>
-
-        <!-- 4 Metric Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-3xl font-extrabold text-slate-900">186</div>
-            <div class="text-xs font-semibold text-slate-600 mt-1">Students Assessed</div>
-            <div class="text-[10px] text-slate-400 mt-1">Cohort baseline</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-3xl font-extrabold text-emerald-600">124</div>
-            <div class="text-xs font-semibold text-slate-600 mt-1">Verified Skills</div>
-            <div class="text-[10px] text-slate-400 mt-1">Demonstrated competency</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-3xl font-extrabold text-brand-600">98</div>
-            <div class="text-xs font-semibold text-slate-600 mt-1">Priority Skill Ready</div>
-            <div class="text-[10px] text-slate-400 mt-1">Fit for enterprise JDs</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-3xl font-extrabold text-amber-600">62</div>
-            <div class="text-xs font-semibold text-slate-600 mt-1">Upskilling Required</div>
-            <div class="text-[10px] text-slate-400 mt-1">Targeted roadmaps active</div>
-          </div>
-        </div>
-
-        <!-- Top Skill Gaps in Cohort -->
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-4">
-          <div class="flex justify-between items-center">
-            <h2 class="text-sm font-bold text-slate-900">Top Skill Gaps in Current Cohort</h2>
-            <button onclick="showToast('Displaying individual student skill gap breakdown.')" class="text-xs font-semibold text-brand-600 hover:underline">
-              View Student Skill Gaps →
-            </button>
-          </div>
-
-          <div class="space-y-3 text-xs">
-            <div>
-              <div class="flex justify-between font-semibold mb-1">
-                <span>REST API Development</span>
-                <span class="text-rose-600">55% of cohort has gap</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2">
-                <div class="bg-rose-500 h-2 rounded-full" style="width: 55%"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between font-semibold mb-1">
-                <span>Docker Containerization</span>
-                <span class="text-rose-600">80% of cohort has gap</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2">
-                <div class="bg-rose-500 h-2 rounded-full" style="width: 80%"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between font-semibold mb-1">
-                <span>Cloud Deployment</span>
-                <span class="text-amber-600">75% of cohort has gap</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2">
-                <div class="bg-amber-500 h-2 rounded-full" style="width: 75%"></div>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: INDUSTRY FEEDBACK (/college/feedback)                           -->
-      <!-- ===================================================================== -->
-      <section id="view-feedback" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Industry Feedback</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Employer feedback helps identify recurring competency and curriculum gaps.</p>
-        </div>
-
-        <!-- Scores Breakdown -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-2xl font-bold text-slate-900">4.1 <span class="text-xs text-slate-400">/ 5</span></div>
-            <div class="text-xs font-semibold text-slate-700 mt-1">Technical Skills</div>
-            <div class="text-[10px] text-emerald-600 mt-0.5">✓ Solid fundamentals</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-2xl font-bold text-slate-900">3.9 <span class="text-xs text-slate-400">/ 5</span></div>
-            <div class="text-xs font-semibold text-slate-700 mt-1">Problem Solving</div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Algorithmic readiness</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-2xl font-bold text-slate-900">4.0 <span class="text-xs text-slate-400">/ 5</span></div>
-            <div class="text-xs font-semibold text-slate-700 mt-1">Communication</div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Team interaction</div>
-          </div>
-          <div class="bg-white p-5 rounded-card border border-bordercol shadow-sm text-center">
-            <div class="text-2xl font-bold text-amber-600">3.5 <span class="text-xs text-slate-400">/ 5</span></div>
-            <div class="text-xs font-semibold text-slate-700 mt-1">Production Readiness</div>
-            <div class="text-[10px] text-amber-600 font-medium mt-0.5">⚠ Focus for curriculum</div>
-          </div>
-        </div>
-
-        <!-- Insight Card -->
-        <div class="bg-white rounded-card p-6 border-2 border-indigo-200 shadow-sm space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded">Closed-Loop Learning</span>
-            <span class="text-xs font-semibold text-slate-400">Post-Hire Cycle</span>
-          </div>
-
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Recurring Employer Feedback:</h2>
-            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-              "Students demonstrate strong fundamentals in Python and SQL, but need additional practical deployment experience with containers (Docker) and REST endpoint performance."
-            </p>
-          </div>
-
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-            <span class="font-bold text-slate-800">Recommended Institutional Action:</span>
-            <div class="text-slate-600">Review practical project and deployment exposure. Update MCA lab coursework to include Docker microservices.</div>
-          </div>
-
-          <div class="pt-2">
-            <button onclick="navigateTo('recommendations')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition shadow-sm">
-              Create Curriculum Review →
-            </button>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ===================================================================== -->
-      <!-- VIEW: INSTITUTION PROFILE (/college/profile)                          -->
-      <!-- ===================================================================== -->
-      <section id="view-profile" class="hidden space-y-6">
-        <div class="pb-2 border-b border-bordercol">
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Institution Profile</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage your institutional identity and department alignments.</p>
-        </div>
-
-        <div class="bg-white rounded-card p-6 border border-bordercol shadow-sm space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-200 text-brand-700 flex items-center justify-center font-black text-xl">
-              IU
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-slate-900">ITM University</h2>
-              <p class="text-xs text-slate-500">Higher Education Institution · Vadodara, Gujarat</p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-              <span class="text-slate-400 font-medium">Institution Type</span>
-              <div class="font-semibold text-slate-800 mt-1">Higher Education Institution</div>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-              <span class="text-slate-400 font-medium">Primary Campus Location</span>
-              <div class="font-semibold text-slate-800 mt-1">Vadodara, Gujarat</div>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <span class="text-xs font-semibold text-slate-700">Connected Programs:</span>
-            <div class="flex flex-wrap gap-2 text-xs">
-              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">MCA</span>
-              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">BCA</span>
-              <span class="px-3 py-1 bg-brand-50 text-brand-700 font-medium rounded-lg border border-brand-100">Computer Science / IT</span>
-            </div>
-          </div>
-
-          <div class="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-xl text-xs flex justify-between items-center">
-            <span class="font-semibold text-emerald-800">Industry Alignment Loop: Enabled</span>
-            <span class="text-[10px] font-bold text-emerald-700">Active</span>
-          </div>
-
-          <div class="pt-2">
-            <button onclick="alert('Institution profile editor opened in prototype mode.')" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl text-xs transition">
-              Edit Institution Profile
-            </button>
-          </div>
-        </div>
-      </section>
-
-    </main>
+      </main>
+    </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL: UPLOAD CURRICULUM                                                  -->
-  <!-- ========================================================================= -->
-  <div id="upload-modal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-card max-w-md w-full p-6 space-y-4 shadow-xl border border-bordercol">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-base text-slate-900">Upload Department Curriculum</h3>
-        <button onclick="closeModal('upload-modal')" class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
-      </div>
-      <div class="space-y-3 text-xs">
+  <!-- ============================================== -->
+  <!-- MODAL: REVIEW RECOMMENDATION -->
+  <!-- ============================================== -->
+  <div id="modal-recommendation" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
         <div>
-          <label class="block font-medium text-slate-700 mb-1">Select Program</label>
-          <select class="w-full border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
-            <option>MCA – Information Technology</option>
-            <option>BCA – Computer Applications</option>
-            <option>B.Tech – Computer Science</option>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600">Curriculum Advisory Review</span>
+          <h3 class="text-base font-bold text-slate-900" id="modal-rec-title">REST API Development</h3>
+        </div>
+        <button onclick="closeRecommendationReviewModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Intervention Type</div>
+          <span id="modal-rec-category" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded">ADD</span>
+        </div>
+
+        <div>
+          <div class="font-bold text-slate-900 mb-1">Justification / Reason:</div>
+          <p id="modal-rec-reason" class="text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+            High industry requirement and significant curriculum gap.
+          </p>
+        </div>
+
+        <div>
+          <div class="font-bold text-slate-900 mb-1">Suggested Academic Action:</div>
+          <p id="modal-rec-action" class="text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+            Add practical REST API development module with project-based assessment.
+          </p>
+        </div>
+
+        <div class="space-y-1.5 pt-2">
+          <label class="font-bold text-slate-900 block">Board of Studies Agenda Routing</label>
+          <select class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-blue-500">
+            <option>Academic Council — Next Quarterly Meeting</option>
+            <option>Information Technology Department Curriculum Review Board</option>
+            <option>Urgent Elective Fast-Track Approval</option>
           </select>
         </div>
+      </div>
+
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <button onclick="closeRecommendationReviewModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 font-semibold text-xs transition">
+          Dismiss
+        </button>
+        <button onclick="endorseRecommendation()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition flex items-center gap-1.5">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          Endorse for Board of Studies
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CREATE ACADEMIC ACTION PLAN (CLOSE-THE-LOOP) -->
+  <!-- ============================================== -->
+  <div id="modal-action-plan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
         <div>
-          <label class="block font-medium text-slate-700 mb-1">Upload Syllabus File (PDF or Excel)</label>
-          <input type="file" class="w-full border border-slate-200 rounded-xl p-2 text-xs">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600">Close the Loop</span>
+          <h3 class="text-base font-bold text-slate-900">Create Academic Action Plan</h3>
+        </div>
+        <button onclick="closeActionPlanModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700">
+        <p class="text-slate-600">
+          Translate employer feedback on <span class="font-bold text-slate-900">&ldquo;Production Readiness (3.5/5)&rdquo;</span> directly into a concrete academic intervention.
+        </p>
+
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-900 block">Intervention Scope</label>
+          <input type="text" id="action-plan-title" value="Mandatory Cloud & Container Deployment Lab" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-900 block">Curriculum Component</label>
+          <select id="action-plan-course" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-blue-500">
+            <option>MCA-402: Advanced Web Technologies Lab</option>
+            <option>MCA-501: Cloud Computing & Distributed Systems</option>
+            <option>MCA-505: Capstone Project Evaluation</option>
+          </select>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-900 block">Faculty Lead</label>
+          <input type="text" value="Dr. M. K. Sharma (Dept. of Computer Applications)" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] text-blue-900">
+          Completing this action registers an evidence-linked improvement on the next accreditation cycle.
         </div>
       </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeModal('upload-modal')" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Cancel</button>
-        <button onclick="submitUploadDemo()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold">Upload & Analyze</button>
+
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <button onclick="closeActionPlanModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 font-semibold text-xs transition">
+          Cancel
+        </button>
+        <button onclick="submitActionPlan()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition flex items-center gap-1.5">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          Register Academic Action
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300">
-    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs flex items-center gap-2.5">
-      <span class="text-emerald-400 font-bold" id="toast-icon">✓</span>
-      <span id="toast-message">Action completed successfully.</span>
-    </div>
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg border border-slate-800 flex items-center gap-2.5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-message">Notification message</span>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: ROUTING & DEMO STATE MACHINE                                 -->
-  <!-- ========================================================================= -->
   <script>
-    // Valid view routes
-    const routes = [
-      'dashboard',
-      'curriculum',
-      'gap-analysis',
-      'industry-demand',
-      'recommendations',
-      'faculty',
-      'infrastructure',
-      'outcomes',
-      'feedback',
-      'profile'
-    ];
-    let currentRoute = 'dashboard';
+    // State management
+    const state = {
+      currentRoute: 'dashboard',
+      facultyBatchEnrolled: false
+    };
 
-    // Navigation function
+    // Route title mappings
+    const routeTitles = {
+      'dashboard': 'College Dashboard',
+      'curriculum': 'Curriculum Review & Coverage',
+      'skill-gap': 'AI Curriculum Gap Analysis',
+      'recommendations': 'AI Curriculum Recommendations',
+      'faculty': 'Faculty Enablement & Training',
+      'outcomes': 'Student Outcomes & Competencies',
+      'feedback': 'Industry & Employer Feedback',
+      'profile': 'Institution Profile — ITM University'
+    };
+
+    // SPA View Router
     function navigateTo(route) {
-      if (!routes.includes(route)) return;
-      currentRoute = route;
+      state.currentRoute = route;
 
-      // Update visibility of main view sections
-      routes.forEach(r => {
-        const viewEl = document.getElementById(`view-${r}`);
-        const navEl = document.getElementById(`nav-${r}`);
+      // Update page title
+      const titleEl = document.getElementById('page-title');
+      if (titleEl && routeTitles[route]) {
+        titleEl.textContent = routeTitles[route];
+      }
 
-        if (viewEl) {
-          if (r === route) {
-            viewEl.classList.remove('hidden');
-          } else {
-            viewEl.classList.add('hidden');
-          }
-        }
+      // Hide all panels
+      document.querySelectorAll('.view-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
 
-        if (navEl) {
-          if (r === route) {
-            navEl.classList.add('nav-active');
-          } else {
-            navEl.classList.remove('nav-active');
-          }
+      // Show requested panel
+      const targetView = document.getElementById(`view-${route}`);
+      if (targetView) {
+        targetView.classList.remove('hidden');
+      }
+
+      // Update sidebar visual active state
+      document.querySelectorAll('#sidebar-nav .nav-item').forEach(item => {
+        const itemRoute = item.getAttribute('data-route');
+        if (itemRoute === route) {
+          item.className = 'nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-blue-700 bg-blue-50 transition';
+        } else {
+          item.className = 'nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition';
         }
       });
 
-      // Close mobile sidebar on navigation
-      document.getElementById('sidebar').classList.add('-translate-x-full');
-      document.getElementById('sidebar-backdrop').classList.add('hidden');
+      // Re-trigger icon parsing
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
 
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll viewport to top
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.scrollTop = 0;
     }
 
-    // Toggle Sidebar for mobile view
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const backdrop = document.getElementById('sidebar-backdrop');
-      sidebar.classList.toggle('-translate-x-full');
-      backdrop.classList.toggle('hidden');
+    // Modal Handlers: Recommendation Review
+    function openRecommendationReviewModal(title, category, reason, action) {
+      document.getElementById('modal-rec-title').textContent = title;
+      document.getElementById('modal-rec-category').textContent = category;
+      document.getElementById('modal-rec-reason').textContent = reason;
+      document.getElementById('modal-rec-action').textContent = action;
+      document.getElementById('modal-recommendation').classList.remove('hidden');
     }
 
-    // Modal controls
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
-    function triggerUploadModal() {
-      openModal('upload-modal');
+    function closeRecommendationReviewModal() {
+      document.getElementById('modal-recommendation').classList.add('hidden');
     }
 
-    // Trigger Toast Notification
-    function showToast(message, isSuccess = true) {
-      const toast = document.getElementById('toast');
-      const msg = document.getElementById('toast-message');
-      const icon = document.getElementById('toast-icon');
-
-      msg.innerText = message;
-      icon.innerText = isSuccess ? '✓' : 'ℹ';
-      toast.classList.remove('hidden');
-
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3500);
+    function endorseRecommendation() {
+      closeRecommendationReviewModal();
+      showToast('Recommendation successfully endorsed for Board of Studies consideration!');
     }
 
-    // Demo Action: Run AI Analysis
-    function runAICurriculumAnalysis() {
+    // Modal Handlers: Academic Action Plan (Close the loop)
+    function openActionPlanModal() {
+      document.getElementById('modal-action-plan').classList.remove('hidden');
+    }
+
+    function closeActionPlanModal() {
+      document.getElementById('modal-action-plan').classList.add('hidden');
+    }
+
+    function submitActionPlan() {
+      closeActionPlanModal();
+      showToast('Academic Action Plan logged! Continuous curriculum improvement loop completed.');
+    }
+
+    // Interactive Demo Simulation: Faculty Cohort Enrollment
+    function enrollFacultyBatch() {
+      if (state.facultyBatchEnrolled) {
+        showToast('All 12 recommended faculty are already enrolled in active training cohorts.');
+        return;
+      }
+      state.facultyBatchEnrolled = true;
+      document.getElementById('stat-faculty-aligned').textContent = '42';
+      document.getElementById('stat-faculty-needed').textContent = '0 in Queue';
+      document.getElementById('faculty-enroll-text').textContent = '12 Faculty Enrolled (In Progress)';
+      document.getElementById('btn-faculty-batch').className = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-sm transition';
+      showToast('Enrolled 12 faculty in REST API & Docker enablement tracks!');
+    }
+
+    // Interactive Demo Simulation: Run Curriculum Analysis
+    function runCurriculumAnalysis() {
       const btn = document.getElementById('btn-run-analysis');
-      btn.innerText = "Analyzing Curriculum...";
-      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Analyzing Syllabus...';
+      if (window.lucide) window.lucide.createIcons();
 
       setTimeout(() => {
-        btn.innerText = "✓ Analysis Complete";
-        btn.classList.replace('bg-slate-900', 'bg-emerald-600');
-        showToast("AI Extraction Complete: 3 priority skill gaps detected vs market demand.");
-        navigateTo('gap-analysis');
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Analysis Up-to-Date';
+        btn.className = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-sm transition';
+        if (window.lucide) window.lucide.createIcons();
+        showToast('AI Curriculum Analysis refreshed across 124 industry vacancy competencies.');
       }, 700);
     }
 
-    // Demo Action: Submit Upload
-    function submitUploadDemo() {
-      closeModal('upload-modal');
-      showToast("Syllabus uploaded successfully! Parsing topics into AI Skill Engine.");
-      runAICurriculumAnalysis();
+    // Toast utility
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toast-message');
+      if (!toast || !msgEl) return;
+
+      msgEl.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
     }
 
-    // Demo Action: Mark All For Review
-    function markAllForReview() {
-      showToast("All 4 curriculum recommendations marked for Academic Council review.");
-    }
-
-    // Logout Demo Action
-    function logoutDemo() {
-      if (confirm("Reset prototype session and return to dashboard?")) {
-        navigateTo('dashboard');
-        showToast("Session reset to initial demo state.");
+    // Initial setup on load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        window.lucide.createIcons();
       }
-    }
+    });
   </script>
 </body>
 </html>
