@@ -284,7 +284,7 @@
                 <p id="competencyText">Assessment completed.</p>
             </div>
             <div style="margin-top:16px;display:flex;justify-content:flex-end;">
-                <button id="backToDashboardBtn" class="secondary">Back to Student Dashboard</button>
+                <button id="backToDashboardBtn" onclick="student()" class="secondary">Back to Student Dashboard</button>
             </div>
         </section>
     </main>
@@ -362,6 +362,11 @@
         const icon = type === "violation" ? "🔴" : type === "warning" ? "⚠" : "✓";
         row.textContent = `[${new Date().toLocaleTimeString()}] ${icon} ${message}`;
         logs.prepend(row);
+    }
+    
+    function student() {
+      window.location.href = 'Student_dashboard.html';
+      
     }
 
     function showViolation(message) {
